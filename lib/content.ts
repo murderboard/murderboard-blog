@@ -1,0 +1,62 @@
+import { promises as fs } from "node:fs";
+import path from "node:path";
+
+import matter from "gray-matter";
+import { remark } from "remark";
+import remarkHtml from "remark-html";
+
+const entriesDirectory = path.join(process.cwd(), "content", "entries");
+
+type EntryFrontmatter = {
+  title: string;
+  slug: string;
+  category: string;
+  status: string;
+  episodes: number;
+  excerpt: string;
+  order: number;
+  accent?: string;
+  coverImage?: string;
+};
+
+export type Entry = EntryFrontmatter & {
+  html: string;
+};
+
+async function markdownToHtml(markdown: string) {
+  const processed = await remark().use(remarkHtml).process(markdown);
+  return processed.toString();
+}
+
+export async function getAllEntries(): Promise<Entry[]> {
+  const fileNames = await fs.readdir(entriesDirectory);
+  const entries = await Promise.all(
+    fileNames
+      .filter((fileName) => fileName.endsWith(".md"))
+      .map(async (fileName) => {
+        const fullPath = path.join(entriesDirectory, fileName);
+        const fileContents = await fs.readFile(fullPath, "utf8");
+        const { data, content } = matter(fileContents);
+        const frontmatter = data as Partial<EntryFrontmatter>;
+
+        if (!frontmatter.title || !frontmatter.slug) {
+          throw new Error(`Missing required frontmatter in ${fileName}`);
+        }
+
+        return {
+          title: frontmatter.title,
+          slug: frontmatter.slug,
+          category: frontmatter.category ?? "Investigation",
+          status: frontmatter.status ?? "Open",
+          episodes: frontmatter.episodes ?? 1,
+          excerpt: frontmatter.excerpt ?? "",
+          order: frontmatter.order ?? Number.MAX_SAFE_INTEGER,
+          accent: frontmatter.accent ?? "#ffd83d",
+          coverImage: frontmatter.coverImage,
+          html: await markdownToHtml(content),
+        } satisfies Entry;
+      }),
+  );
+
+  return entries.sort((left, right) => left.order - right.order);
+}
