@@ -1,6 +1,11 @@
 {
   "dependencies": [
     {
+      "name": "@stylistic/eslint-plugin",
+      "version": "^2",
+      "type": "build"
+    },
+    {
       "name": "@types/node",
       "version": "^16",
       "type": "build"
@@ -14,8 +19,35 @@
       "type": "build"
     },
     {
+      "name": "@typescript-eslint/eslint-plugin",
+      "version": "^8",
+      "type": "build"
+    },
+    {
+      "name": "@typescript-eslint/parser",
+      "version": "^8",
+      "type": "build"
+    },
+    {
       "name": "constructs",
       "version": "^10.0.0",
+      "type": "build"
+    },
+    {
+      "name": "eslint-import-resolver-typescript",
+      "type": "build"
+    },
+    {
+      "name": "eslint-plugin-import",
+      "type": "build"
+    },
+    {
+      "name": "eslint",
+      "version": "^9",
+      "type": "build"
+    },
+    {
+      "name": "gh-pages",
       "type": "build"
     },
     {
@@ -35,11 +67,23 @@
       "type": "runtime"
     },
     {
+      "name": "gray-matter",
+      "type": "runtime"
+    },
+    {
       "name": "next",
       "type": "runtime"
     },
     {
+      "name": "next-seo",
+      "type": "runtime"
+    },
+    {
       "name": "postcss",
+      "type": "runtime"
+    },
+    {
+      "name": "preline",
       "type": "runtime"
     },
     {
@@ -51,7 +95,20 @@
       "type": "runtime"
     },
     {
+      "name": "react-markdown",
+      "type": "runtime"
+    },
+    {
+      "name": "remark",
+      "type": "runtime"
+    },
+    {
+      "name": "remark-html",
+      "type": "runtime"
+    },
+    {
       "name": "tailwindcss",
+      "version": "^3",
       "type": "runtime"
     }
   ],

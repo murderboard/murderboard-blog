@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* @layer base {
+    body {
+      @apply dark:bg-gray-800 bg-white;
+    }
+  } */
+
+html,
+body {
+  min-height: 100vh;
+}
