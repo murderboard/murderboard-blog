@@ -7,16 +7,25 @@ import remarkHtml from "remark-html";
 
 const entriesDirectory = path.join(process.cwd(), "content", "entries");
 
+export type Episode = {
+  title: string;
+  url: string;
+  date?: string;
+};
+
 type EntryFrontmatter = {
   title: string;
   slug: string;
   category: string;
   status: string;
-  episodes: number;
+  episodes: Episode[];
   excerpt: string;
   order: number;
   accent?: string;
   coverImage?: string;
+  substackUrl?: string;
+  murderboardUrl?: string;
+  featured?: boolean;
 };
 
 export type Entry = EntryFrontmatter & {
@@ -26,6 +35,34 @@ export type Entry = EntryFrontmatter & {
 async function markdownToHtml(markdown: string) {
   const processed = await remark().use(remarkHtml).process(markdown);
   return processed.toString();
+}
+
+export async function getEntry(slug: string): Promise<Entry | null> {
+  const fileNames = await fs.readdir(entriesDirectory);
+  const match = fileNames.find((f) => f.endsWith(".md") && f.replace(/\.md$/, "") === slug);
+  if (!match) return null;
+  const fullPath = path.join(entriesDirectory, match);
+  const fileContents = await fs.readFile(fullPath, "utf8");
+  const { data, content } = matter(fileContents);
+  const frontmatter = data as Partial<EntryFrontmatter>;
+  if (!frontmatter.title || !frontmatter.slug) {
+    throw new Error(`Missing required frontmatter in ${match}`);
+  }
+  return {
+    title: frontmatter.title,
+    slug: frontmatter.slug,
+    category: frontmatter.category ?? "Investigation",
+    status: frontmatter.status ?? "Open",
+    episodes: frontmatter.episodes ?? [],
+    excerpt: frontmatter.excerpt ?? "",
+    order: frontmatter.order ?? Number.MAX_SAFE_INTEGER,
+    accent: frontmatter.accent ?? "#ffd83d",
+    coverImage: frontmatter.coverImage,
+    substackUrl: frontmatter.substackUrl,
+    murderboardUrl: frontmatter.murderboardUrl,
+    featured: frontmatter.featured ?? false,
+    html: await markdownToHtml(content),
+  } satisfies Entry;
 }
 
 export async function getAllEntries(): Promise<Entry[]> {
@@ -48,11 +85,14 @@ export async function getAllEntries(): Promise<Entry[]> {
           slug: frontmatter.slug,
           category: frontmatter.category ?? "Investigation",
           status: frontmatter.status ?? "Open",
-          episodes: frontmatter.episodes ?? 1,
+          episodes: frontmatter.episodes ?? [],
           excerpt: frontmatter.excerpt ?? "",
           order: frontmatter.order ?? Number.MAX_SAFE_INTEGER,
           accent: frontmatter.accent ?? "#ffd83d",
           coverImage: frontmatter.coverImage,
+          substackUrl: frontmatter.substackUrl,
+          murderboardUrl: frontmatter.murderboardUrl,
+          featured: frontmatter.featured ?? false,
           html: await markdownToHtml(content),
         } satisfies Entry;
       }),

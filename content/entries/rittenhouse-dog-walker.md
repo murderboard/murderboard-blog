@@ -3,11 +3,20 @@ title: The Rittenhouse Dog Walker
 slug: rittenhouse-dog-walker
 category: Mystery
 status: Ongoing
-episodes: 8
 excerpt: A missing manuscript, a dead novelist, and a dog walker who keeps noticing the details other people step over.
 order: 1
+featured: true
 accent: '#ed1c2e'
 coverImage: /assets/rittenhouse-banner.png
+substackUrl: https://yoursubstack.substack.com/s/rittenhouse-dog-walker
+murderboardUrl: /murderboards/rittenhouse-dog-walker/board.html
+episodes:
+  - title: 'Episode 1: The Alley'
+    url: https://yoursubstack.substack.com/p/rittenhouse-episode-1
+    date: '2026-01-04'
+  - title: 'Episode 2: The Manuscript'
+    url: https://yoursubstack.substack.com/p/rittenhouse-episode-2
+    date: '2026-01-11'
 ---
 
 ## Opening note

@@ -1,17 +1,16 @@
-import type { CSSProperties } from "react";
 import Image from "next/image";
 
 import { getAllEntries } from "@/lib/content";
 
-const stats = [
-  "3 active investigations",
-  "Markdown-controlled case files",
-  "Static export ready for GitHub Pages",
+const stats: string[] = [
+  // "3 active investigations",
+  // "Markdown-controlled case files",
+  // "Static export ready for GitHub Pages",
 ];
 
 export default async function HomePage() {
   const entries = await getAllEntries();
-  const featured = entries[0];
+  const featured = entries.find((entry) => entry.featured) ?? entries[0];
 
   return (
     <main>
@@ -31,7 +30,6 @@ export default async function HomePage() {
         <div className="site-nav__links">
           <a href="#about">About</a>
           <a href="#series">On the Board</a>
-          <a href="#case-files">Case Files</a>
         </div>
       </nav>
 
@@ -52,7 +50,7 @@ export default async function HomePage() {
             <a className="button button--primary" href="#series">
               Browse active cases
             </a>
-            <a className="button button--ghost" href="#case-files">
+            <a className="button button--ghost" href="#series">
               Read the files
             </a>
           </div>
@@ -81,7 +79,7 @@ export default async function HomePage() {
                 <p className="feature-card__meta">Featured file</p>
                 <h2>{featured.title}</h2>
                 <p>{featured.excerpt}</p>
-                <a href={`#${featured.slug}`}>Open file</a>
+                <a href={`/series/${featured.slug}`}>Open file</a>
               </div>
             </div>
           </aside>
@@ -148,53 +146,11 @@ export default async function HomePage() {
                 <h3>{entry.title}</h3>
                 <p>{entry.excerpt}</p>
                 <div className="series-card__footer">
-                  <span>{entry.episodes} episodes</span>
-                  <a href={`#${entry.slug}`}>Read case file</a>
+                  <span>{entry.episodes.length} episodes</span>
+                  <a href={`/series/${entry.slug}`}>Read case file</a>
                 </div>
               </div>
               <div className="series-card__index">{String(index + 1).padStart(2, "0")}</div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section id="case-files" className="case-files shell">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Case files</p>
-            <h2>Rendered from markdown</h2>
-          </div>
-          <p className="section-heading__aside">Long-form copy lives in markdown; the page layout stays in React and CSS.</p>
-        </div>
-
-        <div className="case-files__list">
-          {entries.map((entry) => (
-            <article
-              key={entry.slug}
-              id={entry.slug}
-              className="case-file tape tape--right"
-              style={{ "--entry-accent": entry.accent } as CSSProperties}
-            >
-              <div className="case-file__header">
-                <div>
-                  <p className="eyebrow">{entry.category}</p>
-                  <h3>{entry.title}</h3>
-                </div>
-                <dl>
-                  <div>
-                    <dt>Status</dt>
-                    <dd>{entry.status}</dd>
-                  </div>
-                  <div>
-                    <dt>Episodes</dt>
-                    <dd>{entry.episodes}</dd>
-                  </div>
-                </dl>
-              </div>
-              <div
-                className="case-file__body"
-                dangerouslySetInnerHTML={{ __html: entry.html }}
-              />
             </article>
           ))}
         </div>

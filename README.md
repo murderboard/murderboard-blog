@@ -18,7 +18,7 @@ npm run dev
 
 ## Content editing
 
-Each markdown file in `content/entries` contains frontmatter plus body copy.
+Each series/volume is one markdown file in `content/entries`. The frontmatter drives both its homepage card and its `/series/<slug>` detail page.
 
 ```md
 ---
@@ -26,19 +26,40 @@ title: Example Case
 slug: example-case
 category: Mystery
 status: Ongoing
-episodes: 5
 excerpt: Short summary for the card.
 order: 10
 accent: '#ed1c2e'
 coverImage: /assets/example.png
+substackUrl: https://yoursubstack.substack.com/s/example-case
+murderboardUrl: /murderboards/example-case/board.html
+episodes:
+  - title: 'Episode 1: The Setup'
+    url: https://yoursubstack.substack.com/p/example-episode-1
+    date: '2026-01-01'
+  - title: 'Episode 2: The Twist'
+    url: https://yoursubstack.substack.com/p/example-episode-2
+    date: '2026-01-08'
 ---
 
 ## Body copy
 
-Write markdown here.
+Write markdown here. This becomes the long-form intro on the series detail page.
 ```
 
-Required fields are `title` and `slug`. The rest have defaults.
+Required fields are `title` and `slug`. Everything else has a default — `episodes` defaults to an empty list.
+
+- `substackUrl` — link to the series on Substack; rendered as a "Follow on Substack" button on the detail page.
+- `episodes` — each entry's `url` should point straight at the published Substack post; these render as a list on the detail page.
+- `order` controls the homepage display order (lower first).
+- `featured: true` pins a series as the homepage hero card. Only one series should be marked featured; if none are, the first by `order` is used.
+
+To add a new series: create a new `.md` file in `content/entries`, give it a unique `slug`, and add episodes to the list as they're published — no other code changes needed.
+
+## Interactive murder boards (static HTML)
+
+Standalone interactive board pages live under `public/murderboards/<slug>/` as plain `.html` files (e.g. `public/murderboards/example-case/board.html`). Next.js copies everything in `public/` into the static export untouched, so these are served as-is at `/murderboards/<slug>/board.html`.
+
+Point a series at its board with the `murderboardUrl` frontmatter field; if present, the detail page shows an "Open interactive murder board" button linking to it.
 
 ## GitHub Pages
 

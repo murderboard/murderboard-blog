@@ -3,10 +3,11 @@ title: The Hargrove Inheritance
 slug: the-hargrove-inheritance
 category: Gothic Noir
 status: In development
-episodes: 6
 excerpt: An estate dispute turns feral when a handwritten codicil names an heir nobody in the family will admit exists.
 order: 2
 accent: '#ffd83d'
+substackUrl: https://yoursubstack.substack.com/s/the-hargrove-inheritance
+episodes: []
 ---
 
 ## Estate inventory

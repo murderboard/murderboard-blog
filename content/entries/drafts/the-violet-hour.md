@@ -3,10 +3,14 @@ title: The Violet Hour Tape
 slug: the-violet-hour-tape
 category: Conspiracy
 status: Cold case reopened
-episodes: 4
 excerpt: A vanished radio host leaves behind one unlabeled cassette and a city convinced it heard something different that night.
 order: 3
 accent: '#5fb7ff'
+substackUrl: https://yoursubstack.substack.com/s/the-violet-hour-tape
+episodes:
+  - title: 'Episode 1: Dead Air'
+    url: https://yoursubstack.substack.com/p/violet-hour-episode-1
+    date: '2026-02-02'
 ---
 
 ## Broadcast log
