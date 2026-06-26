@@ -102,13 +102,35 @@ export default async function SeriesPage({ params }: { params: Promise<{ slug: s
           <ol>
             {entry.episodes.map((episode) => (
               <li key={episode.url} className="episode-list__item">
-                <a href={episode.url} target="_blank" rel="noreferrer">
-                  {episode.title}
-                </a>
-                {episode.date ? <span className="episode-list__date">{episode.date}</span> : null}
+                <div className="episode-list__heading">
+                  <span className="episode-list__title">{episode.title}</span>
+                  {episode.date ? <span className="episode-list__date">{episode.date}</span> : null}
+                </div>
+                <div className="episode-list__actions">
+                  <a className="button button--primary" href={episode.url} target="_blank" rel="noreferrer">
+                    Read on Substack
+                  </a>
+                  {episode.murderboardUrl ? (
+                    <a className="button button--ghost" href={episode.murderboardUrl} target="_blank" rel="noreferrer">
+                      View murder board
+                    </a>
+                  ) : null}
+                </div>
               </li>
             ))}
           </ol>
+        </section>
+      ) : null}
+
+      {entry.subscribeUrl ? (
+        <section className="subscribe shell">
+          <div className="subscribe__panel tape tape--left">
+            <p className="eyebrow">Don&apos;t miss the next episode</p>
+            <h2>Subscribe to {entry.title}</h2>
+            <a className="button button--primary" href={entry.subscribeUrl} target="_blank" rel="noreferrer">
+              Subscribe on Substack
+            </a>
+          </div>
         </section>
       ) : null}
     </main>

@@ -10,10 +10,12 @@ accent: '#ed1c2e'
 coverImage: /assets/rittenhouse-banner.png
 substackUrl: https://yoursubstack.substack.com/s/rittenhouse-dog-walker
 murderboardUrl: /murderboards/rittenhouse-dog-walker/board.html
+subscribeUrl: https://yoursubstack.substack.com/subscribe
 episodes:
   - title: 'Episode 1: The Alley'
     url: https://yoursubstack.substack.com/p/rittenhouse-episode-1
     date: '2026-01-04'
+    murderboardUrl: /murderboards/rittenhouse-dog-walker/episode-1.html
   - title: 'Episode 2: The Manuscript'
     url: https://yoursubstack.substack.com/p/rittenhouse-episode-2
     date: '2026-01-11'

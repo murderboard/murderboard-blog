@@ -32,10 +32,12 @@ accent: '#ed1c2e'
 coverImage: /assets/example.png
 substackUrl: https://yoursubstack.substack.com/s/example-case
 murderboardUrl: /murderboards/example-case/board.html
+subscribeUrl: https://yoursubstack.substack.com/subscribe
 episodes:
   - title: 'Episode 1: The Setup'
     url: https://yoursubstack.substack.com/p/example-episode-1
     date: '2026-01-01'
+    murderboardUrl: /murderboards/example-case/episode-1.html
   - title: 'Episode 2: The Twist'
     url: https://yoursubstack.substack.com/p/example-episode-2
     date: '2026-01-08'
@@ -49,7 +51,8 @@ Write markdown here. This becomes the long-form intro on the series detail page.
 Required fields are `title` and `slug`. Everything else has a default — `episodes` defaults to an empty list.
 
 - `substackUrl` — link to the series on Substack; rendered as a "Follow on Substack" button on the detail page.
-- `episodes` — each entry's `url` should point straight at the published Substack post; these render as a list on the detail page.
+- `subscribeUrl` — link to the Substack subscribe page; if present, shows a "Subscribe" section below the episode list.
+- `episodes` — each entry needs `title` and `url` (the published Substack post). Optional `date` and `murderboardUrl` (a per-episode interactive board). Each renders as "Read on Substack" and, if set, "View murder board" buttons.
 - `order` controls the homepage display order (lower first).
 - `featured: true` pins a series as the homepage hero card. Only one series should be marked featured; if none are, the first by `order` is used.
 

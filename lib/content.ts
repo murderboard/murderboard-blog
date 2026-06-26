@@ -11,6 +11,7 @@ export type Episode = {
   title: string;
   url: string;
   date?: string;
+  murderboardUrl?: string;
 };
 
 type EntryFrontmatter = {
@@ -25,6 +26,7 @@ type EntryFrontmatter = {
   coverImage?: string;
   substackUrl?: string;
   murderboardUrl?: string;
+  subscribeUrl?: string;
   featured?: boolean;
 };
 
@@ -60,6 +62,7 @@ export async function getEntry(slug: string): Promise<Entry | null> {
     coverImage: frontmatter.coverImage,
     substackUrl: frontmatter.substackUrl,
     murderboardUrl: frontmatter.murderboardUrl,
+    subscribeUrl: frontmatter.subscribeUrl,
     featured: frontmatter.featured ?? false,
     html: await markdownToHtml(content),
   } satisfies Entry;
@@ -92,6 +95,7 @@ export async function getAllEntries(): Promise<Entry[]> {
           coverImage: frontmatter.coverImage,
           substackUrl: frontmatter.substackUrl,
           murderboardUrl: frontmatter.murderboardUrl,
+          subscribeUrl: frontmatter.subscribeUrl,
           featured: frontmatter.featured ?? false,
           html: await markdownToHtml(content),
         } satisfies Entry;

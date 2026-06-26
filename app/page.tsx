@@ -10,7 +10,6 @@ const stats: string[] = [
 
 export default async function HomePage() {
   const entries = await getAllEntries();
-  const featured = entries.find((entry) => entry.featured) ?? entries[0];
 
   return (
     <main>
@@ -60,30 +59,6 @@ export default async function HomePage() {
             ))}
           </ul>
         </div>
-
-        {featured ? (
-          <aside className="hero__feature shell" aria-label="Featured investigation">
-            <div className="feature-card tape tape--left">
-              {featured.coverImage ? (
-                <div className="feature-card__image">
-                  <Image
-                    src={featured.coverImage}
-                    alt={featured.title}
-                    fill
-                    sizes="(min-width: 1024px) 26rem, 80vw"
-                    priority
-                  />
-                </div>
-              ) : null}
-              <div className="feature-card__body">
-                <p className="feature-card__meta">Featured file</p>
-                <h2>{featured.title}</h2>
-                <p>{featured.excerpt}</p>
-                <a href={`/series/${featured.slug}`}>Open file</a>
-              </div>
-            </div>
-          </aside>
-        ) : null}
       </section>
 
       <section id="about" className="about shell">
@@ -119,7 +94,7 @@ export default async function HomePage() {
             <p className="eyebrow">On the board</p>
             <h2>Active investigations</h2>
           </div>
-          <p className="section-heading__aside">Edit the markdown files to change titles, covers, summaries, and full article bodies.</p>
+          <p className="section-heading__aside"></p>
         </div>
 
         <div className="series-grid">
