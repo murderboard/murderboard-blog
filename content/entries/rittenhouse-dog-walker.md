@@ -19,6 +19,10 @@ episodes:
   - title: 'Episode 2: The Manuscript'
     url: https://yoursubstack.substack.com/p/rittenhouse-episode-2
     date: '2026-01-11'
+  - title: 'Episode 3: The Jazz Club'
+    url: https://yoursubstack.substack.com/p/rittenhouse-episode-3
+    date: '2026-01-18'
+    murderboardUrl: /murderboards/rittenhouse-dog-walker/episode-3.html
 ---
 
 ## Opening note

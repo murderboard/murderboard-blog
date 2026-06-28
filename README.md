@@ -64,6 +64,40 @@ Standalone interactive board pages live under `public/murderboards/<slug>/` as p
 
 Point a series at its board with the `murderboardUrl` frontmatter field; if present, the detail page shows an "Open interactive murder board" button linking to it.
 
+### Generating boards from Obsidian (`tools/`)
+
+The `tools/` directory turns an episode's `Murder Board.md` (in the Obsidian
+vault) into one of these interactive boards and a Substack-ready screenshot.
+Full walkthrough: [`tools/PIPELINE.md`](tools/PIPELINE.md).
+
+| File | Purpose |
+| --- | --- |
+| `tools/md_to_board.py` | Parse `Murder Board.md` → lay out cards/strings → emit a standalone board HTML |
+| `tools/shoot_board.py` | Render a board HTML to a wide PNG, cropped to the cards |
+| `tools/board_template.html` | The reusable interactive board (pan/zoom/lightbox) |
+| `tools/PIPELINE.md` | End-to-end playbook + per-episode routine |
+
+One-time setup:
+
+```bash
+pip install playwright && python -m playwright install chromium
+```
+
+Per episode (example: Episode 3):
+
+```bash
+# 1. generate the interactive board straight into the public/ tree
+python tools/md_to_board.py   "/path/to/Obsidian/.../0003 Episode 3/Murder Board.md"   --template tools/board_template.html   --out public/murderboards/rittenhouse-dog-walker/episode-3.html   --episode 3 --tag "Episode 3 — The Jazz Club" --series rittenhouse-dog-walker
+
+# 2. (optional) polish the `const BOARD = {…}` block at the bottom of the HTML
+
+# 3. render the Substack image (cropped to the cards; --keep-hud to bake in the title)
+python tools/shoot_board.py   public/murderboards/rittenhouse-dog-walker/episode-3.html   --out episode-3-board.png --width 1600 --scale 2
+```
+
+Then add the episode to its series file's `episodes:` list with
+`murderboardUrl: /murderboards/<slug>/episode-N.html`, and build/deploy.
+
 ## GitHub Pages
 
 The Next config exports a static site and automatically applies the repository name as `basePath` when built in GitHub Actions. Push to `main`, enable GitHub Pages with the source set to GitHub Actions, and the workflow will publish the contents of `out`.

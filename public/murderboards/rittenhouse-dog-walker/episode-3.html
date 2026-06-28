@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Murder Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  /*
+    ============================================================
+    DATA BLOCK is at the bottom of the <script> section.
+    To update this board for a new episode: edit BOARD.episodeTag,
+    BOARD.title, BOARD.subhead, BOARD.cards, and BOARD.strings only.
+    Everything above that in this file (styles, layout engine,
+    pan/zoom, lightbox) is the reusable template and matches the
+    Murder Board brand system (see the Claude Design project) --
+    it shouldn't need to change between episodes.
+    ============================================================
+  */
+  * { box-sizing: border-box; }
+  :root {
+    --black: #0d0b0b;
+    --dark: #161212;
+    --dark2: #1c1818;
+    --red: #ed1c2e;
+    --red-dark: #b8101f;
+    --pink: #ff3d8b;
+    --yellow: #ffd83d;
+    --navy: #1a1f3a;
+    --cream: #f0ece0;
+    --cream-dim: #c8c3b2;
+    --cork: #7a5c10;
+  }
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    overflow: hidden; background: var(--black);
+    font-family: 'Special Elite', monospace;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999; opacity: 0.35; mix-blend-mode: overlay;
+  }
+  #viewport { position: absolute; inset: 0; overflow: hidden; cursor: grab; }
+  #viewport.dragging { cursor: grabbing; }
+  #world { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; }
+  #board-surface {
+    position: absolute; top: 0; left: 0;
+    background:
+      repeating-linear-gradient(0deg, rgba(110,82,22,0.05) 0px, rgba(110,82,22,0.05) 1px, transparent 1px, transparent 30px),
+      repeating-linear-gradient(90deg, rgba(110,82,22,0.04) 0px, rgba(110,82,22,0.04) 1px, transparent 1px, transparent 30px),
+      linear-gradient(135deg, #1e1610, #161210, #1a1510);
+    border: 3px solid rgba(100,75,20,0.35);
+  }
+  #board-surface::before {
+    content: '';
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='25' cy='20' rx='18' ry='10' fill='rgba(130,95,20,0.06)' transform='rotate(25 25 20)'/%3E%3Cellipse cx='80' cy='70' rx='14' ry='22' fill='rgba(130,95,20,0.04)' transform='rotate(-10 80 70)'/%3E%3Cellipse cx='50' cy='95' rx='22' ry='8' fill='rgba(130,95,20,0.05)' transform='rotate(15 50 95)'/%3E%3C/svg%3E");
+  }
+  .string-layer { position: absolute; top: 0; left: 0; pointer-events: none; overflow: visible; }
+  .annotation {
+    position: absolute; font-family: 'Special Elite', monospace; font-size: 11px;
+    color: var(--cream-dim); opacity: 0.45; letter-spacing: 0.1em; text-transform: uppercase;
+    pointer-events: none;
+  }
+  .card { position: absolute; cursor: pointer; transition: filter 0.15s ease; user-select: none; }
+  .card:hover { filter: brightness(1.12); z-index: 50; }
+  .pin {
+    position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+    width: 13px; height: 13px; border-radius: 50%; background: var(--red);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6); z-index: 10;
+  }
+  .pin::after {
+    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: 5px; height: 5px; background: rgba(255,200,200,0.45); border-radius: 50%;
+  }
+  .pin.gold { background: #c8942a; }
+  .pin.white { background: #e8e4d8; }
+  .card-polaroid { background: var(--cream); padding: 9px 9px 26px; box-shadow: 3px 6px 22px rgba(0,0,0,0.75); }
+  .card-polaroid .img {
+    background: #1c1515; aspect-ratio: 4/5; display: flex; align-items: center; justify-content: center;
+    font-family: monospace; font-size: 10px; color: #4a3838; text-align: center; padding: 6px; line-height: 1.5;
+  }
+  .card-polaroid .cap {
+    text-align: center; font-family: 'Special Elite', monospace; font-size: 10px; color: #2a2020;
+    padding-top: 8px; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .card-postit { padding: 13px 15px; font-family: 'Special Elite', monospace; font-size: 13px; line-height: 1.55; box-shadow: 3px 5px 16px rgba(0,0,0,0.6); }
+  .card-postit.y { background: #f5e642; color: #1a1400; }
+  .card-postit.r { background: #e83232; color: #fceaea; }
+  .card-postit.w { background: var(--cream); color: #1a1a1a; }
+  .card-postit.pink { background: #f5a0c0; color: #2a0014; }
+  .card-typed {
+    background: var(--cream); color: #111; padding: 14px 16px; font-family: 'Special Elite', monospace;
+    font-size: 13px; line-height: 1.65; box-shadow: 3px 5px 16px rgba(0,0,0,0.6); border-top: 3px solid var(--red);
+  }
+  .card-typed .hdr {
+    font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--red);
+    margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid rgba(192,0,26,0.25);
+  }
+  .card-id { background: var(--cream); color: #111; padding: 12px 14px; box-shadow: 3px 5px 16px rgba(0,0,0,0.6); font-family: 'Special Elite', monospace; border-left: 4px solid var(--red); }
+  .card-id .role { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--red); margin-bottom: 4px; }
+  .card-id .name { font-size: 15px; font-weight: bold; color: var(--black); margin-bottom: 3px; }
+  .card-id .detail { font-size: 11px; color: #555; line-height: 1.55; }
+  .card-clipping { background: #e8e0cc; padding: 13px 15px; font-family: 'Special Elite', monospace; box-shadow: 3px 5px 16px rgba(0,0,0,0.6); }
+  .card-clipping .headline { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: #111; line-height: 1.25; margin-bottom: 6px; border-bottom: 2px solid #111; padding-bottom: 5px; }
+  .card-clipping .body { font-size: 10.5px; color: #333; line-height: 1.6; }
+  #hud { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 24px; pointer-events: none; z-index: 200; }
+  #title-block { max-width: 420px; background: rgba(13,11,11,0.82); border: 1px solid rgba(192,0,26,0.28); padding: 16px 18px 14px; border-radius: 3px; box-shadow: 0 6px 24px rgba(0,0,0,0.55); }
+  .board-episode-tag { display: inline-flex; align-items: center; gap: 0.7rem; background: rgba(192,0,26,0.16); border: 1px solid rgba(192,0,26,0.35); padding: 0.4rem 0.9rem; margin-bottom: 0.7rem; }
+  .board-episode-tag span { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; }
+  .tag-label { color: var(--red); }
+  .tag-ep { color: var(--cream-dim); }
+  #title-text { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 26px; text-transform: uppercase; color: var(--cream); margin: 0 0 6px; line-height: 1.1; }
+  #subhead { font-size: 12px; color: var(--cream-dim); line-height: 1.6; }
+  #hint { font-family: 'Special Elite', monospace; font-size: 11px; color: var(--cream-dim); background: rgba(13,11,11,0.6); border: 1px solid rgba(240,236,224,0.12); padding: 6px 12px; border-radius: 2px; margin-top: 10px; display: inline-block; letter-spacing: 0.04em; }
+  #legend { position: fixed; bottom: 22px; left: 24px; z-index: 200; display: flex; flex-wrap: wrap; gap: 14px; pointer-events: none; background: rgba(13,11,11,0.55); padding: 8px 14px; border: 1px solid rgba(240,236,224,0.1); }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.1em; color: var(--cream-dim); text-transform: uppercase; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; }
+  #controls { position: fixed; bottom: 22px; right: 22px; z-index: 200; display: flex; flex-direction: column; gap: 8px; pointer-events: auto; }
+  #controls button {
+    width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(192,0,26,0.4);
+    background: rgba(13,11,11,0.75); color: var(--cream); font-size: 16px; font-family: 'Special Elite', monospace;
+    cursor: pointer;
+  }
+  #controls button:hover { background: var(--red); border-color: var(--red); }
+  #lightbox { position: fixed; inset: 0; background: rgba(13,11,11,0.85); display: none; align-items: center; justify-content: center; z-index: 500; padding: 32px; cursor: pointer; }
+  #lightbox.open { display: flex; }
+  #lightbox-card { max-width: 380px; cursor: default; }
+  #lightbox-detail {
+    background: var(--cream); margin-top: 14px; padding: 16px 18px; border-top: 3px solid var(--red);
+    font-family: 'Special Elite', monospace; font-size: 13px; line-height: 1.65; color: #1a1a1a;
+    max-width: 380px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+  #lightbox-detail:empty { display: none; }
+  #lightbox-detail .hdr { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--red); margin-bottom: 8px; display: block; }
+</style>
+</head>
+<body>
+
+<div id="viewport">
+  <div id="world">
+    <div id="board-surface"></div>
+    <svg class="string-layer" id="strings"></svg>
+    <div id="annotation-layer"></div>
+    <div id="card-layer"></div>
+  </div>
+</div>
+
+<div id="hud">
+  <div id="title-block">
+    <div class="board-episode-tag">
+      <span class="tag-label" id="tag-label-text">Murder Board</span>
+      <span class="tag-ep" id="tag-ep-text"></span>
+    </div>
+    <h1 id="title-text"></h1>
+    <p id="subhead"></p>
+    <div id="hint">Drag to pan &middot; scroll or pinch to zoom &middot; click a card to examine it</div>
+  </div>
+</div>
+
+<div id="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--red);"></div>Confirmed connection</div>
+  <div class="legend-item"><div class="legend-dot" style="background:rgba(192,0,26,0.35);"></div>Suspected connection</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f5e642;"></div>Physical evidence</div>
+  <div class="legend-item"><div class="legend-dot" style="background:rgba(200,195,178,0.35);"></div>Unverified</div>
+</div>
+
+<div id="controls">
+  <button id="zoom-in" aria-label="Zoom in">+</button>
+  <button id="zoom-out" aria-label="Zoom out">&minus;</button>
+  <button id="zoom-reset" aria-label="Reset view" style="font-size:13px;">&#8634;</button>
+</div>
+
+<div id="lightbox">
+  <div>
+    <div id="lightbox-card"></div>
+    <div id="lightbox-detail"></div>
+  </div>
+</div>
+
+<script>
+const WORLD_W = 2400;
+const WORLD_H = 1500;
+
+const BOARD = {
+  "tagEp": "Episode 3 — The Jazz Club",
+  "title": "The Board So Far",
+  "subhead": "Where the board stands after Episode 3 — and the first suspect pinned at its center.",
+  "cards": [
+    {
+      "id": "timeline",
+      "type": "typed",
+      "w": 330,
+      "header": "Timeline",
+      "text": "<strong>Wednesday</strong> — Realty office walkthrough. Confirmed by Marcus.<br><strong>Thursday morning</strong> — Someone from the realty office may have returned. Marcus uncertain. <em>[This is the theft window.]</em><br><strong>Thursday afternoon</strong> — Halloway home. Discovers theft. Calls police. Speaks to Lena.<br><strong>Thursday night</strong> — Unknown.<br><strong>Friday morning</strong> — Halloway found dead. Ruled suicide. Officer at 2D. Lena dismissed.<br><strong>This week, date uncertain</strong> — Service entrance left unlatched. Marcus mentioned it Saturday morning — doesn't know which morning.",
+      "detail": "",
+      "x": 75,
+      "y": 98,
+      "rotate": 0.3
+    },
+    {
+      "id": "bld0",
+      "type": "postit",
+      "color": "y",
+      "w": 195,
+      "text": "Officer posted at 2D Friday morning; door propped; Lena dismissed.",
+      "detail": "",
+      "x": 79,
+      "y": 355,
+      "rotate": -0.2
+    },
+    {
+      "id": "bld1",
+      "type": "postit",
+      "color": "y",
+      "w": 195,
+      "text": "<strong>Service entrance, unlatched.</strong> Marcus, sideways, in the lobby. He doesn't know which morning.",
+      "detail": "Thursday? Who used it? Who left it open?",
+      "x": 86,
+      "y": 498,
+      "rotate": 0.6
+    },
+    {
+      "id": "victim",
+      "type": "polaroid",
+      "w": 185,
+      "caption": "JAMES HALLOWAY — DECEASED",
+      "detail": "Philosophy professor. Recently announced he'd acquired a previously unknown jazz manuscript and was publishing a book about it. Found dead Friday morning.",
+      "x": 1998,
+      "y": 78,
+      "rotate": 0.3
+    },
+    {
+      "id": "urgent",
+      "type": "postit",
+      "color": "r",
+      "w": 180,
+      "text": "Finish the conversation with Marcus — tomorrow, first thing.",
+      "detail": "",
+      "x": 1989,
+      "y": 414,
+      "rotate": 0.2
+    },
+    {
+      "id": "suspect0",
+      "type": "id",
+      "w": 215,
+      "role": "Suspect — Student",
+      "name": "Theo Thomas",
+      "detailLine": "Third-year student, Rittenhouse Conservatory.",
+      "flag": "NEW",
+      "detail": "Third-year student, Rittenhouse Conservatory. Possibly studied under Halloway. Played variations on Della Mercer's melodic themes at Andy's Jazz Club tonight — unprompted, unannounced. Personal website: work focuses on \"mid-century composers whose contributions have been historically underrecognized.\" <em>[He knows about Della. How well did he know Halloway? Did he know about the manuscript?]</em> — <strong>Pinned at the center of the board this episode. First major suspect.</strong>",
+      "x": 765,
+      "y": 475,
+      "rotate": -0.6
+    },
+    {
+      "id": "suspect1",
+      "type": "id",
+      "w": 215,
+      "role": "Witness / Suspect — Realtor",
+      "name": "Unknown woman from the realty office",
+      "detailLine": "Marcus thinks someone from Diane Ashford Realty came back Thursday morning.",
+      "flag": "",
+      "detail": "Marcus thinks someone from Diane Ashford Realty came back Thursday morning. Might be the same person as Wednesday. Might not. <em>[Who?]</em>",
+      "x": 1037,
+      "y": 467,
+      "rotate": 0.8
+    },
+    {
+      "id": "suspect2",
+      "type": "id",
+      "w": 215,
+      "role": "Person of Interest",
+      "name": "Marcus",
+      "detailLine": "Didn't get to finish the conversation this morning (Roscoe interrupted).",
+      "flag": "STILL OPEN",
+      "detail": "Didn't get to finish the conversation this morning (Roscoe interrupted). He wanted to say more. So did she. <em>[Tomorrow. First thing.]</em>",
+      "x": 1334,
+      "y": 472,
+      "rotate": 1.4
+    },
+    {
+      "id": "corner0",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>The manuscript</strong> <em>(absent)</em> — Della Mercer's original composition notes. Gone.",
+      "detail": "",
+      "x": 481,
+      "y": 864,
+      "rotate": 1.4
+    },
+    {
+      "id": "corner1",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>The lawyer's letter</strong> — Still on the desk, still unread properly.",
+      "detail": "",
+      "x": 726,
+      "y": 866,
+      "rotate": 2.8
+    },
+    {
+      "id": "corner2",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>The Conservatory Newsletter</strong> — Public; named Halloway, the manuscript, the auditions.",
+      "detail": "",
+      "x": 952,
+      "y": 863,
+      "rotate": -2.4
+    },
+    {
+      "id": "corner3",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>The business card</strong> — Cream card stock, Diane Ashford Realty.",
+      "detail": "",
+      "x": 1192,
+      "y": 867,
+      "rotate": -1.7
+    },
+    {
+      "id": "corner4",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>The branded folder on the counter</strong> — Out of place, unopened.",
+      "detail": "",
+      "x": 1449,
+      "y": 865,
+      "rotate": 1.7
+    },
+    {
+      "id": "cornerstone",
+      "type": "clipping",
+      "w": 345,
+      "headline": "CORNERSTONE RECORDS",
+      "body": "Label credit on a 1962 Della Mercer reissue. Founded by Victor Reese, Philadelphia. Absorbed into a larger company in the seventies.",
+      "detail": "What happened to the catalog? Where did the rights go?",
+      "x": 91,
+      "y": 864,
+      "rotate": 1.3
+    },
+    {
+      "id": "q0",
+      "type": "postit",
+      "color": "pink",
+      "w": 200,
+      "text": "He knows about Della. How well did he know Halloway? Did he know about the manuscript?",
+      "detail": "",
+      "x": 769,
+      "y": 666,
+      "rotate": -2.0
+    },
+    {
+      "id": "q1",
+      "type": "postit",
+      "color": "pink",
+      "w": 200,
+      "text": "Who?",
+      "detail": "",
+      "x": 1046,
+      "y": 665,
+      "rotate": -1.2
+    },
+    {
+      "id": "q2",
+      "type": "postit",
+      "color": "pink",
+      "w": 200,
+      "text": "What happened to the catalog? Where did the rights go?",
+      "detail": "",
+      "x": 1308,
+      "y": 672,
+      "rotate": -0.2
+    }
+  ],
+  "annotations": [
+    {
+      "x": 60,
+      "y": 50,
+      "text": "Timeline"
+    },
+    {
+      "x": 1995,
+      "y": 50,
+      "text": "The victim"
+    },
+    {
+      "x": 760,
+      "y": 432,
+      "text": "Persons of interest"
+    },
+    {
+      "x": 80,
+      "y": 828,
+      "text": "Physical evidence"
+    }
+  ],
+  "strings": [
+    {
+      "from": [
+        2090,
+        216
+      ],
+      "to": [
+        872,
+        537
+      ],
+      "sag": 84,
+      "kind": "confirmed"
+    },
+    {
+      "from": [
+        2090,
+        216
+      ],
+      "to": [
+        1144,
+        515
+      ],
+      "sag": 49,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        2090,
+        216
+      ],
+      "to": [
+        1441,
+        534
+      ],
+      "sag": 56,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        872,
+        537
+      ],
+      "to": [
+        2079,
+        462
+      ],
+      "sag": 36,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        872,
+        537
+      ],
+      "to": [
+        263,
+        928
+      ],
+      "sag": 113,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        240,
+        205
+      ],
+      "to": [
+        263,
+        928
+      ],
+      "sag": 64,
+      "kind": "evidence"
+    },
+    {
+      "from": [
+        240,
+        205
+      ],
+      "to": [
+        176,
+        414
+      ],
+      "sag": 48,
+      "kind": "unverified"
+    }
+  ]
+};
+
+const STRING_STYLE = {
+  confirmed: { stroke: '#ed1c2e', width: 2, opacity: 0.75, dash: null },
+  suspected: { stroke: '#ed1c2e', width: 1.4, opacity: 0.4, dash: null },
+  evidence: { stroke: '#f5e642', width: 1.4, opacity: 0.55, dash: null },
+  unverified: { stroke: '#c8c3b2', width: 1.2, opacity: 0.35, dash: '5 4' }
+};
+
+function renderStrings() {
+  const svg = document.getElementById('strings');
+  svg.setAttribute('width', WORLD_W);
+  svg.setAttribute('height', WORLD_H);
+  svg.setAttribute('viewBox', `0 0 ${WORLD_W} ${WORLD_H}`);
+  let html = '';
+  BOARD.strings.forEach(s => {
+    const st = STRING_STYLE[s.kind] || STRING_STYLE.suspected;
+    const mx = (s.from[0] + s.to[0]) / 2;
+    const my = (s.from[1] + s.to[1]) / 2 + s.sag;
+    const dashAttr = st.dash ? `stroke-dasharray="${st.dash}"` : '';
+    html += `<path d="M ${s.from[0]} ${s.from[1]} Q ${mx} ${my} ${s.to[0]} ${s.to[1]}"
+      stroke="${st.stroke}" stroke-width="${st.width}" fill="none" opacity="${st.opacity}" stroke-linecap="round" ${dashAttr}/>`;
+    html += `<circle cx="${s.from[0]}" cy="${s.from[1]}" r="3" fill="${st.stroke}" opacity="${st.opacity + 0.15}"/>`;
+    html += `<circle cx="${s.to[0]}" cy="${s.to[1]}" r="3" fill="${st.stroke}" opacity="${st.opacity + 0.15}"/>`;
+  });
+  svg.innerHTML = html;
+}
+
+function renderAnnotations() {
+  const layer = document.getElementById('annotation-layer');
+  layer.innerHTML = (BOARD.annotations || []).map(a =>
+    `<div class="annotation" style="left:${a.x}px; top:${a.y}px;">${a.text}</div>`
+  ).join('');
+}
+
+function pinHTML(variant) {
+  const cls = variant === 'gold' ? 'pin gold' : variant === 'white' ? 'pin white' : 'pin';
+  return `<div class="${cls}"></div>`;
+}
+
+function cardInnerHTML(card) {
+  if (card.type === 'polaroid') {
+    return `<div class="card-polaroid"><div class="img">case photo</div><div class="cap">${card.caption}</div></div>`;
+  }
+  if (card.type === 'postit') {
+    return `<div class="card-postit ${card.color}">${card.text}</div>`;
+  }
+  if (card.type === 'typed') {
+    return `<div class="card-typed"><div class="hdr">${card.header}</div>${card.text}</div>`;
+  }
+  if (card.type === 'id') {
+    return `<div class="card-id">
+      <div class="role">${card.role}</div>
+      <div class="name">${card.name}</div>
+      <div class="detail">${card.detailLine}${card.flag ? '<br><span style="color:var(--red);">' + card.flag + '</span>' : ''}</div>
+    </div>`;
+  }
+  if (card.type === 'clipping') {
+    return `<div class="card-clipping"><div class="headline">${card.headline}</div><div class="body">${card.body}</div></div>`;
+  }
+  return '';
+}
+
+function pinVariantFor(card, i) {
+  if (card.type === 'id') return i % 2 === 0 ? 'gold' : 'white';
+  if (card.type === 'postit' && card.color === 'r') return 'default';
+  return i % 4 === 0 ? 'white' : 'default';
+}
+
+function renderCards() {
+  const layer = document.getElementById('card-layer');
+  let html = '';
+  BOARD.cards.forEach((card, i) => {
+    html += `<div class="card" data-id="${card.id}" style="left:${card.x}px; top:${card.y}px; width:${card.w}px; transform: rotate(${card.rotate}deg);">
+      ${pinHTML(pinVariantFor(card, i))}
+      ${cardInnerHTML(card)}
+    </div>`;
+  });
+  layer.innerHTML = html;
+
+  layer.querySelectorAll('.card').forEach(el => {
+    el.addEventListener('click', () => {
+      if (suppressClick) return;
+      const card = BOARD.cards.find(c => c.id === el.dataset.id);
+      openLightbox(card);
+    });
+  });
+}
+
+function openLightbox(card) {
+  const lb = document.getElementById('lightbox');
+  const lbCard = document.getElementById('lightbox-card');
+  const lbDetail = document.getElementById('lightbox-detail');
+  lbCard.innerHTML = cardInnerHTML(card);
+  lbCard.style.width = (card.w * 1.6) + 'px';
+  const detail = card.detail || '';
+  lbDetail.innerHTML = detail ? `<span class="hdr">Detective's note</span>${detail}` : '';
+  lb.classList.add('open');
+}
+document.getElementById('lightbox').addEventListener('click', (e) => {
+  if (e.target.id === 'lightbox') document.getElementById('lightbox').classList.remove('open');
+});
+
+document.getElementById('tag-ep-text').textContent = BOARD.tagEp;
+document.getElementById('title-text').textContent = BOARD.title;
+document.getElementById('subhead').textContent = BOARD.subhead;
+
+const board = document.getElementById('board-surface');
+board.style.width = WORLD_W + 'px';
+board.style.height = WORLD_H + 'px';
+document.getElementById('world').style.width = WORLD_W + 'px';
+document.getElementById('world').style.height = WORLD_H + 'px';
+
+renderStrings();
+renderAnnotations();
+renderCards();
+
+const viewport = document.getElementById('viewport');
+const world = document.getElementById('world');
+
+let scale = 0.55, tx = 0, ty = 0;
+let isDragging = false, lastX = 0, lastY = 0, moved = 0;
+let suppressClick = false;
+
+function applyTransform() {
+  world.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+}
+
+function centerView() {
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  scale = Math.min(vw / WORLD_W, vh / WORLD_H) * 1.6;
+  scale = Math.max(0.35, Math.min(scale, 1));
+  tx = (vw - WORLD_W * scale) / 2;
+  ty = (vh - WORLD_H * scale) / 2;
+  applyTransform();
+}
+
+viewport.addEventListener('mousedown', (e) => {
+  isDragging = true; moved = 0;
+  lastX = e.clientX; lastY = e.clientY;
+  viewport.classList.add('dragging');
+});
+window.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  const dx = e.clientX - lastX, dy = e.clientY - lastY;
+  moved += Math.abs(dx) + Math.abs(dy);
+  tx += dx; ty += dy;
+  lastX = e.clientX; lastY = e.clientY;
+  applyTransform();
+});
+window.addEventListener('mouseup', () => {
+  isDragging = false;
+  viewport.classList.remove('dragging');
+  suppressClick = moved > 6;
+  setTimeout(() => { suppressClick = false; }, 50);
+});
+
+viewport.addEventListener('touchstart', (e) => {
+  if (e.touches.length !== 1) return;
+  isDragging = true; moved = 0;
+  lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+}, { passive: true });
+viewport.addEventListener('touchmove', (e) => {
+  if (!isDragging || e.touches.length !== 1) return;
+  const dx = e.touches[0].clientX - lastX, dy = e.touches[0].clientY - lastY;
+  moved += Math.abs(dx) + Math.abs(dy);
+  tx += dx; ty += dy;
+  lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+  applyTransform();
+}, { passive: true });
+viewport.addEventListener('touchend', () => {
+  isDragging = false;
+  suppressClick = moved > 6;
+  setTimeout(() => { suppressClick = false; }, 50);
+});
+
+function zoomAt(cx, cy, factor) {
+  const newScale = Math.max(0.25, Math.min(2.5, scale * factor));
+  const wx = (cx - tx) / scale, wy = (cy - ty) / scale;
+  scale = newScale;
+  tx = cx - wx * scale;
+  ty = cy - wy * scale;
+  applyTransform();
+}
+
+viewport.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.12 : 0.89;
+  zoomAt(e.clientX, e.clientY, factor);
+}, { passive: false });
+
+document.getElementById('zoom-in').addEventListener('click', () => {
+  zoomAt(viewport.clientWidth / 2, viewport.clientHeight / 2, 1.25);
+});
+document.getElementById('zoom-out').addEventListener('click', () => {
+  zoomAt(viewport.clientWidth / 2, viewport.clientHeight / 2, 0.8);
+});
+document.getElementById('zoom-reset').addEventListener('click', centerView);
+
+window.addEventListener('resize', centerView);
+centerView();
+</script>
+
+</body>
+</html>
