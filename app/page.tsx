@@ -3,9 +3,8 @@ import Image from "next/image";
 import { getAllEntries } from "@/lib/content";
 
 const stats: string[] = [
-  // "3 active investigations",
-  // "Markdown-controlled case files",
-  // "Static export ready for GitHub Pages",
+  "1 active serial",
+  "New episodes weekly",
 ];
 
 export default async function HomePage() {
@@ -16,10 +15,10 @@ export default async function HomePage() {
       <nav className="site-nav">
         <a className="site-nav__brand" href="#hero" aria-label="Murder Board home">
           <Image
-            src="/assets/murder-board-logo.png"
+            src="/assets/brand/lockup-reversed.png"
             alt="Murder Board"
             width={240}
-            height={38}
+            height={44}
             priority
           />
           <span className="site-nav__brand-text">
@@ -37,20 +36,20 @@ export default async function HomePage() {
         <div className="hero__blinds" />
         <div className="hero__spotlight" />
         <div className="hero__content shell">
-          <p className="eyebrow">Serialized crime fiction and obsessive investigation</p>
+          <p className="eyebrow">Serialized mystery &amp; thriller fiction</p>
           <h1>
             Murder
             <span>Board</span>
           </h1>
           <p className="hero__dek">
-            Build your landing page from markdown files while keeping the atmosphere of a corkboard, a case file, and a late-night newsroom.
+            Mysteries told one episode at a time. Every installment ends on the board &mdash; photographs, notes, red string &mdash; so you&apos;re not just following the case. You&apos;re working it.
           </p>
           <div className="hero__actions">
             <a className="button button--primary" href="#series">
-              Browse active cases
+              Browse the board
             </a>
             <a className="button button--ghost" href="#series">
-              Read the files
+              Start with Rittenhouse
             </a>
           </div>
           <ul className="hero__stats" aria-label="Project highlights">
@@ -63,26 +62,26 @@ export default async function HomePage() {
 
       <section id="about" className="about shell">
         <div className="about__heading">
-          <p className="eyebrow">About the scaffold</p>
-          <h2>One page, many case files.</h2>
+          <p className="eyebrow">About</p>
+          <h2>Some stories you read. This one you work.</h2>
         </div>
         <div className="about__grid">
           <article className="dossier-card tape tape--right">
-            <h3>Markdown controls the entries</h3>
+            <h3>Serialized, a clue at a time</h3>
             <p>
-              Each file in <code>content/entries</code> defines the card metadata and the long-form body that gets converted to HTML at build time.
+              New mysteries released episode by episode, the way a case actually unfolds &mdash; a clue, a complication, and a thread you can&apos;t let go of.
             </p>
           </article>
           <article className="dossier-card tape tape--left">
-            <h3>Static export for Pages</h3>
+            <h3>The board is the method</h3>
             <p>
-              The project uses the Next.js app router with <code>output: "export"</code>, a GitHub Pages workflow, and repo-aware base path handling.
+              Every episode ends on a murder board: the photos, index cards, and red string of an investigation laid bare. See the connections form, and start theorizing before the next thread drops.
             </p>
           </article>
           <article className="dossier-card tape tape--right">
-            <h3>Design-driven structure</h3>
+            <h3>Atmosphere over hype</h3>
             <p>
-              The layout borrows the archive&apos;s noir palette, type pairing, and evidence-board visual language while staying intentionally single-page.
+              Wry, shadowed mysteries built on real places and small, telling details &mdash; where the doorman&apos;s silence matters as much as the body.
             </p>
           </article>
         </div>

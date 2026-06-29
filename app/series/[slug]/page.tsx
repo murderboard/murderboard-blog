@@ -26,7 +26,7 @@ export default async function SeriesPage({ params }: { params: Promise<{ slug: s
       <nav className="site-nav">
         <a className="site-nav__brand" href="/" aria-label="Murder Board home">
           <Image
-            src="/assets/murder-board-logo.png"
+            src="/assets/murder-board-logo-dark.png"
             alt="Murder Board"
             width={240}
             height={38}
