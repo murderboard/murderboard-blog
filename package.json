@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "preview": "npx serve out"
+    "start": "next start",
+    "preview": "next build && next start"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
