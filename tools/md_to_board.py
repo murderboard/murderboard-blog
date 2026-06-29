@@ -36,6 +36,16 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 # Per-series static block (set once per volume; not in the episode MD)
 # ---------------------------------------------------------------------------
+#
+# Add one entry per series. The keys:
+#   victim          -> the board's fixed centerpiece polaroid (set once per
+#                      volume; doesn't come from the episode MD). For a body it's
+#                      the victim; for a series with no body it's the central
+#                      figure or case object. caption is printed on the photo;
+#                      detail shows in the lightbox.
+#   tag_label       -> the small label in the episode tag chip (top-left).
+#   default_subhead -> used when --subhead isn't passed.
+#
 SERIES_CONFIG = {
     "rittenhouse-dog-walker": {
         "victim": {
@@ -46,6 +56,33 @@ SERIES_CONFIG = {
         },
         "tag_label": "Murder Board",
         "default_subhead": "Where the board stands at the end of this episode.",
+    },
+
+    # --- EXAMPLES for the other two imprint series (edit names/details) -------
+
+    # Middle-grade, playful/cipher board. No body — the centerpiece is the case
+    # itself, so the "victim" card holds the mystery's central object.
+    "porchlight-detectives": {
+        "victim": {
+            "caption": "THE CASE: THE PORCHLIGHT THAT WENT OUT",
+            "detail": ("Old Mr. Alvarez's porchlight has been on every night for "
+                       "thirty years. Last Tuesday it went dark — and so did he. "
+                       "The Porchlight Detectives are on it."),
+        },
+        "tag_label": "Case Board",
+        "default_subhead": "What the Porchlight Detectives have figured out so far.",
+    },
+
+    # Adult thriller, clinical/data-viz board. Centerpiece is the victim.
+    "cassandra-files": {
+        "victim": {
+            "caption": "SUBJECT 01 — DECEASED",
+            "detail": ("Found at the scene. Casey Reilly's models flagged the "
+                       "pattern weeks before anyone else saw it. Probability the "
+                       "death is unrelated: low."),
+        },
+        "tag_label": "The Cassandra Files",
+        "default_subhead": "Current threat model. Weighted by what the data says, not what they want to believe.",
     },
 }
 

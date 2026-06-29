@@ -58,6 +58,9 @@ with the repo.
 - `tools/board_template.html` — the reusable interactive board (pan/zoom/lightbox).
   This is the canonical copy for the pipeline; keep it in sync with the
   "Claude Design" Murder Board template if you change the look.
+- `tools/Murder Board.example.md` — an annotated example/template showing exactly
+  how to format an episode's MD (every section, `[NEW]`, `*[asides]*`, suspects,
+  cornerstone). Copy it to start a new episode or series.
 - `tools/shoot_board.py` — renders a finished board HTML to a wide PNG, cropped
   to the cards (no empty cork).
 - `content/entries/<slug>.md` — the series file; its `episodes:` list points each
@@ -72,9 +75,10 @@ python -m playwright install chromium     # on macOS this is self-contained
 npm install                               # for the Next.js build/preview
 ```
 
-Per series, add a block to `SERIES_CONFIG` in `md_to_board.py` (the victim
+Per series, add a block to `SERIES_CONFIG` in `md_to_board.py` (the centerpiece
 photo caption + detail and the default subhead). `rittenhouse-dog-walker` is
-already there.
+live; `porchlight-detectives` and `cassandra-files` are included as worked
+examples — edit their names/details when you start those series.
 
 ## Per-episode routine
 
