@@ -79,6 +79,15 @@ def clean_plain(text: str) -> str:
     return text.strip()
 
 
+def slugify(text: str, maxwords: int = 6) -> str:
+    """Stable id fragment from a card's content. Same words -> same id, so a
+    card keeps its identity (and saved position) from episode to episode."""
+    text = clean_plain(re.sub(r"\[.*?\]", "", text)).lower()
+    text = re.sub(r"[^a-z0-9\s-]", "", text)
+    words = [w for w in text.split() if w][:maxwords]
+    return ("-".join(words)[:48]) or "x"
+
+
 # ---------------------------------------------------------------------------
 # Parse Murder Board.md into sections -> raw items
 # ---------------------------------------------------------------------------
@@ -209,176 +218,236 @@ def center_of(card):
     return (card["x"] + card["w"] / 2, card["y"] + est_height(card) / 2)
 
 
+# Section bands: where each category of card lives. New cards are dropped into
+# the first free slot of their band; existing cards keep their saved position.
+BANDS = {
+    "left":     (80, 90, 470, 1010),
+    "tr":       (1950, 70, 2360, 470),
+    "suspect":  (700, 440, 2360, 810),
+    "question": (700, 830, 2280, 1120),
+    "bottom":   (80, 1140, 2360, 1500),
+}
+
+
+def box_of(card):
+    return (card["x"], card["y"], card["x"] + card["w"], card["y"] + est_height(card))
+
+
+def _overlap(a, b, pad):
+    return not (a[2] < b[0] - pad or a[0] > b[2] + pad or
+                a[3] < b[1] - pad or a[1] > b[3] + pad)
+
+
+def free_slot(card, band, placed, step=24, pad=16):
+    """Scan a band row-major for the first spot where `card` doesn't collide
+    with anything already placed. Extends below the band if it's full."""
+    x0, y0, x1, y1 = band
+    w, h = card["w"], est_height(card)
+    y = y0
+    while y + h <= y1 + 600:
+        x = x0
+        while x + w <= x1:
+            box = (x, y, x + w, y + h)
+            if not any(_overlap(box, b, pad) for b in placed):
+                return x, y
+            x += step
+        y += step
+    return x0, y1
+
+
+def sag_for(a, b):
+    """Deterministic string droop from endpoint distance, so a string between
+    two fixed cards looks identical every episode."""
+    import math
+    d = math.hypot(a[0] - b[0], a[1] - b[1])
+    return int(min(120, 25 + d * 0.05))
+
+
 # ---------------------------------------------------------------------------
 # Build the BOARD object
 # ---------------------------------------------------------------------------
-def build_board(md, cfg, tag, title, subhead, seed):
+def build_board(md, cfg, tag, title, subhead, seed, layout, first_build):
+    """Build the BOARD object plus an updated layout-memory dict.
+
+    `layout` = {"meta": {...}, "cards": {id: {x, y, rotate}}}. Existing cards
+    reuse their saved position; only first-appearance cards are placed fresh
+    (into the first free slot of their section band) and tagged isNew.
+    """
     rng = random.Random(seed)
     sections = parse_sections(md)
-    cards, strings, annotations = [], [], []
-    anchors = {}
+    saved = layout.get("cards", {})
+    meta = layout.get("meta", {})
+    cards = []
 
-    # ---- Timeline -> one typed card, top-left -------------------------------
+    def add(card, cat):
+        card["_cat"] = cat
+        cards.append(card)
+        return card
+
+    # ---- Timeline -> one typed card -----------------------------------------
     tl = bullets(section(sections, "timeline"))
+    timeline = None
     if tl:
-        lines = []
-        for b in tl:
-            clean, is_new = strip_new(b)
-            lines.append(md_inline(clean))
-        c = {"id": "timeline", "type": "typed", "w": 330, "header": "Timeline",
-             "text": "<br>".join(lines), "detail": ""}
-        cards.append(c)
+        lines = [md_inline(strip_new(b)[0]) for b in tl]
+        timeline = add({"id": "timeline", "type": "typed", "w": 330,
+                        "header": "Timeline", "text": "<br>".join(lines),
+                        "detail": ""}, "left")
 
-    # ---- Building / Location notes -> yellow postits (TL column) -------------
-    bld = bullets(section(sections, "building", "location"))
+    # ---- Building / Location notes -> yellow postits -------------------------
     bld_cards = []
-    for i, b in enumerate(bld):
-        clean, is_new = strip_new(b)
+    for b in bullets(section(sections, "building", "location")):
+        clean, _ = strip_new(b)
         aside = re.findall(r"\*\[(.+?)\]\*", clean)
         body = re.sub(r"\*\[.+?\]\*", "", clean).strip()
-        c = {"id": f"bld{i}", "type": "postit", "color": "y", "w": 195,
-             "text": md_inline(body),
-             "detail": " ".join(aside)}
-        cards.append(c); bld_cards.append(c)
+        bld_cards.append(add({"id": "bld-" + slugify(body), "type": "postit",
+                              "color": "y", "w": 195, "text": md_inline(body),
+                              "detail": " ".join(aside)}, "left"))
 
-    # ---- Victim polaroid + Urgent (top-right) -------------------------------
+    # ---- Victim polaroid + Urgent -------------------------------------------
     v = cfg["victim"]
-    victim = {"id": "victim", "type": "polaroid", "w": 185,
-              "caption": v["caption"], "detail": v["detail"]}
-    cards.append(victim)
+    victim = add({"id": "victim", "type": "polaroid", "w": 185,
+                  "caption": v["caption"], "detail": v["detail"]}, "tr")
 
-    urgent_items = bullets(section(sections, "urgent", "now"))
     urgent_card = None
+    urgent_items = bullets(section(sections, "urgent", "now"))
     if urgent_items:
         clean, _ = strip_new(urgent_items[0])
-        urgent_card = {"id": "urgent", "type": "postit", "color": "r", "w": 180,
-                       "text": md_inline(clean).upper() if len(clean) < 40 else md_inline(clean),
-                       "detail": " ".join(md_inline(strip_new(u)[0]) for u in urgent_items[1:])}
-        cards.append(urgent_card)
+        urgent_card = add({"id": "urgent", "type": "postit", "color": "r",
+                           "w": 180,
+                           "text": md_inline(clean).upper() if len(clean) < 40 else md_inline(clean),
+                           "detail": " ".join(md_inline(strip_new(u)[0]) for u in urgent_items[1:])},
+                          "tr")
 
-    # ---- Suspects -> id cards (center-right column) -------------------------
-    suspects = parse_suspects(section(sections, "suspect"))
+    # ---- Suspects -> id cards (stable id = slug of the name) -----------------
     suspect_cards = []
-    for i, (raw_name, body) in enumerate(suspects):
-        name, is_new = strip_new(raw_name)
+    for raw_name, body in parse_suspects(section(sections, "suspect")):
+        name, _ = strip_new(raw_name)
         status_flag = ""
         m = re.search(r"—\s*(STILL OPEN|OPEN|CLEARED|RULED OUT)", name, re.I)
         if m:
             status_flag = m.group(1).upper()
             name = name[: m.start()].strip(" —")
-        if is_new:
-            status_flag = (status_flag + "  •  NEW").strip(" •") if status_flag else "NEW"
-        c = {"id": f"suspect{i}", "type": "id", "w": 215,
-             "role": guess_role(name, body), "name": name,
-             "detailLine": first_sentence(body),
-             "flag": status_flag, "detail": md_inline(re.sub(r"\s+", " ", body))}
-        cards.append(c); suspect_cards.append(c)
+        suspect_cards.append(add({"id": "sus-" + slugify(name), "type": "id",
+                                  "w": 215, "role": guess_role(name, body),
+                                  "name": name, "detailLine": first_sentence(body),
+                                  "flag": status_flag,
+                                  "detail": md_inline(re.sub(r"\s+", " ", body))},
+                                 "suspect"))
 
-    # ---- Cornerstone -> 1 clipping + cream postits (bottom-left) ------------
-    corner = bullets(section(sections, "cornerstone", "central"))
+    # ---- Cornerstone -> 1 stable clipping + cream evidence postits -----------
+    corner_items = []
+    for b in bullets(section(sections, "cornerstone", "central")):
+        clean, _ = strip_new(b)
+        aside = re.findall(r"\*\[(.+?)\]\*", clean)
+        body = re.sub(r"\*\[.+?\]\*", "", clean).strip()
+        parts = re.split(r"\s+—\s+", body, maxsplit=1)
+        corner_items.append({"cid": "cs-" + slugify(parts[0]), "parts": parts,
+                             "body": body, "aside": aside})
+    clip_id = meta.get("clipping_id")
+    ids_now = [it["cid"] for it in corner_items]
+    if corner_items and (not clip_id or clip_id not in ids_now):
+        clip_id = max(corner_items, key=lambda it: len(it["body"]))["cid"]
     clip_card = None
     corner_cards = []
-    # pick the most "prose-like" cornerstone item for the clipping
-    def proseiness(b):
-        return len(clean_plain(re.sub(r"\*\[.+?\]\*", "", b)))
-    if corner:
-        idx = max(range(len(corner)), key=lambda i: proseiness(corner[i]))
-        for i, b in enumerate(corner):
-            clean, is_new = strip_new(b)
-            aside = re.findall(r"\*\[(.+?)\]\*", clean)
-            body = re.sub(r"\*\[.+?\]\*", "", clean).strip()
-            # split "Name — description" into headline / body for the clipping
-            if i == idx:
-                parts = re.split(r"\s+—\s+", body, maxsplit=1)
-                headline = clean_plain(parts[0]).upper()
-                btext = md_inline(parts[1]) if len(parts) > 1 else md_inline(body)
-                clip_card = {"id": "cornerstone", "type": "clipping", "w": 345,
+    for it in corner_items:
+        if it["cid"] == clip_id:
+            headline = clean_plain(it["parts"][0]).upper()
+            btext = md_inline(it["parts"][1]) if len(it["parts"]) > 1 else md_inline(it["body"])
+            clip_card = add({"id": it["cid"], "type": "clipping", "w": 345,
                              "headline": headline, "body": btext,
-                             "detail": " ".join(aside)}
-                cards.append(clip_card)
-            else:
-                c = {"id": f"corner{i}", "type": "postit", "color": "w", "w": 185,
-                     "text": md_inline(body), "detail": " ".join(aside)}
-                cards.append(c); corner_cards.append(c)
+                             "detail": " ".join(it["aside"])}, "bottom")
+        else:
+            corner_cards.append(add({"id": it["cid"], "type": "postit",
+                                     "color": "w", "w": 185,
+                                     "text": md_inline(it["body"]),
+                                     "detail": " ".join(it["aside"])}, "bottom"))
 
-    # ---- Open-question asides -> a couple of pink "question" postits --------
+    # ---- Open-question asides -> pink stickies -------------------------------
     asides = []
     for blk in (section(sections, "suspect"), section(sections, "cornerstone", "central")):
         asides += re.findall(r"\*\[(.+?\?)\]\*", blk)
     q_cards = []
-    for i, q in enumerate(asides[:3]):
-        c = {"id": f"q{i}", "type": "postit", "color": "pink", "w": 200,
-             "text": md_inline(q), "detail": ""}
-        cards.append(c); q_cards.append(c)
+    for q in asides[:3]:
+        q_cards.append(add({"id": "q-" + slugify(q), "type": "postit",
+                            "color": "pink", "w": 200, "text": md_inline(q),
+                            "detail": ""}, "question"))
 
-    # ---- Lay out in balanced bands ------------------------------------------
-    # TOP-LEFT column: timeline, then building/location notes stacked under it.
-    left_col = ([cards[0]] if (cards and cards[0]["id"] == "timeline") else []) + bld_cards
-    left_bottom = flow(left_col, 80, 90, x_max=290, rng=rng, gap=42)
+    # ---- Placement: lock existing, drop in new ------------------------------
+    if first_build:
+        # Initial board: lay out balanced bands once; nothing is "new".
+        left_col = ([timeline] if timeline else []) + bld_cards
+        left_b = flow(left_col, 80, 90, x_max=290, rng=rng, gap=42)
+        tr_b = flow([victim] + ([urgent_card] if urgent_card else []),
+                    1995, 80, x_max=2200, rng=rng, gap=52)
+        sus_b = flow(suspect_cards, 760, 470, x_max=2340, rng=rng, gap=70)
+        q_b = flow(q_cards, 760, sus_b + 80, x_max=2160, rng=rng, gap=80)
+        band_y = max(left_b, tr_b, q_b) + 70
+        flow(([clip_card] if clip_card else []) + corner_cards,
+             80, band_y, x_max=2340, rng=rng, gap=55)
+    else:
+        placed = []
+        for c in cards:                       # existing cards keep their spot
+            if c["id"] in saved:
+                p = saved[c["id"]]
+                c["x"], c["y"], c["rotate"] = p["x"], p["y"], p.get("rotate", 0)
+                placed.append(box_of(c))
+        for c in cards:                       # new cards find an open slot
+            if c["id"] not in saved:
+                x, y = free_slot(c, BANDS[c["_cat"]], placed)
+                c["x"], c["y"] = x, y
+                c["rotate"] = round(rng.uniform(-3.0, 3.0), 1)
+                c["isNew"] = True
+                placed.append(box_of(c))
 
-    # TOP-RIGHT: victim photo, with the urgent flag pinned just under it.
-    tr_cards = [victim] + ([urgent_card] if urgent_card else [])
-    tr_bottom = flow(tr_cards, 1995, 80, x_max=2200, rng=rng, gap=52)
-
-    # MID BAND (center, spread across): persons of interest in one row.
-    sus_bottom = flow(suspect_cards, 760, 470, x_max=2340, rng=rng, gap=70)
-
-    # LOWER-MID: open-question stickies, spread under the suspects.
-    q_bottom = flow(q_cards, 760, sus_bottom + 80, x_max=2160, rng=rng, gap=80)
-
-    # BOTTOM BAND (full width): cornerstone clipping, then evidence postits.
-    band_y = max(left_bottom, tr_bottom, q_bottom) + 70
-    bottom_cards = ([clip_card] if clip_card else []) + corner_cards
-    flow(bottom_cards, 80, band_y, x_max=2340, rng=rng, gap=55)
-
-    # ---- Loose, atmospheric strings (approximate, never traced) -------------
+    # ---- Loose, atmospheric strings (deterministic, never traced) -----------
     def anchor(card):
         cx, cy = center_of(card)
         return [int(cx), int(cy)]
 
+    strings = []
     vic_a = anchor(victim)
     if suspect_cards:
-        # central/NEW suspect gets a slightly stronger thread
-        central = next((c for c in suspect_cards if "NEW" in (c.get("flag") or "")),
-                       suspect_cards[0])
+        central = next((c for c in suspect_cards if c.get("isNew")), suspect_cards[0])
         for c in suspect_cards:
             kind = "confirmed" if c is central else "suspected"
             strings.append({"from": vic_a, "to": anchor(c),
-                            "sag": rng.randint(30, 90), "kind": kind})
+                            "sag": sag_for(vic_a, anchor(c)), "kind": kind})
         if urgent_card:
-            strings.append({"from": anchor(central), "to": anchor(urgent_card),
-                            "sag": rng.randint(20, 50), "kind": "suspected"})
+            a, b = anchor(central), anchor(urgent_card)
+            strings.append({"from": a, "to": b, "sag": sag_for(a, b), "kind": "suspected"})
         if clip_card:
-            strings.append({"from": anchor(central), "to": anchor(clip_card),
-                            "sag": rng.randint(60, 120), "kind": "suspected"})
-    if clip_card and cards and cards[0]["id"] == "timeline":
-        strings.append({"from": anchor(cards[0]), "to": anchor(clip_card),
-                        "sag": rng.randint(40, 90), "kind": "evidence"})
-    if bld_cards and cards and cards[0]["id"] == "timeline":
-        strings.append({"from": anchor(cards[0]), "to": anchor(bld_cards[0]),
-                        "sag": rng.randint(30, 60), "kind": "unverified"})
+            a, b = anchor(central), anchor(clip_card)
+            strings.append({"from": a, "to": b, "sag": sag_for(a, b), "kind": "suspected"})
+    if clip_card and timeline:
+        a, b = anchor(timeline), anchor(clip_card)
+        strings.append({"from": a, "to": b, "sag": sag_for(a, b), "kind": "evidence"})
+    if bld_cards and timeline:
+        a, b = anchor(timeline), anchor(bld_cards[0])
+        strings.append({"from": a, "to": b, "sag": sag_for(a, b), "kind": "unverified"})
 
-    # ---- Annotations (faint zone labels) -----------------------------------
+    # ---- Annotations (faint zone labels) ------------------------------------
+    ev_y = min((c["y"] for c in ([clip_card] if clip_card else []) + corner_cards),
+               default=1140) - 34
     annotations = [
         {"x": 60, "y": 50, "text": "Timeline"},
         {"x": 1995, "y": 50, "text": "The victim"},
         {"x": 760, "y": 432, "text": "Persons of interest"},
-        {"x": 80, "y": band_y - 34, "text": "Physical evidence"},
+        {"x": 80, "y": ev_y, "text": "Physical evidence"},
     ]
 
-    # ---- World height from content extent -----------------------------------
+    # ---- Save layout memory + finalise cards --------------------------------
+    new_layout = {"meta": {"clipping_id": clip_id},
+                  "cards": {c["id"]: {"x": c["x"], "y": c["y"], "rotate": c["rotate"]}
+                            for c in cards}}
+    for c in cards:
+        c.pop("_cat", None)
+
     bottom = max((c["y"] + est_height(c)) for c in cards) if cards else MIN_WORLD_H
     world_h = max(MIN_WORLD_H, int(bottom + MARGIN_BOTTOM))
 
-    board = {
-        "tagEp": tag,
-        "title": title,
-        "subhead": subhead,
-        "cards": cards,
-        "annotations": annotations,
-        "strings": strings,
-    }
-    return board, WORLD_W, world_h
+    board = {"tagEp": tag, "title": title, "subhead": subhead,
+             "cards": cards, "annotations": annotations, "strings": strings}
+    return board, WORLD_W, world_h, new_layout
 
 
 # ---------------------------------------------------------------------------
@@ -406,6 +475,10 @@ def main():
     ap.add_argument("--subhead", default=None)
     ap.add_argument("--series", default="rittenhouse-dog-walker")
     ap.add_argument("--seed", type=int, default=None)
+    ap.add_argument("--layout", default=None,
+                    help="layout-memory JSON (default: <script>/layouts/<series>.json)")
+    ap.add_argument("--reflow", action="store_true",
+                    help="ignore saved positions and re-lay-out the whole board")
     args = ap.parse_args()
 
     cfg = SERIES_CONFIG.get(args.series)
@@ -418,11 +491,27 @@ def main():
     subhead = args.subhead or cfg["default_subhead"]
     seed = args.seed if args.seed is not None else args.episode or 1
 
-    board, w, h = build_board(md, cfg, tag, args.title, subhead, seed)
+    # Layout memory makes the board grow organically: saved card positions are
+    # reused, only new cards are placed, so it reads as one evolving board.
+    layout_path = Path(args.layout) if args.layout else \
+        Path(__file__).resolve().parent / "layouts" / f"{args.series}.json"
+    layout = {}
+    if layout_path.exists() and not args.reflow:
+        layout = json.loads(layout_path.read_text(encoding="utf-8"))
+    first_build = args.reflow or not layout.get("cards")
+
+    board, w, h, new_layout = build_board(md, cfg, tag, args.title, subhead,
+                                          seed, layout, first_build)
     out_html = inject(template, board, w, h)
     Path(args.out).write_text(out_html, encoding="utf-8")
-    print(f"Wrote {args.out}  ({len(board['cards'])} cards, "
+    layout_path.parent.mkdir(parents=True, exist_ok=True)
+    layout_path.write_text(json.dumps(new_layout, indent=2, ensure_ascii=False),
+                           encoding="utf-8")
+
+    n_new = sum(1 for c in board["cards"] if c.get("isNew"))
+    print(f"Wrote {args.out}  ({len(board['cards'])} cards, {n_new} new, "
           f"{len(board['strings'])} strings, world {w}x{h})")
+    print(f"Layout memory: {layout_path}  ({'created' if first_build else 'updated'})")
 
 
 if __name__ == "__main__":

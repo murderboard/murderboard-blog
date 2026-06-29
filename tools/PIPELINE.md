@@ -15,10 +15,46 @@ Murder Board.md  ──►  md_to_board.py  ──►  episode-N.html  ──►
                                                   └──►  shoot_board.py  ──►  episode-N-board.png  ──►  Substack
 ```
 
+## How the board grows (layout memory)
+
+The board is meant to look like **one physical board that accretes over time**,
+not a fresh arrangement each episode. The converter keeps a per-series memory
+file at `tools/layouts/<slug>.json` mapping each card to a locked `x/y/rotate`.
+
+- **First run** for a series lays out the whole board in balanced bands and
+  saves every position.
+- **Every run after** reuses the saved position for any card it has seen before,
+  and only finds an open slot (in that card's section band) for genuinely new
+  cards. Existing pins never move.
+- New cards get a small **NEW** tab so the latest additions stand out; it clears
+  on the next episode (once the card is part of the saved board).
+- Need a fresh arrangement when the board gets crowded? Run once with
+  `--reflow` to re-lay-out everything and overwrite the memory.
+
+### Keeping card identity stable
+
+A card's id comes from its **content**, so identity (and therefore position) is
+preserved only if the wording stays stable:
+
+- A **suspect** is keyed by name — keep the `### Name` heading the same episode
+  to episode (status suffixes like `— STILL OPEN` and `[NEW]` are ignored, so
+  those are safe to change).
+- A **note / evidence item** is keyed by its text. Light edits keep its id;
+  substantially rewording it reads as a brand-new card in a new spot.
+- The **timeline**, **victim**, and **urgent** slots are singletons — their text
+  can change freely; they stay put.
+- The **cornerstone clipping** (the one newspaper-style card) is chosen on the
+  first build and remembered; later cornerstone items become evidence post-its.
+
+Commit `tools/layouts/<slug>.json` along with the boards so the memory travels
+with the repo.
+
 ## Files
 
 - `tools/md_to_board.py` — parser + layout engine. Reads a `Murder Board.md`,
   builds the `BOARD` data object, splices it into the template.
+- `tools/layouts/<slug>.json` — per-series layout memory (card positions). Auto
+  created/updated; commit it.
 - `tools/board_template.html` — the reusable interactive board (pan/zoom/lightbox).
   This is the canonical copy for the pipeline; keep it in sync with the
   "Claude Design" Murder Board template if you change the look.

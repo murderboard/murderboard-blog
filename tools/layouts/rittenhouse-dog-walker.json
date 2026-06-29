@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "clipping_id": "cs-cornerstone-records"
+  },
+  "cards": {
+    "timeline": {
+      "x": 75,
+      "y": 98,
+      "rotate": 0.3
+    },
+    "bld-officer-posted-at-2d-friday-morning": {
+      "x": 79,
+      "y": 355,
+      "rotate": -0.2
+    },
+    "bld-service-entrance-unlatched-marcus-sideways-in": {
+      "x": 86,
+      "y": 498,
+      "rotate": 0.6
+    },
+    "victim": {
+      "x": 1998,
+      "y": 78,
+      "rotate": 0.3
+    },
+    "urgent": {
+      "x": 1989,
+      "y": 414,
+      "rotate": 0.2
+    },
+    "sus-theo-thomas": {
+      "x": 765,
+      "y": 475,
+      "rotate": -0.6
+    },
+    "sus-unknown-woman-from-the-realty-office": {
+      "x": 1037,
+      "y": 467,
+      "rotate": 0.8
+    },
+    "sus-marcus": {
+      "x": 1334,
+      "y": 472,
+      "rotate": 1.4
+    },
+    "cs-the-manuscript-absent": {
+      "x": 481,
+      "y": 864,
+      "rotate": 1.4
+    },
+    "cs-the-lawyers-letter": {
+      "x": 726,
+      "y": 866,
+      "rotate": 2.8
+    },
+    "cs-the-conservatory-newsletter": {
+      "x": 952,
+      "y": 863,
+      "rotate": -2.4
+    },
+    "cs-the-business-card": {
+      "x": 1192,
+      "y": 867,
+      "rotate": -1.7
+    },
+    "cs-the-branded-folder-on-the-counter": {
+      "x": 1449,
+      "y": 865,
+      "rotate": 1.7
+    },
+    "cs-cornerstone-records": {
+      "x": 91,
+      "y": 864,
+      "rotate": 1.3
+    },
+    "q-he-knows-about-della-how-well": {
+      "x": 769,
+      "y": 666,
+      "rotate": -2.0
+    },
+    "q-who": {
+      "x": 1046,
+      "y": 665,
+      "rotate": -1.2
+    },
+    "q-what-happened-to-the-catalog-where": {
+      "x": 1308,
+      "y": 672,
+      "rotate": -0.2
+    }
+  }
+}

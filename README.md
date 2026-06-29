@@ -73,6 +73,7 @@ Full walkthrough: [`tools/PIPELINE.md`](tools/PIPELINE.md).
 | File | Purpose |
 | --- | --- |
 | `tools/md_to_board.py` | Parse `Murder Board.md` → lay out cards/strings → emit a standalone board HTML |
+| `tools/layouts/<slug>.json` | Per-series **layout memory** so the board grows organically (auto-saved; commit it) |
 | `tools/shoot_board.py` | Render a board HTML to a wide PNG, cropped to the cards |
 | `tools/board_template.html` | The reusable interactive board (pan/zoom/lightbox) |
 | `tools/PIPELINE.md` | End-to-end playbook + per-episode routine |
@@ -82,6 +83,8 @@ One-time setup:
 ```bash
 pip install playwright && python -m playwright install chromium
 ```
+
+The board **grows organically**: positions are saved to `tools/layouts/<slug>.json`, so each run keeps existing cards where they are and only places new ones (tagged with a small NEW badge). Keep suspect headings and note wording stable so cards keep their identity; use `--reflow` to deliberately rearrange. See [`tools/PIPELINE.md`](tools/PIPELINE.md) for the rules.
 
 Per episode (example: Episode 3):
 
