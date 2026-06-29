@@ -11,6 +11,7 @@ export type Episode = {
   title: string;
   url: string;
   date?: string;
+  description?: string;
   murderboardUrl?: string;
 };
 

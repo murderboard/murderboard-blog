@@ -15,13 +15,16 @@ episodes:
   - title: 'Episode 1: The Alley'
     url: https://yoursubstack.substack.com/p/rittenhouse-episode-1
     date: '2026-01-04'
+    description: A dog walker's bad week in posh Rittenhouse Square takes a turn when a reclusive professor, a stolen manuscript, and unexpected news collide.
     murderboardUrl: /murderboards/rittenhouse-dog-walker/episode-1.html
   - title: 'Episode 2: The Manuscript'
     url: https://yoursubstack.substack.com/p/rittenhouse-episode-2
     date: '2026-01-11'
+    description: Lena builds her first murder board, the police won't listen, and a wary building doorman becomes her unlikely ally in Rittenhouse Square.
   - title: 'Episode 3: The Jazz Club'
     url: https://yoursubstack.substack.com/p/rittenhouse-episode-3
     date: '2026-01-18'
+    description: A jazz club, a name from the past, and a young musician Lena is suddenly certain she has figured out — maybe a little too certain.
     murderboardUrl: /murderboards/rittenhouse-dog-walker/episode-3.html
 ---
 

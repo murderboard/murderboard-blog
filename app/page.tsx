@@ -28,6 +28,7 @@ export default async function HomePage() {
         <div className="site-nav__links">
           <a href="#about">About</a>
           <a href="#series">On the Board</a>
+          <a href="#subscribe">Subscribe</a>
         </div>
       </nav>
 
@@ -128,6 +129,23 @@ export default async function HomePage() {
             </article>
           ))}
         </div>
+      </section>
+
+      <section id="subscribe" className="subscribe shell">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Stay on the case</p>
+            <h2>Subscribe for new episodes</h2>
+          </div>
+        </div>
+        <iframe
+          src="https://murderboard.substack.com/embed?transparent=1&light=1"
+          width="480"
+          height="320"
+          style={{ border: 0, background: "transparent" }}
+          frameBorder="0"
+          scrolling="no"
+        />
       </section>
     </main>
   );

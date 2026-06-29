@@ -106,6 +106,9 @@ export default async function SeriesPage({ params }: { params: Promise<{ slug: s
                   <span className="episode-list__title">{episode.title}</span>
                   {episode.date ? <span className="episode-list__date">{episode.date}</span> : null}
                 </div>
+                {episode.description ? (
+                  <p className="episode-list__summary">{episode.description}</p>
+                ) : null}
                 <div className="episode-list__actions">
                   <a className="button button--primary" href={episode.url} target="_blank" rel="noreferrer">
                     Read on Substack

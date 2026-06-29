@@ -615,6 +615,14 @@ img {
   white-space: nowrap;
 }
 
+.episode-list__summary {
+  margin: 0;
+  color: var(--cream-dim);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 60ch;
+}
+
 .episode-list__actions {
   display: flex;
   gap: 0.75rem;
