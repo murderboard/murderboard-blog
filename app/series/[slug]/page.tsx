@@ -133,6 +133,14 @@ export default async function SeriesPage({ params }: { params: Promise<{ slug: s
             <a className="button button--primary" href={entry.subscribeUrl} target="_blank" rel="noreferrer">
               Subscribe on Substack
             </a>
+            <iframe
+              src="https://murderboard.substack.com/embed?transparent=1&light=1"
+              width="480"
+              height="320"
+              style={{ border: 0, background: "transparent" }}
+              frameBorder="0"
+              scrolling="no"
+            />
           </div>
         </section>
       ) : null}
