@@ -43,7 +43,7 @@ export default async function HomePage() {
             <span>Board</span>
           </h1>
           <p className="hero__dek">
-            Mysteries told one episode at a time. Every installment ends on the board &mdash; photographs, notes, red string &mdash; so you&apos;re not just following the case. You&apos;re working it.
+            Serialized mysteries for readers who can&apos;t stop at one chapter. Every episode ends on the board &mdash; photographs, notes, red string &mdash; so you&apos;re not just following the case. You&apos;re working it.
           </p>
           <div className="hero__actions">
             <a className="button button--primary" href="#series">
@@ -136,6 +136,9 @@ export default async function HomePage() {
           <div>
             <p className="eyebrow">Stay on the case</p>
             <h2>Subscribe for new episodes</h2>
+            <p className="section-heading__dek">
+              New threads land on Substack. Subscribe and pull each one the moment it&apos;s pinned to the board.
+            </p>
           </div>
         </div>
         <iframe

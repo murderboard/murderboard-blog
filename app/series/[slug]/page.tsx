@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const entry = await getEntry(slug);
   if (!entry) return {};
-  return { title: `${entry.title} — Murder Board`, description: entry.excerpt };
+  return { title: entry.title, description: entry.excerpt };
 }
 
 export default async function SeriesPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -130,9 +130,6 @@ export default async function SeriesPage({ params }: { params: Promise<{ slug: s
           <div className="subscribe__panel tape tape--left">
             <p className="eyebrow">Don&apos;t miss the next episode</p>
             <h2>Subscribe to {entry.title}</h2>
-            <a className="button button--primary" href={entry.subscribeUrl} target="_blank" rel="noreferrer">
-              Subscribe on Substack
-            </a>
             <iframe
               src="https://murderboard.substack.com/embed?transparent=1&light=1"
               width="480"

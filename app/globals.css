@@ -361,6 +361,13 @@ img {
   line-height: 1.8;
 }
 
+.section-heading__dek {
+  margin-top: 0.9rem;
+  max-width: 52ch;
+  color: var(--cream-dim);
+  line-height: 1.7;
+}
+
 .feature-card__body a,
 .series-card__footer a {
   color: var(--yellow);

@@ -25,9 +25,12 @@ const serif = IM_Fell_English({
 });
 
 export const metadata: Metadata = {
-  title: "Murder Board",
+  title: {
+    default: "Murder Board — Serialized Mysteries & Thrillers",
+    template: "%s — Murder Board",
+  },
   description:
-    "A static, markdown-driven Next.js landing page for serialized crime and mystery stories.",
+    "Murder Board publishes serialized mysteries and thrillers for readers who can't stop at one chapter. Each episode ends on the board — clues, suspects, red string. Pull the thread.",
 };
 
 export default function RootLayout({
