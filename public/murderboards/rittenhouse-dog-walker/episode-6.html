@@ -193,7 +193,7 @@ const WORLD_H = 1500;
 const BOARD = {
   tagEp: "Episode 6 — The Apartment",
   title: "The Missing Manuscript",
-  subhead: "Two documented claims on Della's work. One anonymous threat. One needle that doesn't belong.",
+  subhead: "Two documented claims on Della's work. One anonymous threat. One syringe that doesn't belong.",
 
   cards: [
 
@@ -205,8 +205,8 @@ const BOARD = {
 
     /* --- TIMELINE --- */
     { id:'timeline', type:'typed', x:285, y:305, w:340, rotate:-1, header: 'What We Know',
-      text: "WED: Diane Ashford Realty walkthrough — Diane + someone from her office.<br>THU MORNING: Someone from the office returns alone, dropping paperwork. Marcus assumed Diane.<br>THU AFTERNOON (raining): Halloway gets home, finds the manuscript gone. Calls police. Tells Lena.<br>THU NIGHT: Halloway frightened (per Marcus). Service entrance left unlatched — found 4am Fri, no log of who.<br>FRI ~9AM: Marcus finds Halloway dead. Keys missing from the apartment. Needle on the counter.<br>FRI NIGHT: Death announced at Margaret's card game.",
-      detail: "Marcus assumed the Thursday solo visitor was Diane — but he's not certain, and the note in the Ashford folder is signed 'Kelsey.' The realty return, the frightened evening, the unlatched door, the missing keys, and the needle all sit inside a 48-hour window the police never treated as suspicious."
+      text: "WED: Diane Ashford Realty walkthrough — Diane + someone from her office.<br>THU MORNING: Someone from the office returns alone, dropping paperwork. Marcus assumed Diane.<br>THU AFTERNOON (raining): Halloway gets home, finds the manuscript gone. Calls police. Tells Lena.<br>THU NIGHT: Halloway frightened (per Marcus). Service entrance left unlatched — found 4am Fri, no log of who.<br>FRI ~9AM: Marcus finds Halloway dead. Keys missing from the apartment. A syringe on the counter.<br>FRI NIGHT: Death announced at Margaret's card game.",
+      detail: "Marcus assumed the Thursday solo visitor was Diane — but he's not certain, and the note in the Ashford folder is signed 'Kelsey.' The realty return, the frightened evening, the unlatched door, the missing keys, and the syringe all sit inside a 48-hour window the police never treated as suspicious."
     },
 
     /* --- DELLA MERCER MANUSCRIPT (center anchor / MacGuffin) --- */
@@ -235,8 +235,8 @@ const BOARD = {
 
     /* --- THREATENING NOTE (red postit, far right) --- */
     { id:'threat-note', type:'postit', color:'r', x:2055, y:308, w:207, rotate:-3,
-      text: '"Della belongs to us." Handwritten on a torn conservatory newsletter, sealed in a sandwich bag. Halloway bagged it himself.',
-      detail: "'Us' is plural — a claim, not a person. Cornerstone by a back channel? Naomi's camp? A third party? Author unknown. It's written on the same newsletter that announced the manuscript in the first place — the fact that Halloway bagged and kept it says he took it seriously."
+      text: '"Della belongs to me." Handwritten on a torn conservatory newsletter, sealed in a sandwich bag. Halloway bagged it himself.',
+      detail: "'Me' is singular — one person's claim, not a company's or an estate's. Possessive. Personal. It doesn't sound like Cornerstone's lawyers or Naomi's family; it sounds like someone who thinks Della is theirs. Author unknown. Written on the same newsletter that announced the manuscript in the first place — and Halloway bagged and kept it, which says he took it seriously."
     },
 
     /* --- ASHFORD FOLDER (yellow postit, mid-left) --- */
@@ -259,8 +259,8 @@ const BOARD = {
 
     /* --- THE NEEDLE (red postit, CRITICAL) --- */
     { id:'needle', type:'postit', color:'r', x:330, y:710, w:242, rotate:1.5,
-      text: 'THE NEEDLE. Marcus found it on the counter when he found Halloway. Gone by the time we visited. NOT one of his insulin pens.',
-      detail: "Halloway's insulin pens were in the fridge — three of them, lined up, labeled, with a cold pack. What Marcus saw on the counter wasn't one of them. He went quiet at the fridge. Neither of us said the word. He showed me where he found him, too — on the kitchen floor, right by that counter; body, needle, and pens all within a few feet. The police never looked in the fridge."
+      text: 'THE SYRINGE. Marcus found it on the counter when he found Halloway. Gone by the time we visited. NOT one of his insulin pens — a loose syringe.',
+      detail: "Halloway's insulin pens were in the fridge — three of them, lined up, labeled, with a cold pack. What Marcus saw on the counter wasn't one of them — it was a syringe. He went quiet at the fridge. Neither of us said the word. He showed me where he found him, too — on the kitchen floor, right by that counter; body, syringe, and pens all within a few feet. The police never looked in the fridge."
     },
 
     /* --- NAOMI'S LAWYER'S LETTER (typed card, desk find) --- */
@@ -289,7 +289,7 @@ const BOARD = {
 
     /* --- OPEN Q: WHO SENT THE NOTE (pink postit) --- */
     { id:'q-note', type:'postit', color:'pink', x:2005, y:610, w:218, rotate:3,
-      text: 'Who sent the threatening note? Cornerstone via back channel? Naomi\'s camp? A third party? "Us" is plural — a claim, not a name.',
+      text: 'Who wrote "Della belongs to me"? Singular, possessive — an individual, not a company or an estate. Not the language of the two legal claims.',
       detail: ""
     },
 
