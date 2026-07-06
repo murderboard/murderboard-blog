@@ -186,181 +186,179 @@ const WORLD_W = 2400;
 const WORLD_H = 1500;
 
 /* ============================================================
-   EPISODE DATA — edit only this block to update the board.
+   EPISODE 6 DATA — edit only this block to update the board.
    Cards: polaroid | postit (y/r/w/pink) | typed | id | clipping
    Strings: kind = confirmed | suspected | evidence | unverified
    ============================================================ */
 const BOARD = {
-  "tagEp": "Episode 1 — The Card Game",
-  "title": "The Missing Manuscript",
-  "subhead": "A theft, then a death within a day. Nothing connects yet — just fragments, and a bad feeling about the timing.",
-  "cards": [
-    {
-      "id": "halloway",
-      "type": "polaroid",
-      "x": 110,
-      "y": 340,
-      "w": 185,
-      "rotate": -2.5,
-      "caption": "PROF. HALLOWAY — FOUND FRIDAY",
-      "detail": "Two days ago, frantic in his apartment over a stolen manuscript. This morning the doorman found him dead. They're calling it suicide. I don't believe it — I can't say why yet."
+  tagEp: "Episode 6 — The Apartment",
+  title: "The Missing Manuscript",
+  subhead: "Two documented claims on Della's work. One anonymous threat. One needle that doesn't belong.",
+
+  cards: [
+
+    /* --- VICTIM --- */
+    { id:'halloway', type:'polaroid', x:70, y:320, w:165, rotate:-2.5,
+      caption: 'PROF. JAMES HALLOWAY — VICTIM',
+      detail: "Rittenhouse Conservatory — pianist and jazz scholar. Bought Della Mercer's manuscript at an estate sale, had it authenticated, was writing a book. Found dead Friday morning (~9–9:30) by Marcus. Officially ruled a suicide; police call it 'not suspicious' and closed the case. Marcus — who knew him — says he was scared Thursday night, after the theft. Not upset about the theft. Scared."
     },
-    {
-      "id": "timeline",
-      "type": "typed",
-      "x": 345,
-      "y": 330,
-      "w": 330,
-      "rotate": -1,
-      "header": "What We Know",
-      "text": "THU AFTERNOON: Halloway finds the manuscript gone. Calls police (“thorough,” he said, not kindly). Tells me.<br>THU MORNING / NIGHT: ?<br>FRI MORNING: Doorman finds him. Ruled a suicide.",
-      "detail": "Barely a day between the theft and the death. That's the whole reason this board exists."
+
+    /* --- TIMELINE --- */
+    { id:'timeline', type:'typed', x:285, y:305, w:340, rotate:-1, header: 'What We Know',
+      text: "WED: Diane Ashford Realty walkthrough — Diane + someone from her office.<br>THU MORNING: Someone from the office returns alone, dropping paperwork. Marcus assumed Diane.<br>THU AFTERNOON (raining): Halloway gets home, finds the manuscript gone. Calls police. Tells Lena.<br>THU NIGHT: Halloway frightened (per Marcus). Service entrance left unlatched — found 4am Fri, no log of who.<br>FRI ~9AM: Marcus finds Halloway dead. Keys missing from the apartment. Needle on the counter.<br>FRI NIGHT: Death announced at Margaret's card game.",
+      detail: "Marcus assumed the Thursday solo visitor was Diane — but he's not certain, and the note in the Ashford folder is signed 'Kelsey.' The realty return, the frightened evening, the unlatched door, the missing keys, and the needle all sit inside a 48-hour window the police never treated as suspicious."
     },
-    {
-      "id": "manuscript",
-      "type": "clipping",
-      "x": 885,
-      "y": 345,
-      "w": 380,
-      "rotate": 0.5,
-      "headline": "THE MISSING MANUSCRIPT",
-      "body": "Della Mercer's original composition notes — Philadelphia jazz, authenticated, announced in the conservatory newsletter. Priceless to Halloway. Gone from the middle of his desk."
+
+    /* --- DELLA MERCER MANUSCRIPT (center anchor / MacGuffin) --- */
+    { id:'manuscript', type:'clipping', x:875, y:300, w:390, rotate:0.5,
+      headline: "THE DELLA MERCER MANUSCRIPT — MISSING",
+      body: "Original composition notes, Philadelphia jazz, 1930s–1950s. Appears to prove Della authored work long credited to other artists — a catalog potentially worth millions. Bought by Halloway at an estate sale and authenticated by conservatory scholars before the theft. His draft chapters and research notes are still in the apartment. The manuscript itself: gone from the cleared center of the desk."
     },
-    {
-      "id": "lawyer",
-      "type": "typed",
-      "x": 1480,
-      "y": 335,
-      "w": 300,
-      "rotate": -1.5,
-      "header": "A LEGAL CLAIM",
-      "text": "Law-firm letterhead glimpsed on his desk. Two words I caught: <em>legal claim</em>, <em>manuscript</em>. And it looked filed <em>before</em> the theft was ever reported.",
-      "detail": "Who claims something before it's reported stolen? The timing is the first wrong thing."
+
+    /* --- NAOMI MERCER (suspect, top right) --- */
+    { id:'naomi', type:'id', x:1490, y:308, w:232, rotate:-2,
+      role: 'Suspect — Nearest Kin',
+      name: 'Naomi Mercer',
+      detailLine: "Della's granddaughter. Her lawyer's letter asserts an estate claim and names an authenticator already retained.",
+      flag: '? Why is an authenticator already retained before any of this is settled?',
+      detail: "Formal legal approach — nearest-kin claim over Della's compositions and manuscripts. Her lawyer's letter was on Halloway's desk before he died; he received it and did not comply. No in-person appearance yet. Strong motive, real resources, doing everything correctly — which is its own kind of suspicious to Lena."
     },
-    {
-      "id": "client",
-      "type": "postit",
-      "color": "pink",
-      "x": 1870,
-      "y": 660,
-      "w": 225,
-      "rotate": -2,
-      "text": "THE CLIENT. Somebody's lawyer wants the manuscript — name not on the page I saw. Who lawyers up over old jazz notes?",
-      "detail": ""
+
+    /* --- CORNERSTONE RECORDS (suspect, top right) --- */
+    { id:'cornerstone', type:'id', x:1768, y:308, w:238, rotate:2,
+      role: 'Suspect — Corporate IP Claim',
+      name: 'Cornerstone Records',
+      detailLine: "Philadelphia jazz label. Represented by Harmon & Associates LLP (New York). Demand letter on Halloway's desk before he died.",
+      flag: '? Their legal claim predates the theft.',
+      detail: "Claim: Della's compositions were made under contract to Cornerstone, so the label owns the IP and the manuscripts must be returned. They have the most to lose if her authorship is confirmed. A second Harmon envelope — same firm, different letter, marked urgent — arrived by courier the Monday after the death."
     },
-    {
-      "id": "newsletter",
-      "type": "clipping",
-      "x": 905,
-      "y": 800,
-      "w": 360,
-      "rotate": -1,
-      "headline": "CONSERVATORY NEWSLETTER",
-      "body": "Public. Named Halloway, named the manuscript, announced auditions for a student ensemble. Anyone with a Google alert could have seen it."
+
+    /* --- THREATENING NOTE (red postit, far right) --- */
+    { id:'threat-note', type:'postit', color:'r', x:2055, y:308, w:207, rotate:-3,
+      text: '"Della belongs to us." Handwritten on a torn conservatory newsletter, sealed in a sandwich bag. Halloway bagged it himself.',
+      detail: "'Us' is plural — a claim, not a person. Cornerstone by a back channel? Naomi's camp? A third party? Author unknown. It's written on the same newsletter that announced the manuscript in the first place — the fact that Halloway bagged and kept it says he took it seriously."
     },
-    {
-      "id": "diane",
-      "type": "id",
-      "x": 1520,
-      "y": 720,
-      "w": 235,
-      "rotate": 2,
-      "role": "realtor?",
-      "name": "Diane Ashford",
-      "detailLine": "Cream card, half-under a grocery receipt in his foyer.",
-      "flag": "? Why was a realtor in his apartment?",
-      "detail": "Margaret: 'Diane Ashford. She does most of the building.' Said with a look I couldn't read."
+
+    /* --- ASHFORD FOLDER (yellow postit, mid-left) --- */
+    { id:'ashford', type:'postit', color:'y', x:640, y:640, w:232, rotate:-2,
+      text: 'Branded Diane Ashford Realty folder on the kitchen counter, listing contract inside. Already there before anyone from the building touched the apartment.',
+      detail: "Marcus brought the first mail batch on this visit; the folder predates that — left during or after the walkthrough, before Halloway's death. A handwritten note is clipped to the front."
     },
-    {
-      "id": "urgent",
-      "type": "postit",
-      "color": "y",
-      "x": 150,
-      "y": 800,
-      "w": 245,
-      "rotate": -3,
-      "text": "Stolen Thursday. Dead by Friday. Killed for what he KNEW, or what he HAD?",
-      "detail": "And who's the client on that letter? When was it filed? Why was Diane here at all?"
-    }
+
+    /* --- KELSEY (yellow postit, mid-right) --- */
+    { id:'kelsey', type:'postit', color:'y', x:1455, y:605, w:238, rotate:2.5,
+      text: '"— Kelsey" signed on the Ashford note. Same Kelsey from the phone call. Of course she dropped it off — she works there.',
+      detail: "Diane's assistant; she had reason to be in the building, so Lena filed her as mundane. But her sales pitch (Ep4) described inside sensory details — including the rainy-day sound on the neighboring roof — as if she'd been in the apartment herself. Whether she was the Thursday solo visitor is the dormant question. Not a suspect on this board yet."
+    },
+
+    /* --- RAIN BOOTS (yellow postit, mid-left) --- */
+    { id:'rainboots', type:'postit', color:'y', x:70, y:680, w:207, rotate:-3.5,
+      text: 'Duck boots at the apartment door — dark green, slightly muddy, not moved. Thursday was the last hard rain.',
+      detail: "Likely Halloway's own — stepped out of them in a hurry and never dealt with them. Either way, the mud confirms the Thursday window that everything else sits inside."
+    },
+
+    /* --- THE NEEDLE (red postit, CRITICAL) --- */
+    { id:'needle', type:'postit', color:'r', x:330, y:710, w:242, rotate:1.5,
+      text: 'THE NEEDLE. Marcus found it on the counter when he found Halloway. Gone by the time we visited. NOT one of his insulin pens.',
+      detail: "Halloway's insulin pens were in the fridge — three of them, lined up, labeled, with a cold pack. What Marcus saw on the counter wasn't one of them. He went quiet at the fridge. Neither of us said the word. He showed me where he found him, too — on the kitchen floor, right by that counter; body, needle, and pens all within a few feet. The police never looked in the fridge."
+    },
+
+    /* --- NAOMI'S LAWYER'S LETTER (typed card, desk find) --- */
+    { id:'naomi-letter', type:'typed', x:1070, y:620, w:298, rotate:-1, header: "D-01 — NAOMI'S LAWYER'S LETTER",
+      text: "Law firm retained by Naomi Mercer. Estate claim: nearest kin, Della's compositions and physical manuscripts. Names and gives contact for an independent authenticator already brought in to verify.<br><br>Glimpsed on the desk in Episode 1 — read in full here.",
+      detail: "He received this and did not comply. The authenticator's contact is the live thread — reaching them tells us how far authentication got, who else was in contact, and whether anyone else has been asking about the manuscript."
+    },
+
+    /* --- CORNERSTONE DEMAND LETTER (typed card, desk find) --- */
+    { id:'cornerstone-letter', type:'typed', x:1420, y:910, w:298, rotate:1, header: "D-05 — CORNERSTONE DEMAND LETTER",
+      text: "Harmon & Associates LLP, on behalf of Cornerstone Records. Formal IP claim — Della's compositions were produced under their agreements, so any materials must be returned immediately; all rights reserved.<br><br>On Halloway's desk, there before he died.",
+      detail: "A separate Harmon envelope — same firm, different letter, marked 'urgent' — was delivered by courier the Monday after the death (Lena photographed the return address in Marcus's office). Two letters, same sender, tightening."
+    },
+
+    /* --- AUTHENTICATOR LEAD (yellow postit) --- */
+    { id:'authenticator', type:'postit', color:'y', x:1075, y:980, w:232, rotate:2.5,
+      text: 'LEAD: The authenticator. Named in Naomi\'s letter. Contact info in hand. Who else have they spoken to?',
+      detail: "Someone verified the manuscript's authenticity before it was stolen. They know what it is, what it's worth, and who has been in contact. This is the next call to make."
+    },
+
+    /* --- HALLOWAY'S FEAR (yellow postit) --- */
+    { id:'fear', type:'postit', color:'y', x:340, y:950, w:232, rotate:-2.5,
+      text: "Marcus: Halloway was scared Thursday night — not upset about the theft, scared. Marcus knew him well enough to tell the difference.",
+      detail: "Robbed, receiving legal threats, and holding an anonymous note — he had reason to be. The police read it as distress over the theft. Marcus, who'd known the man for years, read it as fear."
+    },
+
+    /* --- OPEN Q: WHO SENT THE NOTE (pink postit) --- */
+    { id:'q-note', type:'postit', color:'pink', x:2005, y:610, w:218, rotate:3,
+      text: 'Who sent the threatening note? Cornerstone via back channel? Naomi\'s camp? A third party? "Us" is plural — a claim, not a name.',
+      detail: ""
+    },
+
+    /* --- OPEN Q: THEO (pink postit) --- */
+    { id:'q-theo', type:'postit', color:'pink', x:1745, y:605, w:218, rotate:-2,
+      text: 'THEO THOMAS — Lena\'s prime suspect, pinned at center. Conservatory student, cut from the Della ensemble, eidetic musical memory, saw the original scores. Went silent the moment she messaged him. Active 2 days ago.',
+      detail: "Lena reads the silence as guilt. It's more likely grief — dramatic irony she can't see yet. When shown his photo Marcus went quiet, not hostile: a recalibration, not a recognition of a killer. The thread isn't cold, but it isn't what she thinks it is."
+    },
+
+    /* --- POLICE STATUS (typed card, bottom left) --- */
+    { id:'police', type:'typed', x:80, y:1150, w:338, rotate:-1, header: 'Police Status',
+      text: "CASE: CLOSED. Ruled not suspicious. Theft filed separately — low priority. Cameras are display-only, nothing recorded. No one looked at the needle. No one looked in the fridge.",
+      detail: "The theft gave them a tidy story: a man with a break-in and missing valuables, found dead — unfortunate, not suspicious. Marcus told them about the service door, the missing keys, and the needle. None of it landed."
+    },
+
+    /* --- MISSING KEYS (yellow postit, left) --- */
+    { id:'keys', type:'postit', color:'y', x:120, y:895, w:205, rotate:-3,
+      text: "Halloway's keys — gone from the apartment when Marcus found him. Marcus reported it to police. Dismissed.",
+      detail: "Missing keys mean someone could have let themselves in and out. Sits alongside the unlatched service door: two separate ways in, neither one investigated."
+    },
+
+    /* --- "STEPPED ON SOME TOES" (yellow postit, right) --- */
+    { id:'toes', type:'postit', color:'y', x:1775, y:980, w:225, rotate:2.5,
+      text: '"Stepped on some toes with the book." Halloway said it to Marcus weeks ago, offhand, like a joke. Marcus thinks about it differently now.',
+      detail: "Unconnected for now — but it's Halloway himself saying the book had made him an enemy, weeks before anyone thought there was a case to investigate."
+    },
+
+    /* --- DELLA / NEWSLETTER (clipping, bottom center) --- */
+    { id:'della', type:'clipping', x:492, y:1128, w:422, rotate:0.5,
+      headline: "CONSERVATORY NEWSLETTER — THE SPARK",
+      body: "Halloway's announcement of a student ensemble to perform Della Mercer's recovered arrangements this spring. A public PDF — the document that set everything in motion, and the same newsletter a torn piece of which carried the handwritten threat. How Naomi and Cornerstone each learned of the find is still unknown."
+    },
+
   ],
-  "annotations": [
-    {
-      "x": 100,
-      "y": 312,
-      "text": "Victim"
-    },
-    {
-      "x": 875,
-      "y": 315,
-      "text": "The MacGuffin"
-    },
-    {
-      "x": 1475,
-      "y": 305,
-      "text": "Who Wanted It?"
-    }
+
+  annotations: [
+    { x: 65, y: 290, text: 'Victim' },
+    { x: 862, y: 285, text: 'The MacGuffin' },
+    { x: 1474, y: 288, text: 'Suspects' },
+    { x: 65, y: 1108, text: 'Background' },
   ],
-  "strings": [
-    {
-      "from": [
-        200,
-        350
-      ],
-      "to": [
-        1075,
-        380
-      ],
-      "sag": 55,
-      "kind": "confirmed"
-    },
-    {
-      "from": [
-        1630,
-        365
-      ],
-      "to": [
-        1075,
-        380
-      ],
-      "sag": 55,
-      "kind": "suspected"
-    },
-    {
-      "from": [
-        1085,
-        800
-      ],
-      "to": [
-        1075,
-        475
-      ],
-      "sag": -30,
-      "kind": "confirmed"
-    },
-    {
-      "from": [
-        1630,
-        745
-      ],
-      "to": [
-        205,
-        380
-      ],
-      "sag": 150,
-      "kind": "unverified"
-    },
-    {
-      "from": [
-        1980,
-        675
-      ],
-      "to": [
-        1630,
-        375
-      ],
-      "sag": 40,
-      "kind": "suspected"
-    }
+
+  strings: [
+    /* Halloway found the manuscript (confirmed) */
+    { from:[152, 450], to:[1065, 405], sag:60, kind:'confirmed' },
+    /* Naomi wants the manuscript (suspected) */
+    { from:[1606, 380], to:[1065, 405], sag:55, kind:'suspected' },
+    /* Cornerstone wants the manuscript (confirmed — demand letter) */
+    { from:[1880, 380], to:[1065, 405], sag:80, kind:'confirmed' },
+    /* Threatening note → manuscript ("Della belongs to us") */
+    { from:[2148, 375], to:[1065, 405], sag:115, kind:'suspected' },
+    /* Naomi → Naomi's lawyer's letter (confirmed) */
+    { from:[1606, 380], to:[1219, 750], sag:40, kind:'confirmed' },
+    /* Cornerstone → Cornerstone demand letter (confirmed) */
+    { from:[1880, 380], to:[1569, 1045], sag:85, kind:'confirmed' },
+    /* Kelsey → Ashford folder (confirmed — her name is on the note) */
+    { from:[1574, 670], to:[756, 745], sag:55, kind:'confirmed' },
+    /* Needle → Halloway (physical evidence — critical) */
+    { from:[451, 800], to:[152, 450], sag:60, kind:'evidence' },
+    /* Naomi letter → authenticator lead (the contact info is inside) */
+    { from:[1219, 815], to:[1191, 992], sag:22, kind:'confirmed' },
+    /* Halloway received / bagged the threatening note (confirmed) */
+    { from:[152, 450], to:[2148, 375], sag:200, kind:'confirmed' },
+    /* Rain boots → Thursday timeline (unverified — could be either person) */
+    { from:[172, 770], to:[455, 420], sag:80, kind:'unverified' },
+    /* Cornerstone letter → threatening note (suspected same source / escalation) */
+    { from:[1569, 950], to:[2148, 375], sag:80, kind:'suspected' },
+    /* Missing keys → Halloway (physical evidence — access to victim) */
+    { from:[222, 900], to:[152, 470], sag:45, kind:'evidence' },
   ]
 };
 

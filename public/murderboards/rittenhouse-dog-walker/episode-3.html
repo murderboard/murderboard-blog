@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Murder Board</title>
+<title>Murder Board — Episode 6</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Special+Elite&display=swap" rel="stylesheet">
@@ -15,8 +15,7 @@
     BOARD.title, BOARD.subhead, BOARD.cards, and BOARD.strings only.
     Everything above that in this file (styles, layout engine,
     pan/zoom, lightbox) is the reusable template and matches the
-    Murder Board brand system (see the Claude Design project) --
-    it shouldn't need to change between episodes.
+    Murder Board brand system -- it shouldn't need to change between episodes.
     ============================================================
   */
   * { box-sizing: border-box; }
@@ -68,7 +67,6 @@
   }
   .card { position: absolute; cursor: pointer; transition: filter 0.15s ease; user-select: none; }
   .card:hover { filter: brightness(1.12); z-index: 50; }
-  .new-tab { position: absolute; top: -9px; right: -8px; background: var(--red); color: #fff; font-size: 8px; letter-spacing: 0.14em; padding: 2px 5px 1px; transform: rotate(3deg); box-shadow: 0 2px 6px rgba(0,0,0,0.55); z-index: 22; font-family: 'Special Elite', monospace; }
   .pin {
     position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
     width: 13px; height: 13px; border-radius: 50%; background: var(--red);
@@ -110,14 +108,14 @@
   .card-clipping .headline { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: #111; line-height: 1.25; margin-bottom: 6px; border-bottom: 2px solid #111; padding-bottom: 5px; }
   .card-clipping .body { font-size: 10.5px; color: #333; line-height: 1.6; }
   #hud { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 24px; pointer-events: none; z-index: 200; }
-  #title-block { max-width: 420px; background: rgba(13,11,11,0.82); border: 1px solid rgba(192,0,26,0.28); padding: 16px 18px 14px; border-radius: 3px; box-shadow: 0 6px 24px rgba(0,0,0,0.55); }
+  #title-block { max-width: 420px; }
   .board-episode-tag { display: inline-flex; align-items: center; gap: 0.7rem; background: rgba(192,0,26,0.16); border: 1px solid rgba(192,0,26,0.35); padding: 0.4rem 0.9rem; margin-bottom: 0.7rem; }
   .board-episode-tag span { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; }
   .tag-label { color: var(--red); }
   .tag-ep { color: var(--cream-dim); }
   #title-text { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 26px; text-transform: uppercase; color: var(--cream); margin: 0 0 6px; line-height: 1.1; }
   #subhead { font-size: 12px; color: var(--cream-dim); line-height: 1.6; }
-  #hint { font-family: 'Special Elite', monospace; font-size: 11px; color: var(--cream-dim); background: rgba(13,11,11,0.6); border: 1px solid rgba(240,236,224,0.12); padding: 6px 12px; border-radius: 2px; margin-top: 10px; display: inline-block; letter-spacing: 0.04em; }
+  #hint { display: none; }
   #legend { position: fixed; bottom: 22px; left: 24px; z-index: 200; display: flex; flex-wrap: wrap; gap: 14px; pointer-events: none; background: rgba(13,11,11,0.55); padding: 8px 14px; border: 1px solid rgba(240,236,224,0.1); }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.1em; color: var(--cream-dim); text-transform: uppercase; }
   .legend-dot { width: 9px; height: 9px; border-radius: 50%; }
@@ -187,313 +185,277 @@
 const WORLD_W = 2400;
 const WORLD_H = 1500;
 
+/* ============================================================
+   EPISODE DATA — edit only this block to update the board.
+   Cards: polaroid | postit (y/r/w/pink) | typed | id | clipping
+   Strings: kind = confirmed | suspected | evidence | unverified
+   ============================================================ */
 const BOARD = {
   "tagEp": "Episode 3 — The Jazz Club",
-  "title": "The Board So Far",
-  "subhead": "Where the board stands after Episode 3 — and the first suspect pinned at its center.",
+  "title": "The Missing Manuscript",
+  "subhead": "For the first time the board points somewhere — at a music student who played Della on the wrong night. (That’s the problem.)",
   "cards": [
+    {
+      "id": "halloway",
+      "type": "polaroid",
+      "x": 80,
+      "y": 330,
+      "w": 170,
+      "rotate": -2.5,
+      "caption": "PROF. HALLOWAY — FOUND FRIDAY",
+      "detail": "The victim. A theft, then a death a day later, ruled a suicide nobody but me is questioning."
+    },
     {
       "id": "timeline",
       "type": "typed",
-      "w": 330,
-      "header": "Timeline",
-      "text": "<strong>Wednesday</strong> — Realty office walkthrough. Confirmed by Marcus.<br><strong>Thursday morning</strong> — Someone from the realty office may have returned. Marcus uncertain. <em>[This is the theft window.]</em><br><strong>Thursday afternoon</strong> — Halloway home. Discovers theft. Calls police. Speaks to Lena.<br><strong>Thursday night</strong> — Unknown.<br><strong>Friday morning</strong> — Halloway found dead. Ruled suicide. Officer at 2D. Lena dismissed.<br><strong>This week, date uncertain</strong> — Service entrance left unlatched. Marcus mentioned it Saturday morning — doesn't know which morning.",
-      "detail": "",
-      "x": 75,
-      "y": 98,
-      "rotate": 0.3
+      "x": 270,
+      "y": 310,
+      "w": 335,
+      "rotate": -1,
+      "header": "What We Know",
+      "text": "WED: Realty walkthrough.<br>THU MORNING: Someone returns (theft window).<br>THU AFTERNOON: Theft found. Police. Talks to me.<br>THU/FRI: Service entrance left unlatched — which morning? (Marcus)<br>FRI MORNING: Found dead. Ruled suicide.",
+      "detail": "The service entrance is new. A way in that isn’t the front door."
     },
     {
-      "id": "bld-officer-posted-at-2d-friday-morning",
-      "type": "postit",
-      "color": "y",
-      "w": 195,
-      "text": "Officer posted at 2D Friday morning; door propped; Lena dismissed.",
-      "detail": "",
-      "x": 79,
-      "y": 355,
-      "rotate": -0.2
+      "id": "manuscript",
+      "type": "clipping",
+      "x": 695,
+      "y": 330,
+      "w": 355,
+      "rotate": 0.5,
+      "headline": "THE MISSING MANUSCRIPT",
+      "body": "Della Mercer's authenticated composition notes. Gone. Everything traces back to who wanted this and why."
     },
     {
-      "id": "bld-service-entrance-unlatched-marcus-sideways-in",
-      "type": "postit",
-      "color": "y",
-      "w": 195,
-      "text": "<strong>Service entrance, unlatched.</strong> Marcus, sideways, in the lobby. He doesn't know which morning.",
-      "detail": "Thursday? Who used it? Who left it open?",
-      "x": 86,
-      "y": 498,
-      "rotate": 0.6
-    },
-    {
-      "id": "victim",
+      "id": "theo",
       "type": "polaroid",
-      "w": 185,
-      "caption": "JAMES HALLOWAY — DECEASED",
-      "detail": "Philosophy professor. Recently announced he'd acquired a previously unknown jazz manuscript and was publishing a book about it. Found dead Friday morning.",
-      "x": 1998,
-      "y": 78,
-      "rotate": 0.3
+      "x": 1080,
+      "y": 545,
+      "w": 205,
+      "rotate": -2,
+      "caption": "THEO THOMAS — SUSPECT",
+      "detail": "Third-year at the conservatory. Played Della's melodies at Andy's tonight — unannounced. His site: 'mid-century composers historically underrecognized.' How well did he know Halloway? Did he know about the manuscript? Pinned at the center. First real suspect."
+    },
+    {
+      "id": "lawyer",
+      "type": "typed",
+      "x": 1470,
+      "y": 320,
+      "w": 290,
+      "rotate": -1.5,
+      "header": "THE LAWYER'S LETTER",
+      "text": "A formal ownership claim on the manuscript, glimpsed on his desk. Still unread properly. Client unknown.",
+      "detail": ""
+    },
+    {
+      "id": "diane",
+      "type": "id",
+      "x": 1785,
+      "y": 320,
+      "w": 235,
+      "rotate": 2,
+      "role": "realtor?",
+      "name": "Diane Ashford",
+      "detailLine": "Card in his foyer. 'She does most of the building.'",
+      "flag": "? Why here, and when?",
+      "detail": ""
+    },
+    {
+      "id": "realty-woman",
+      "type": "id",
+      "x": 1490,
+      "y": 600,
+      "w": 235,
+      "rotate": 2,
+      "role": "Suspect?",
+      "name": "The realty visitor",
+      "detailLine": "Came back Thursday morning — the theft window.",
+      "flag": "? Same woman as Wednesday, or not?",
+      "detail": ""
+    },
+    {
+      "id": "marcus",
+      "type": "id",
+      "x": 1785,
+      "y": 600,
+      "w": 238,
+      "rotate": -2,
+      "role": "Ally — STILL OPEN",
+      "name": "Marcus",
+      "detailLine": "Doorman. Found the body. Notices things.",
+      "flag": "Roscoe interrupted us. He wanted to say more. So did I.",
+      "detail": "Tomorrow. First thing."
+    },
+    {
+      "id": "folder",
+      "type": "postit",
+      "color": "y",
+      "x": 110,
+      "y": 700,
+      "w": 225,
+      "rotate": -3,
+      "text": "BRANDED FOLDER on the counter. Out of place, unopened. A realty logo. Who left it?",
+      "detail": ""
+    },
+    {
+      "id": "service",
+      "type": "postit",
+      "color": "y",
+      "x": 390,
+      "y": 715,
+      "w": 240,
+      "rotate": 1.5,
+      "text": "SERVICE ENTRANCE off the back hall — left unlatched this week. Marcus doesn’t know which morning. Opens into the alley.",
+      "detail": "[Thursday? Who used it? Who left it open?]"
+    },
+    {
+      "id": "cornerstone",
+      "type": "id",
+      "x": 290,
+      "y": 1085,
+      "w": 305,
+      "rotate": -1,
+      "role": "Label / catalog",
+      "name": "Cornerstone Records",
+      "detailLine": "Label credit on a 1962 Della reissue. Founder: Victor Reese. Absorbed into a bigger company in the ’70s.",
+      "flag": "? What happened to the catalog rights?",
+      "detail": "Noted, not understood. Just a name in a box for now."
+    },
+    {
+      "id": "newsletter",
+      "type": "clipping",
+      "x": 760,
+      "y": 1095,
+      "w": 350,
+      "rotate": -1,
+      "headline": "CONSERVATORY NEWSLETTER",
+      "body": "Public. Named Halloway, the manuscript, the auditions. How everyone found out."
     },
     {
       "id": "urgent",
       "type": "postit",
-      "color": "r",
-      "w": 180,
-      "text": "Finish the conversation with Marcus — tomorrow, first thing.",
-      "detail": "",
-      "x": 1989,
-      "y": 414,
-      "rotate": 0.2
-    },
-    {
-      "id": "sus-theo-thomas",
-      "type": "id",
-      "w": 215,
-      "role": "Suspect — Student",
-      "name": "Theo Thomas",
-      "detailLine": "Third-year student, Rittenhouse Conservatory.",
-      "flag": "",
-      "detail": "Third-year student, Rittenhouse Conservatory. Possibly studied under Halloway. Played variations on Della Mercer's melodic themes at Andy's Jazz Club tonight — unprompted, unannounced. Personal website: work focuses on \"mid-century composers whose contributions have been historically underrecognized.\" <em>[He knows about Della. How well did he know Halloway? Did he know about the manuscript?]</em> — <strong>Pinned at the center of the board this episode. First major suspect.</strong>",
-      "x": 765,
-      "y": 475,
-      "rotate": -0.6
-    },
-    {
-      "id": "sus-unknown-woman-from-the-realty-office",
-      "type": "id",
-      "w": 215,
-      "role": "Witness / Suspect — Realtor",
-      "name": "Unknown woman from the realty office",
-      "detailLine": "Marcus thinks someone from Diane Ashford Realty came back Thursday morning.",
-      "flag": "",
-      "detail": "Marcus thinks someone from Diane Ashford Realty came back Thursday morning. Might be the same person as Wednesday. Might not. <em>[Who?]</em>",
-      "x": 1037,
-      "y": 467,
-      "rotate": 0.8
-    },
-    {
-      "id": "sus-marcus",
-      "type": "id",
-      "w": 215,
-      "role": "Person of Interest",
-      "name": "Marcus",
-      "detailLine": "Didn't get to finish the conversation this morning (Roscoe interrupted).",
-      "flag": "STILL OPEN",
-      "detail": "Didn't get to finish the conversation this morning (Roscoe interrupted). He wanted to say more. So did she. <em>[Tomorrow. First thing.]</em>",
-      "x": 1334,
-      "y": 472,
-      "rotate": 1.4
-    },
-    {
-      "id": "cs-the-manuscript-absent",
-      "type": "postit",
-      "color": "w",
-      "w": 185,
-      "text": "<strong>The manuscript</strong> <em>(absent)</em> — Della Mercer's original composition notes. Gone.",
-      "detail": "",
-      "x": 481,
-      "y": 864,
-      "rotate": 1.4
-    },
-    {
-      "id": "cs-the-lawyers-letter",
-      "type": "postit",
-      "color": "w",
-      "w": 185,
-      "text": "<strong>The lawyer's letter</strong> — Still on the desk, still unread properly.",
-      "detail": "",
-      "x": 726,
-      "y": 866,
-      "rotate": 2.8
-    },
-    {
-      "id": "cs-the-conservatory-newsletter",
-      "type": "postit",
-      "color": "w",
-      "w": 185,
-      "text": "<strong>The Conservatory Newsletter</strong> — Public; named Halloway, the manuscript, the auditions.",
-      "detail": "",
-      "x": 952,
-      "y": 863,
-      "rotate": -2.4
-    },
-    {
-      "id": "cs-the-business-card",
-      "type": "postit",
-      "color": "w",
-      "w": 185,
-      "text": "<strong>The business card</strong> — Cream card stock, Diane Ashford Realty.",
-      "detail": "",
-      "x": 1192,
-      "y": 867,
-      "rotate": -1.7
-    },
-    {
-      "id": "cs-the-branded-folder-on-the-counter",
-      "type": "postit",
-      "color": "w",
-      "w": 185,
-      "text": "<strong>The branded folder on the counter</strong> — Out of place, unopened.",
-      "detail": "",
-      "x": 1449,
-      "y": 865,
-      "rotate": 1.7
-    },
-    {
-      "id": "cs-cornerstone-records",
-      "type": "clipping",
-      "w": 345,
-      "headline": "CORNERSTONE RECORDS",
-      "body": "Label credit on a 1962 Della Mercer reissue. Founded by Victor Reese, Philadelphia. Absorbed into a larger company in the seventies.",
-      "detail": "What happened to the catalog? Where did the rights go?",
-      "x": 91,
-      "y": 864,
-      "rotate": 1.3
-    },
-    {
-      "id": "q-he-knows-about-della-how-well",
-      "type": "postit",
       "color": "pink",
-      "w": 200,
-      "text": "He knows about Della. How well did he know Halloway? Did he know about the manuscript?",
-      "detail": "",
-      "x": 769,
-      "y": 666,
-      "rotate": -2.0
-    },
-    {
-      "id": "q-who",
-      "type": "postit",
-      "color": "pink",
-      "w": 200,
-      "text": "Who?",
-      "detail": "",
-      "x": 1046,
-      "y": 665,
-      "rotate": -1.2
-    },
-    {
-      "id": "q-what-happened-to-the-catalog-where",
-      "type": "postit",
-      "color": "pink",
-      "w": 200,
-      "text": "What happened to the catalog? Where did the rights go?",
-      "detail": "",
-      "x": 1308,
-      "y": 672,
-      "rotate": -0.2
+      "x": 1260,
+      "y": 1080,
+      "w": 240,
+      "rotate": 2,
+      "text": "Finish the conversation with Marcus. Tomorrow. First thing.",
+      "detail": ""
     }
   ],
   "annotations": [
     {
-      "x": 60,
-      "y": 50,
-      "text": "Timeline"
+      "x": 75,
+      "y": 308,
+      "text": "Victim"
     },
     {
-      "x": 1995,
-      "y": 50,
-      "text": "The victim"
+      "x": 690,
+      "y": 305,
+      "text": "The MacGuffin"
     },
     {
-      "x": 760,
-      "y": 432,
-      "text": "Persons of interest"
+      "x": 1465,
+      "y": 298,
+      "text": "Suspects"
     },
     {
-      "x": 80,
-      "y": 829,
-      "text": "Physical evidence"
+      "x": 285,
+      "y": 1062,
+      "text": "Background"
     }
   ],
   "strings": [
     {
       "from": [
-        2090,
-        216
+        165,
+        340
       ],
       "to": [
-        872,
-        523
+        875,
+        375
       ],
-      "sag": 87,
+      "sag": 55,
       "kind": "confirmed"
     },
     {
       "from": [
-        2090,
-        216
+        875,
+        410
       ],
       "to": [
-        1144,
-        515
-      ],
-      "sag": 74,
-      "kind": "suspected"
-    },
-    {
-      "from": [
-        2090,
-        216
-      ],
-      "to": [
-        1441,
-        534
-      ],
-      "sag": 61,
-      "kind": "suspected"
-    },
-    {
-      "from": [
-        872,
-        523
-      ],
-      "to": [
-        2079,
-        462
-      ],
-      "sag": 85,
-      "kind": "suspected"
-    },
-    {
-      "from": [
-        872,
-        523
-      ],
-      "to": [
-        263,
-        928
-      ],
-      "sag": 61,
-      "kind": "suspected"
-    },
-    {
-      "from": [
-        240,
-        205
-      ],
-      "to": [
-        263,
-        928
-      ],
-      "sag": 61,
-      "kind": "evidence"
-    },
-    {
-      "from": [
-        240,
-        205
-      ],
-      "to": [
-        176,
-        414
+        1180,
+        545
       ],
       "sag": 35,
+      "kind": "confirmed"
+    },
+    {
+      "from": [
+        1615,
+        360
+      ],
+      "to": [
+        875,
+        375
+      ],
+      "sag": 60,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        935,
+        1095
+      ],
+      "to": [
+        875,
+        420
+      ],
+      "sag": 120,
+      "kind": "confirmed"
+    },
+    {
+      "from": [
+        1607,
+        640
+      ],
+      "to": [
+        1607,
+        360
+      ],
+      "sag": 25,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        440,
+        1085
+      ],
+      "to": [
+        875,
+        410
+      ],
+      "sag": 90,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        510,
+        730
+      ],
+      "to": [
+        440,
+        380
+      ],
+      "sag": 70,
       "kind": "unverified"
     }
   ]
 };
+
+/* ============================================================
+   TEMPLATE ENGINE — do not edit below this line between episodes
+   ============================================================ */
 
 const STRING_STYLE = {
   confirmed: { stroke: '#ed1c2e', width: 2, opacity: 0.75, dash: null },
@@ -569,7 +531,6 @@ function renderCards() {
     html += `<div class="card" data-id="${card.id}" style="left:${card.x}px; top:${card.y}px; width:${card.w}px; transform: rotate(${card.rotate}deg);">
       ${pinHTML(pinVariantFor(card, i))}
       ${cardInnerHTML(card)}
-      ${card.isNew ? '<div class="new-tab">NEW</div>' : ''}
     </div>`;
   });
   layer.innerHTML = html;
@@ -624,8 +585,8 @@ function applyTransform() {
 
 function centerView() {
   const vw = viewport.clientWidth, vh = viewport.clientHeight;
-  scale = Math.min(vw / WORLD_W, vh / WORLD_H) * 1.6;
-  scale = Math.max(0.35, Math.min(scale, 1));
+  scale = Math.min(vw / WORLD_W, vh / WORLD_H) * 0.92;
+  scale = Math.max(0.25, Math.min(scale, 1));
   tx = (vw - WORLD_W * scale) / 2;
   ty = (vh - WORLD_H * scale) / 2;
   applyTransform();

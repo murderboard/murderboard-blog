@@ -191,174 +191,277 @@ const WORLD_H = 1500;
    Strings: kind = confirmed | suspected | evidence | unverified
    ============================================================ */
 const BOARD = {
-  "tagEp": "Episode 1 — The Card Game",
+  "tagEp": "Episode 4 — The DM",
   "title": "The Missing Manuscript",
-  "subhead": "A theft, then a death within a day. Nothing connects yet — just fragments, and a bad feeling about the timing.",
+  "subhead": "Two clusters that don't touch: the student who went silent, and the realty assistant who'd been inside the apartment.",
   "cards": [
     {
       "id": "halloway",
       "type": "polaroid",
-      "x": 110,
-      "y": 340,
-      "w": 185,
+      "x": 80,
+      "y": 325,
+      "w": 170,
       "rotate": -2.5,
       "caption": "PROF. HALLOWAY — FOUND FRIDAY",
-      "detail": "Two days ago, frantic in his apartment over a stolen manuscript. This morning the doorman found him dead. They're calling it suicide. I don't believe it — I can't say why yet."
+      "detail": "The victim. Theft, then death a day later. Still ruled a suicide."
     },
     {
       "id": "timeline",
       "type": "typed",
-      "x": 345,
-      "y": 330,
-      "w": 330,
+      "x": 265,
+      "y": 308,
+      "w": 335,
       "rotate": -1,
       "header": "What We Know",
-      "text": "THU AFTERNOON: Halloway finds the manuscript gone. Calls police (“thorough,” he said, not kindly). Tells me.<br>THU MORNING / NIGHT: ?<br>FRI MORNING: Doorman finds him. Ruled a suicide.",
-      "detail": "Barely a day between the theft and the death. That's the whole reason this board exists."
+      "text": "WED: Walkthrough.<br>THU MORNING: Someone returns (theft window).<br>THU (raining): Kelsey’s pitch mentions rain on the roof — not connected yet.<br>THU AFTERNOON: Theft found. Police.<br>FRI MORNING: Found dead. Ruled suicide.",
+      "detail": "A rainy-Thursday detail is sitting here loose. I don’t know why it matters yet."
     },
     {
       "id": "manuscript",
       "type": "clipping",
-      "x": 885,
-      "y": 345,
-      "w": 380,
+      "x": 695,
+      "y": 335,
+      "w": 350,
       "rotate": 0.5,
       "headline": "THE MISSING MANUSCRIPT",
-      "body": "Della Mercer's original composition notes — Philadelphia jazz, authenticated, announced in the conservatory newsletter. Priceless to Halloway. Gone from the middle of his desk."
+      "body": "Della Mercer's authenticated composition notes. Gone. The thing everyone seems to want."
+    },
+    {
+      "id": "theo",
+      "type": "polaroid",
+      "x": 1080,
+      "y": 520,
+      "w": 205,
+      "rotate": -2,
+      "caption": "THEO THOMAS — SUSPECT",
+      "detail": "Pinned at the center. My prime suspect — and going quiet only made me surer."
+    },
+    {
+      "id": "theo-case",
+      "type": "postit",
+      "color": "r",
+      "x": 1330,
+      "y": 640,
+      "w": 230,
+      "rotate": 3,
+      "text": "CASE AGAINST THEO: early access to the scores. Eidetic musical memory (his words). Cut from the ensemble. Went OFFLINE the second I mentioned Halloway’s death.",
+      "detail": "Three arrows now. Reads like guilt. [does it, though?]"
     },
     {
       "id": "lawyer",
       "type": "typed",
-      "x": 1480,
-      "y": 335,
-      "w": 300,
+      "x": 1490,
+      "y": 315,
+      "w": 285,
       "rotate": -1.5,
-      "header": "A LEGAL CLAIM",
-      "text": "Law-firm letterhead glimpsed on his desk. Two words I caught: <em>legal claim</em>, <em>manuscript</em>. And it looked filed <em>before</em> the theft was ever reported.",
-      "detail": "Who claims something before it's reported stolen? The timing is the first wrong thing."
+      "header": "THE LAWYER'S LETTER",
+      "text": "Formal ownership claim on the manuscript. Client still unnamed. On his desk.",
+      "detail": ""
     },
     {
-      "id": "client",
+      "id": "marcus",
+      "type": "id",
+      "x": 1790,
+      "y": 315,
+      "w": 235,
+      "rotate": 2,
+      "role": "Ally",
+      "name": "Marcus",
+      "detailLine": "Doorman. Found the body.",
+      "flag": "Off today. Conversation still pending — tomorrow.",
+      "detail": ""
+    },
+    {
+      "id": "diane",
+      "type": "id",
+      "x": 1490,
+      "y": 895,
+      "w": 235,
+      "rotate": 2,
+      "role": "realtor",
+      "name": "Diane Ashford",
+      "detailLine": "Runs the listing. 'Does most of the building.'",
+      "flag": "",
+      "detail": ""
+    },
+    {
+      "id": "kelsey",
       "type": "postit",
-      "color": "pink",
-      "x": 1870,
-      "y": 660,
-      "w": 225,
+      "color": "y",
+      "x": 1780,
+      "y": 880,
+      "w": 235,
       "rotate": -2,
-      "text": "THE CLIENT. Somebody's lawyer wants the manuscript — name not on the page I saw. Who lawyers up over old jazz notes?",
+      "text": "KELSEY — Diane's assistant. Answered the phone. Described 2D from the INSIDE: the light, the moldings, rain on the roof. She's been in there. Recently. Listing isn’t even active.",
+      "detail": "[Why was she in the apartment with nothing signed?]"
+    },
+    {
+      "id": "folder",
+      "type": "postit",
+      "color": "y",
+      "x": 110,
+      "y": 695,
+      "w": 225,
+      "rotate": -3,
+      "text": "BRANDED FOLDER on the counter. Still out of place, still unopened.",
+      "detail": ""
+    },
+    {
+      "id": "service",
+      "type": "postit",
+      "color": "y",
+      "x": 385,
+      "y": 715,
+      "w": 235,
+      "rotate": 1.5,
+      "text": "SERVICE ENTRANCE left unlatched this week. Still don’t know which morning.",
+      "detail": ""
+    },
+    {
+      "id": "cornerstone",
+      "type": "id",
+      "x": 290,
+      "y": 1085,
+      "w": 300,
+      "rotate": -1,
+      "role": "Label / catalog",
+      "name": "Cornerstone Records",
+      "detailLine": "Founder Victor Reese. Absorbed in the ’70s.",
+      "flag": "Noted, dormant.",
       "detail": ""
     },
     {
       "id": "newsletter",
       "type": "clipping",
-      "x": 905,
-      "y": 800,
-      "w": 360,
+      "x": 730,
+      "y": 1095,
+      "w": 350,
       "rotate": -1,
       "headline": "CONSERVATORY NEWSLETTER",
-      "body": "Public. Named Halloway, named the manuscript, announced auditions for a student ensemble. Anyone with a Google alert could have seen it."
-    },
-    {
-      "id": "diane",
-      "type": "id",
-      "x": 1520,
-      "y": 720,
-      "w": 235,
-      "rotate": 2,
-      "role": "realtor?",
-      "name": "Diane Ashford",
-      "detailLine": "Cream card, half-under a grocery receipt in his foyer.",
-      "flag": "? Why was a realtor in his apartment?",
-      "detail": "Margaret: 'Diane Ashford. She does most of the building.' Said with a look I couldn't read."
+      "body": "Public. Named the manuscript and the auditions. Now fully paid off — it’s what led me to the Ashford call."
     },
     {
       "id": "urgent",
       "type": "postit",
-      "color": "y",
-      "x": 150,
-      "y": 800,
-      "w": 245,
-      "rotate": -3,
-      "text": "Stolen Thursday. Dead by Friday. Killed for what he KNEW, or what he HAD?",
-      "detail": "And who's the client on that letter? When was it filed? Why was Diane here at all?"
+      "color": "pink",
+      "x": 1200,
+      "y": 1080,
+      "w": 255,
+      "rotate": 2,
+      "text": "Two questions now: Why did Theo go dark? And why was Kelsey in the apartment with nothing signed?",
+      "detail": ""
     }
   ],
   "annotations": [
     {
-      "x": 100,
-      "y": 312,
+      "x": 75,
+      "y": 305,
       "text": "Victim"
     },
     {
-      "x": 875,
-      "y": 315,
+      "x": 690,
+      "y": 308,
       "text": "The MacGuffin"
     },
     {
-      "x": 1475,
-      "y": 305,
-      "text": "Who Wanted It?"
+      "x": 1120,
+      "y": 498,
+      "text": "The Student"
+    },
+    {
+      "x": 1485,
+      "y": 872,
+      "text": "The Realty Office"
+    },
+    {
+      "x": 285,
+      "y": 1062,
+      "text": "Background"
     }
   ],
   "strings": [
     {
       "from": [
-        200,
-        350
+        165,
+        338
       ],
       "to": [
-        1075,
-        380
+        870,
+        375
       ],
       "sag": 55,
       "kind": "confirmed"
     },
     {
       "from": [
-        1630,
-        365
+        870,
+        415
       ],
       "to": [
-        1075,
-        380
+        1182,
+        520
       ],
-      "sag": 55,
+      "sag": 30,
+      "kind": "confirmed"
+    },
+    {
+      "from": [
+        1445,
+        650
+      ],
+      "to": [
+        1230,
+        540
+      ],
+      "sag": 20,
+      "kind": "confirmed"
+    },
+    {
+      "from": [
+        905,
+        1095
+      ],
+      "to": [
+        1130,
+        545
+      ],
+      "sag": 60,
       "kind": "suspected"
     },
     {
       "from": [
-        1085,
-        800
+        1897,
+        880
       ],
       "to": [
-        1075,
-        475
+        1607,
+        935
       ],
-      "sag": -30,
+      "sag": 25,
       "kind": "confirmed"
     },
     {
       "from": [
-        1630,
-        745
+        1830,
+        890
       ],
       "to": [
-        205,
-        380
+        870,
+        420
       ],
-      "sag": 150,
+      "sag": 180,
       "kind": "unverified"
     },
     {
       "from": [
-        1980,
-        675
+        1610,
+        360
       ],
       "to": [
-        1630,
+        870,
         375
       ],
-      "sag": 40,
+      "sag": 60,
       "kind": "suspected"
     }
   ]
