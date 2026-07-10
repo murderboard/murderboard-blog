@@ -393,6 +393,31 @@ class VerifyHelpers(unittest.TestCase):
         self.assertTrue(ok3)                                  # clean
 
 
+class DryRunLint(unittest.TestCase):
+    def test_classify_sections(self):
+        md = VICTIM + "## Suspects\n### A\nx\n\n## Notes to self\n- meta\n"
+        rec, ign = md2b.classify_sections(md)
+        self.assertIn("victim", rec)
+        self.assertIn("suspects", rec)
+        self.assertIn("notes to self", ign)
+
+    def test_missing_victim_is_collected_as_warning(self):
+        warnings = []
+        md2b.build_board("## Suspects\n### A\nx\n", CFG, "t", "T", "s", 1, {},
+                         True, episode=1, warnings=warnings)
+        self.assertTrue(any("Victim" in w for w in warnings))
+
+    def test_dry_run_report_contents(self):
+        board, _, _, _, mem = _build(EP1, episode=1)
+        clean = md2b.dry_run_report(EP1, board, mem, [], 1, "rittenhouse-dog-walker")
+        self.assertIn("DRY RUN", clean)
+        self.assertIn("cards:", clean)
+        self.assertIn("no warnings", clean)
+        noisy = md2b.dry_run_report(EP1, board, mem, ["something off"], 1, "x")
+        self.assertIn("WARNINGS (1)", noisy)
+        self.assertIn("something off", noisy)
+
+
 class SeriesConfigFiles(unittest.TestCase):
     def test_all_series_load_with_required_keys(self):
         sc = _load_module("series_config")

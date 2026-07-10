@@ -166,7 +166,7 @@ Files: new `tools/series/*.json`; `md_to_board.py`, `regen.py`, `shoot_board.py`
   and emitted BOARD is valid JSON; (4) every image path relative; (5) no duplicate
   ids; (6) an unresolved connection id fails. Runnable locally and in the Pages
   workflow.
-- **`--lint` / `--dry-run`** (assembled from checks added across phases): reports
+- **`--lint` / `--dry-run`** ✅ DONE (assembled from checks added across phases): reports
   unrecognized H2s and which section each matched, bullets skipped, unparsed wiki
   syntax, id churn vs memory (with rename suggestions), images resolved/missing,
   band overflow, would-be memory deletions, and unresolved connection ids —

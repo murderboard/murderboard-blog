@@ -334,13 +334,14 @@ def sag_for(a, b):
 # (in SERIES_CONFIG for the victim, or an `![[file]]` embed for suspects /
 # evidence); the resolver finds it in the tree and returns the relative path,
 # so the folder layout is a config detail, not something the author types.
-def build_asset_resolver(out_path, check=False):
+def build_asset_resolver(out_path, check=False, warnings=None):
     """Return ``resolve(filename) -> "assets/<kind>/<file>"`` (or None).
 
     Indexes the ``assets/`` folder that sits next to the output board, matching
-    on basename so the author never has to spell out the sub-folder. Missing
-    files warn to stderr, or hard-fail when ``check`` is set (``--check-assets``).
-    Deterministic: on a duplicate basename the lexicographically-first path wins.
+    on basename so the author never has to spell out the sub-folder. A missing
+    file is collected into ``warnings`` (a list) if given — else printed — or
+    hard-fails when ``check`` is set (``--check-assets``). Deterministic: on a
+    duplicate basename the lexicographically-first path wins.
     """
     board_dir = Path(out_path).resolve().parent
     assets_dir = board_dir / "assets"
@@ -358,7 +359,10 @@ def build_asset_resolver(out_path, check=False):
             msg = f"image not found under {assets_dir}: {filename!r}"
             if check:
                 sys.exit(f"[md_to_board] {msg}")
-            print(f"WARNING [md_to_board]: {msg}", file=sys.stderr)
+            if warnings is not None:
+                warnings.append(msg)
+            else:
+                print(f"WARNING [md_to_board]: {msg}", file=sys.stderr)
             return None
         return p.relative_to(board_dir).as_posix()
 
@@ -398,14 +402,22 @@ def layout_diff(saved: dict, current: dict, prune: bool = False) -> dict:
 # Strings — authored `## Connections`, else the legacy heuristic
 # ---------------------------------------------------------------------------
 def build_strings(sections, cards, anchor, victim, suspect_cards,
-                  urgent_card, clip_card, timeline, bld_cards):
+                  urgent_card, clip_card, timeline, bld_cards,
+                  warnings=None, lenient=False):
     """Return the board's connection strings.
 
     If the episode declares a `## Connections` section, that is the source of
     truth: each `from-id -> to-id: kind` line is resolved by **explicit id**, and
     an unknown id or kind is a hard error (a typo can never silently drop a
-    string). With no `## Connections`, fall back to the legacy deterministic
-    heuristic so un-migrated episodes still build."""
+    string) — unless `lenient` (dry-run), where the problem is recorded in
+    `warnings` and the line skipped so the report can still render. With no
+    `## Connections`, fall back to the legacy deterministic heuristic."""
+    def problem(msg):
+        if lenient:
+            (warnings if warnings is not None else []).append(msg)
+            return True          # signal: skip this line
+        sys.exit(f"[md_to_board] {msg}")
+
     strings = []
     conn_block = section(sections, "connection")
     if conn_block.strip():
@@ -413,17 +425,20 @@ def build_strings(sections, cards, anchor, victim, suspect_cards,
         for line in bullets(conn_block):
             m = re.match(r"^(.+?)\s*->\s*(.+?)\s*:\s*([A-Za-z]+)\s*$", line)
             if not m:
-                sys.exit(f"[md_to_board] bad connection line {line!r}; "
-                         f"expected 'from-id -> to-id: kind'.")
+                problem(f"bad connection line {line!r}; expected "
+                        f"'from-id -> to-id: kind'.")
+                continue
             a_id, b_id, kind = m.group(1).strip(), m.group(2).strip(), m.group(3).lower()
             if kind not in STRING_KINDS:
-                sys.exit(f"[md_to_board] unknown connection kind {kind!r} in {line!r}; "
-                         f"valid kinds: {', '.join(STRING_KINDS)}.")
-            for eid in (a_id, b_id):
-                if eid not in index:
-                    sys.exit(f"[md_to_board] connection references unknown id {eid!r} "
-                             f"in {line!r}. Pin it with %%id: {eid}%% or fix the "
-                             f"reference. Known ids: {', '.join(sorted(index))}.")
+                problem(f"unknown connection kind {kind!r} in {line!r}; "
+                        f"valid kinds: {', '.join(STRING_KINDS)}.")
+                continue
+            if any(eid not in index for eid in (a_id, b_id)):
+                bad = [eid for eid in (a_id, b_id) if eid not in index]
+                problem(f"connection references unknown id {bad!r} in {line!r}. "
+                        f"Pin it with %%id: name%% or fix the reference. "
+                        f"Known ids: {', '.join(sorted(index))}.")
+                continue
             a, b = anchor(index[a_id]), anchor(index[b_id])
             strings.append({"from": a, "to": b, "sag": sag_for(a, b), "kind": kind})
         return strings
@@ -455,16 +470,20 @@ def build_strings(sections, cards, anchor, victim, suspect_cards,
 # Build the BOARD object
 # ---------------------------------------------------------------------------
 def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
-                resolve_asset=None, episode=0, prune=False):
+                resolve_asset=None, episode=0, prune=False, warnings=None,
+                lenient=False):
     """Build the BOARD object plus an updated layout-memory dict.
 
     `layout` = {"meta": {...}, "cards": {id: {x, y, rotate}}}. Existing cards
     reuse their saved position; only first-appearance cards are placed fresh
     (into the first free slot of their section band) and tagged isNew.
+    Non-fatal issues are appended to `warnings` (a list) when given.
     """
     rng = random.Random(seed)
     if resolve_asset is None:
         resolve_asset = lambda _f: None
+    if warnings is None:
+        warnings = []
     md = strip_comments(md)          # drop %%author notes%%, keep %%id%% markers
     sections = parse_sections(md)
     saved = layout.get("cards", {})
@@ -505,8 +524,8 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
     # ---- Victim polaroid (from the ## Victim section) + Urgent --------------
     vic_block = section(sections, "victim", "centerpiece")
     if not vic_block.strip():
-        print("WARNING [md_to_board]: no ## Victim section — the centerpiece will "
-              "use a placeholder. Add a ## Victim block to the episode.", file=sys.stderr)
+        warnings.append("no ## Victim section — the centerpiece uses a placeholder. "
+                        "Add a ## Victim block to the episode.")
     v = parse_victim(vic_block)
     victim = add({"id": "victim", "type": "polaroid", "w": 185,
                   "caption": v["caption"], "detail": v["detail"]}, "tr")
@@ -634,8 +653,12 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
     seen = set()
     for c in cards:
         if c["id"] in seen:
-            sys.exit(f"[md_to_board] duplicate card id {c['id']!r}. Two cards "
-                     f"resolved to the same id — pin distinct %%id: name%% markers.")
+            msg = (f"duplicate card id {c['id']!r}. Two cards resolved to the same "
+                   f"id — pin distinct %%id: name%% markers.")
+            if lenient:
+                warnings.append(msg)
+            else:
+                sys.exit(f"[md_to_board] {msg}")
         seen.add(c["id"])
 
     # ---- Placement: lock existing, drop in new ------------------------------
@@ -667,9 +690,8 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
                 if overflowed:
                     overflow_bands.add(c["_cat"])
         for b in sorted(overflow_bands):
-            print(f"NOTE [md_to_board]: band {b!r} was full — new card(s) placed "
-                  f"below it (world grew to fit). Consider a polish pass or "
-                  f"--reflow.", file=sys.stderr)
+            warnings.append(f"band {b!r} was full — new card(s) placed below it "
+                            f"(world grew to fit). Consider a polish pass or --reflow.")
 
     # ---- Provenance & NEW tags (stable across reruns) -----------------------
     # A card is "new" iff this is the episode it first appeared in. Reading that
@@ -697,7 +719,8 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
         return [int(cx), int(cy)]
 
     strings = build_strings(sections, cards, anchor, victim, suspect_cards,
-                            urgent_card, clip_card, timeline, bld_cards)
+                            urgent_card, clip_card, timeline, bld_cards,
+                            warnings=warnings, lenient=lenient)
 
     # ---- Annotations (faint zone labels) ------------------------------------
     ev_y = min((c["y"] for c in ([clip_card] if clip_card else []) + corner_cards),
@@ -777,6 +800,58 @@ def extract_board(html: str) -> dict:
     return json.loads(m.group(1))
 
 
+# ---------------------------------------------------------------------------
+# Lint / dry-run
+# ---------------------------------------------------------------------------
+# Keywords section() matches on. Any H2 not containing one of these is ignored
+# by the parser — the lint surfaces those so a mistyped `## Suspcets` is visible.
+KNOWN_SECTION_KEYWORDS = (
+    "victim", "centerpiece", "timeline", "building", "location", "suspect",
+    "document", "cornerstone", "central", "connection", "urgent", "now",
+)
+
+
+def classify_sections(md):
+    """Return (recognized_titles, ignored_titles) for the H2s in the source."""
+    titles = list(parse_sections(strip_comments(md)).keys())
+    rec = [t for t in titles if any(k in t for k in KNOWN_SECTION_KEYWORDS)]
+    ign = [t for t in titles if t not in rec]
+    return rec, ign
+
+
+def dry_run_report(md, board, mem, warnings, episode, series):
+    """Human-readable summary of what a build WOULD do (no files touched)."""
+    from collections import Counter
+    rec, ign = classify_sections(md)
+    has_conn = bool(section(parse_sections(strip_comments(md)), "connection").strip())
+    types = Counter(c["type"] for c in board["cards"])
+    new_ids = [c["id"] for c in board["cards"] if c.get("isNew")]
+    imaged = sum(1 for c in board["cards"] if c.get("image"))
+
+    L = [f"DRY RUN — episode {episode} [{series}]  (no files written)"]
+    L.append(f"  sections: {', '.join(rec) or '(none)'}")
+    if ign:
+        L.append(f"  ignored H2s (not parsed): {', '.join(ign)}")
+    L.append(f"  cards: {len(board['cards'])} — "
+             + ", ".join(f"{n} {t}" for t, n in sorted(types.items())))
+    if new_ids:
+        L.append(f"  new this episode: {', '.join(new_ids)}")
+    L.append(f"  memory: {len(mem['added'])} added, {len(mem['kept'])} kept, "
+             f"{len(mem['moved'])} moved, {len(mem['not_in_input'])} not-in-input")
+    if mem["not_in_input"]:
+        L.append(f"    not-in-input (kept unless --prune): "
+                 f"{', '.join(mem['not_in_input'])}")
+    L.append(f"  images: {imaged} resolved")
+    L.append(f"  strings: {len(board['strings'])} "
+             f"({'authored ## Connections' if has_conn else 'heuristic fallback'})")
+    if warnings:
+        L.append(f"  WARNINGS ({len(warnings)}):")
+        L += [f"    - {w}" for w in warnings]
+    else:
+        L.append("  no warnings.")
+    return "\n".join(L)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("source", help="path to the episode's Murder Board.md")
@@ -799,9 +874,15 @@ def main():
                          "rebuild can't clobber later episodes)")
     ap.add_argument("--check-assets", action="store_true",
                     help="fail if a referenced card image is missing (default: warn)")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="parse and report what would happen; write nothing")
+    ap.add_argument("--lint", action="store_true",
+                    help="like --dry-run, but exit non-zero if there are warnings "
+                         "or unrecognized sections (for CI)")
     args = ap.parse_args()
 
     cfg = load_series(args.series)
+    dry = args.dry_run or args.lint
 
     md = Path(args.source).read_text(encoding="utf-8")
     template = Path(args.template).read_text(encoding="utf-8")
@@ -822,10 +903,20 @@ def main():
     first_build = args.reflow or not layout.get("cards")
 
     # Card images resolve against the assets/ tree beside the output board.
-    resolve_asset = build_asset_resolver(args.out, check=args.check_assets)
+    # In a dry run, collect missing-image warnings instead of hard-failing.
+    warnings = []
+    resolve_asset = build_asset_resolver(
+        args.out, check=args.check_assets and not dry, warnings=warnings)
     board, w, h, new_layout, mem = build_board(
         md, cfg, tag, args.title, subhead, seed, layout, first_build,
-        resolve_asset=resolve_asset, episode=args.episode, prune=args.prune)
+        resolve_asset=resolve_asset, episode=args.episode, prune=args.prune,
+        warnings=warnings, lenient=dry)
+
+    if dry:
+        print(dry_run_report(md, board, mem, warnings, args.episode, args.series))
+        if args.lint and (warnings or classify_sections(md)[1]):
+            sys.exit(1)
+        return
 
     out_html = inject(template, board, w, h)
     # Self-check: the board we're about to ship must round-trip as valid JSON.
@@ -848,6 +939,8 @@ def main():
           f"({'created' if first_build else 'updated'}; "
           f"{len(mem['added'])} added, {len(mem['kept'])} kept, "
           f"{len(mem['moved'])} moved, {tail})")
+    for wmsg in warnings:
+        print(f"WARNING [md_to_board]: {wmsg}", file=sys.stderr)
 
 
 if __name__ == "__main__":

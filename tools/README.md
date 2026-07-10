@@ -213,7 +213,16 @@ python3 tools/md_to_board.py SOURCE.md \
 ```
 `--seed` defaults to the episode number (keeps jitter reproducible). `--layout`
 defaults to `tools/layouts/<series>.json`. `--reflow` re-lays-out everything and
-overwrites the memory.
+overwrites the memory. `--check-assets` hard-fails on a missing image; `--prune`
+drops layout-memory cards not in this episode.
+
+**`--dry-run` / `--lint`:** parse and print a report — recognized vs **ignored**
+H2s (catches a mistyped `## Suspcets`), card counts by type, the memory diff, id
+churn, missing images, string source (authored vs heuristic), and every warning —
+**without writing any file**. `--lint` is the same but exits non-zero when there
+are warnings or unrecognized sections (for CI or a pre-migration check). Both are
+lenient: connection/duplicate-id problems become warnings in the report instead of
+aborting, so you see everything at once.
 
 ### The splice (`inject`)
 The generator replaces the template text **between the sentinels
