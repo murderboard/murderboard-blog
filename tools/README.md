@@ -188,24 +188,36 @@ defaults to `tools/layouts/<series>.json`. `--reflow` re-lays-out everything and
 overwrites the memory.
 
 ### The splice (`inject`)
-The generator replaces the template text **between the markers
-`const WORLD_W` and `const STRING_STYLE`** with fresh `WORLD_W`/`WORLD_H`/`BOARD`
-definitions. **Those two markers must exist verbatim in `board_template.html`** —
-if you refactor the template, keep them, or update `inject()` to match.
+The generator replaces the template text **between the sentinels
+`/* BOARD-DATA-START */` and `/* BOARD-DATA-END */`** with fresh
+`WORLD_W`/`WORLD_H`/`BOARD` definitions. **Exactly one of each sentinel must exist
+in `board_template.html`** — a missing or duplicated sentinel is a hard error, not
+a silent mis-splice. After building, `inject()`/`extract_board()` validate that the
+emitted `BOARD` round-trips as JSON. If you refactor the template, keep the
+sentinel pair (or update `inject()` to match).
 
 ---
 
 ## 6. Layout memory (how the board "grows")
 
-`tools/layouts/<slug>.json` maps each card id → `{x, y, rotate}`, plus
-`meta.clipping_id`.
+`tools/layouts/<slug>.json` maps each card id →
+`{x, y, rotate, first_seen_episode}`, plus `meta.clipping_id`. Keys are written
+sorted for readable diffs.
 
 - **First build** (no memory, or `--reflow`): lay the whole board out in balanced
   bands and save every position.
 - **Every later build**: cards already in memory **keep their exact saved
   position**; only first-appearance cards are placed, into the first free
   (non-overlapping) slot of their **section band** (`BANDS` in the script:
-  `left`, `tr`, `suspect`, `question`, `bottom`), and tagged `isNew`.
+  `left`, `tr`, `suspect`, `question`, `bottom`).
+- **Memory MERGES, it doesn't replace.** Each build updates the entries for the
+  cards it produced and **keeps every other saved card untouched**, so rebuilding
+  an early episode can't wipe the positions of cards introduced later. `--prune`
+  is the only thing that drops a stale id; every run prints a one-line memory
+  report (`N added, N kept, N moved, N not-in-input`).
+- **`first_seen_episode` drives the NEW tab** (`isNew = first_seen == episode`),
+  not memory membership — so re-running the same episode is byte-identical and the
+  NEW tab doesn't decay. `--reflow` still preserves provenance.
 - **Existing pins never move.** This is the core promise — the reader sees one
   evolving board. Do not defeat it (e.g. don't reflow just to tidy a single
   episode; nudge that one card's saved coords instead).
@@ -313,9 +325,9 @@ bounding-box math must run after they paint.
 2. **Never move a saved pin.** Existing card positions come from
    `layouts/<slug>.json` and must persist. To adjust one card, edit its saved
    coords; don't `--reflow` a mid-series episode.
-3. **Keep template ↔ generator in sync.** The `inject()` markers
-   (`const WORLD_W` … `const STRING_STYLE`) and the card-field names must match
-   between `md_to_board.py` and `board_template.html`.
+3. **Keep template ↔ generator in sync.** The `inject()` sentinels
+   (`/* BOARD-DATA-START */` … `/* BOARD-DATA-END */`) and the card-field names
+   must match between `md_to_board.py` and `board_template.html`.
 4. **Relative image paths only** — `assets/<kind>/<file>` (§9.2). Root-absolute
    (`/assets/…`, `/murderboards/…`) breaks the `file://` screenshot.
 5. **The `BOARD` object is emitted as JSON** (`json.dumps`). Anything you add to a

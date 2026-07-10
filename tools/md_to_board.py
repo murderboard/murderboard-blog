@@ -371,10 +371,39 @@ def build_asset_resolver(out_path, check=False):
 
 
 # ---------------------------------------------------------------------------
+# Layout-memory diff (for the merge safety report)
+# ---------------------------------------------------------------------------
+def layout_diff(saved: dict, current: dict, prune: bool = False) -> dict:
+    """Compare the saved card positions against this build's cards.
+
+    `saved`/`current` are {id: {x, y, rotate, ...}}. Returns lists of ids by
+    category so `main()` can print a one-line safety report and so a rebuild of
+    an early episode can never silently drop later cards without it showing.
+    """
+    s, c = set(saved), set(current)
+    both = s & c
+
+    def moved(k):
+        a, b = saved[k], current[k]
+        return (a.get("x"), a.get("y"), a.get("rotate")) != \
+               (b.get("x"), b.get("y"), b.get("rotate"))
+
+    moved_ids = sorted(k for k in both if moved(k))
+    not_in_input = sorted(s - c)   # in memory but not in this episode's input
+    return {
+        "added": sorted(c - s),
+        "kept": sorted(k for k in both if k not in moved_ids),
+        "moved": moved_ids,
+        "not_in_input": not_in_input,
+        "removed": not_in_input if prune else [],
+    }
+
+
+# ---------------------------------------------------------------------------
 # Build the BOARD object
 # ---------------------------------------------------------------------------
 def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
-                resolve_asset=None):
+                resolve_asset=None, episode=0, prune=False):
     """Build the BOARD object plus an updated layout-memory dict.
 
     `layout` = {"meta": {...}, "cards": {id: {x, y, rotate}}}. Existing cards
@@ -525,8 +554,25 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
                 x, y = free_slot(c, BANDS[c["_cat"]], placed)
                 c["x"], c["y"] = x, y
                 c["rotate"] = round(rng.uniform(-3.0, 3.0), 1)
-                c["isNew"] = True
                 placed.append(box_of(c))
+
+    # ---- Provenance & NEW tags (stable across reruns) -----------------------
+    # A card is "new" iff this is the episode it first appeared in. Reading that
+    # from saved memory — not from placement state — makes reruns idempotent
+    # (the NEW tab no longer decays on a second run) and keeps the "central"
+    # suspect string below from jumping between runs.
+    for c in cards:
+        prev = saved.get(c["id"])
+        if prev is None:
+            c["_first_seen"] = episode
+            c["isNew"] = True
+        else:
+            fs = prev.get("first_seen_episode")
+            # Legacy memory (pre-provenance): adopt the current episode as the
+            # stamp but don't retroactively flag a long-standing card as new.
+            c["_first_seen"] = episode if fs is None else fs
+            if fs == episode:
+                c["isNew"] = True
 
     # ---- Loose, atmospheric strings (deterministic, never traced) -----------
     def anchor(card):
@@ -565,32 +611,67 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
     ]
 
     # ---- Save layout memory + finalise cards --------------------------------
-    new_layout = {"meta": {"clipping_id": clip_id},
-                  "cards": {c["id"]: {"x": c["x"], "y": c["y"], "rotate": c["rotate"]}
-                            for c in cards}}
+    # MERGE, don't replace: keep the saved position of every card this episode
+    # didn't mention, so rebuilding an early episode can't wipe later episodes'
+    # memory. `--prune` (prune=True) is the only way to drop stale ids.
+    current = {c["id"]: {"x": c["x"], "y": c["y"], "rotate": c["rotate"],
+                         "first_seen_episode": c["_first_seen"]}
+               for c in cards}
+    merged = dict(current) if prune else {**saved, **current}
+    new_layout = {"meta": {"clipping_id": clip_id}, "cards": merged}
+    mem_diff = layout_diff(saved, current, prune)
     for c in cards:
         c.pop("_cat", None)
+        c.pop("_first_seen", None)
 
     bottom = max((c["y"] + est_height(c)) for c in cards) if cards else MIN_WORLD_H
     world_h = max(MIN_WORLD_H, int(bottom + MARGIN_BOTTOM))
 
     board = {"tagEp": tag, "title": title, "subhead": subhead,
              "cards": cards, "annotations": annotations, "strings": strings}
-    return board, WORLD_W, world_h, new_layout
+    return board, WORLD_W, world_h, new_layout, mem_diff
 
 
 # ---------------------------------------------------------------------------
 # Splice into the template
 # ---------------------------------------------------------------------------
+# The generator replaces the region between these two sentinels. Using explicit
+# sentinels (rather than matching `const WORLD_W` / `const STRING_STYLE` by
+# substring) means a refactor or a stray comment can't silently splice the wrong
+# span — a missing/duplicated sentinel is a hard error instead.
+BOARD_START = "/* BOARD-DATA-START */"
+BOARD_END = "/* BOARD-DATA-END */"
+
+
 def inject(template: str, board: dict, world_w: int, world_h: int) -> str:
-    start = template.index("const WORLD_W")
-    end = template.index("const STRING_STYLE")
+    for marker in (BOARD_START, BOARD_END):
+        n = template.count(marker)
+        if n != 1:
+            sys.exit(f"[md_to_board] template must contain exactly one {marker} "
+                     f"(found {n}). See tools/README.md §5 (the splice).")
+    board_json = json.dumps(board, indent=2, ensure_ascii=False)
+    json.loads(board_json)  # emitted BOARD must be valid JSON before we ship it
+    s = template.index(BOARD_START) + len(BOARD_START)
+    e = template.index(BOARD_END)
     data = (
-        f"const WORLD_W = {world_w};\n"
+        f"\nconst WORLD_W = {world_w};\n"
         f"const WORLD_H = {world_h};\n\n"
-        f"const BOARD = {json.dumps(board, indent=2, ensure_ascii=False)};\n\n"
+        f"const BOARD = {board_json};\n"
     )
-    return template[:start] + data + template[end:]
+    return template[:s] + data + template[e:]
+
+
+def extract_board(html: str) -> dict:
+    """Pull the injected BOARD object literal back out of a built board and parse
+    it as JSON. Proves the emitted board round-trips; used by the post-build
+    self-check and by the test suite."""
+    if html.count(BOARD_START) != 1 or html.count(BOARD_END) != 1:
+        raise ValueError("built board is missing its BOARD-DATA sentinels")
+    seg = html[html.index(BOARD_START):html.index(BOARD_END)]
+    m = re.search(r"const BOARD = (\{.*\});", seg, re.S)
+    if not m:
+        raise ValueError("no BOARD literal found between sentinels")
+    return json.loads(m.group(1))
 
 
 def main():
@@ -607,7 +688,12 @@ def main():
     ap.add_argument("--layout", default=None,
                     help="layout-memory JSON (default: <script>/layouts/<series>.json)")
     ap.add_argument("--reflow", action="store_true",
-                    help="ignore saved positions and re-lay-out the whole board")
+                    help="ignore saved positions and re-lay-out the whole board "
+                         "(provenance/first_seen is still preserved)")
+    ap.add_argument("--prune", action="store_true",
+                    help="drop cards from layout memory that aren't in this "
+                         "episode's input (default: keep them so an early-episode "
+                         "rebuild can't clobber later episodes)")
     ap.add_argument("--check-assets", action="store_true",
                     help="fail if a referenced card image is missing (default: warn)")
     args = ap.parse_args()
@@ -626,27 +712,41 @@ def main():
     # reused, only new cards are placed, so it reads as one evolving board.
     layout_path = Path(args.layout) if args.layout else \
         Path(__file__).resolve().parent / "layouts" / f"{args.series}.json"
+    # Always load the memory if it exists — even with --reflow, so provenance
+    # (first_seen_episode) and meta.clipping_id survive a re-layout. --reflow only
+    # controls whether saved *positions* are reused.
     layout = {}
-    if layout_path.exists() and not args.reflow:
+    if layout_path.exists():
         layout = json.loads(layout_path.read_text(encoding="utf-8"))
     first_build = args.reflow or not layout.get("cards")
 
     # Card images resolve against the assets/ tree beside the output board.
     resolve_asset = build_asset_resolver(args.out, check=args.check_assets)
-    board, w, h, new_layout = build_board(md, cfg, tag, args.title, subhead,
-                                          seed, layout, first_build,
-                                          resolve_asset=resolve_asset)
+    board, w, h, new_layout, mem = build_board(
+        md, cfg, tag, args.title, subhead, seed, layout, first_build,
+        resolve_asset=resolve_asset, episode=args.episode, prune=args.prune)
+
     out_html = inject(template, board, w, h)
+    # Self-check: the board we're about to ship must round-trip as valid JSON.
+    extract_board(out_html)
+
     Path(args.out).write_text(out_html, encoding="utf-8")
     layout_path.parent.mkdir(parents=True, exist_ok=True)
-    layout_path.write_text(json.dumps(new_layout, indent=2, ensure_ascii=False),
-                           encoding="utf-8")
+    layout_path.write_text(
+        json.dumps(new_layout, indent=2, ensure_ascii=False, sort_keys=True),
+        encoding="utf-8")
 
     n_new = sum(1 for c in board["cards"] if c.get("isNew"))
     n_img = sum(1 for c in board["cards"] if c.get("image"))
     print(f"Wrote {args.out}  ({len(board['cards'])} cards, {n_new} new, "
           f"{n_img} with images, {len(board['strings'])} strings, world {w}x{h})")
-    print(f"Layout memory: {layout_path}  ({'created' if first_build else 'updated'})")
+    tail = ("pruned" if args.prune else
+            f"{len(mem['not_in_input'])} not-in-input kept — --prune to remove"
+            if mem["not_in_input"] else "none stale")
+    print(f"Layout memory: {layout_path}  "
+          f"({'created' if first_build else 'updated'}; "
+          f"{len(mem['added'])} added, {len(mem['kept'])} kept, "
+          f"{len(mem['moved'])} moved, {tail})")
 
 
 if __name__ == "__main__":

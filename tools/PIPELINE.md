@@ -29,7 +29,11 @@ file at `tools/layouts/<slug>.json` mapping each card to a locked `x/y/rotate`.
 - New cards get a small **NEW** tab so the latest additions stand out; it clears
   on the next episode (once the card is part of the saved board).
 - Need a fresh arrangement when the board gets crowded? Run once with
-  `--reflow` to re-lay-out everything and overwrite the memory.
+  `--reflow` to re-lay-out positions (provenance is preserved).
+- The memory **merges** every run — rebuilding an early episode keeps later
+  episodes' cards. Each run prints a report (`N added, N kept, N moved,
+  N not-in-input`); pass `--prune` only when you deliberately want to drop cards
+  that are no longer in the input.
 
 ### Keeping card identity stable
 
@@ -85,6 +89,9 @@ directly for a one-off flag `regen.py` doesn't expose yet.
   cornerstone). Copy it to start a new episode or series.
 - `tools/shoot_board.py` — renders a finished board HTML to a wide PNG, cropped
   to the cards (no empty cork).
+- `tools/test_pipeline.py` — fast, dependency-free regression tests (determinism,
+  memory merge, provenance, the splice). Run `python3 tools/test_pipeline.py`
+  before committing generator changes.
 - `content/entries/<slug>.md` — the series file; its `episodes:` list points each
   episode at its board via `murderboardUrl`.
 

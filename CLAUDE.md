@@ -26,9 +26,9 @@ memory in `tools/layouts/<slug>.json`) → `episode-N.html` → `tools/shoot_boa
 2. **Never move a card that already has a saved position** in
    `tools/layouts/<slug>.json`. Nudge its saved coords; don't `--reflow`
    mid-series.
-3. **Keep the generator and template in sync** — the `inject()` markers
-   `const WORLD_W` … `const STRING_STYLE` must exist verbatim in
-   `board_template.html`.
+3. **Keep the generator and template in sync** — the `inject()` sentinels
+   `/* BOARD-DATA-START */` … `/* BOARD-DATA-END */` must exist (exactly one each)
+   in `board_template.html`.
 4. **Card images use RELATIVE paths** (`assets/<kind>/<file>`, beside the board),
    never root-absolute `/assets/…` — `shoot_board.py` loads boards over `file://`,
    where root-absolute paths silently 404 and ship a broken screenshot. (Image
