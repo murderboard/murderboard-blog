@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Murder Board — Episode 6</title>
+<title>Murder Board</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Special+Elite&display=swap" rel="stylesheet">
@@ -15,7 +15,8 @@
     BOARD.title, BOARD.subhead, BOARD.cards, and BOARD.strings only.
     Everything above that in this file (styles, layout engine,
     pan/zoom, lightbox) is the reusable template and matches the
-    Murder Board brand system -- it shouldn't need to change between episodes.
+    Murder Board brand system (see the Claude Design project) --
+    it shouldn't need to change between episodes.
     ============================================================
   */
   * { box-sizing: border-box; }
@@ -67,6 +68,7 @@
   }
   .card { position: absolute; cursor: pointer; transition: filter 0.15s ease; user-select: none; }
   .card:hover { filter: brightness(1.12); z-index: 50; }
+  .new-tab { position: absolute; top: -9px; right: -8px; background: var(--red); color: #fff; font-size: 8px; letter-spacing: 0.14em; padding: 2px 5px 1px; transform: rotate(3deg); box-shadow: 0 2px 6px rgba(0,0,0,0.55); z-index: 22; font-family: 'Special Elite', monospace; }
   .pin {
     position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
     width: 13px; height: 13px; border-radius: 50%; background: var(--red);
@@ -83,6 +85,8 @@
     background: #1c1515; aspect-ratio: 4/5; display: flex; align-items: center; justify-content: center;
     font-family: monospace; font-size: 10px; color: #4a3838; text-align: center; padding: 6px; line-height: 1.5;
   }
+  .card-polaroid .img.has-photo { padding: 0; overflow: hidden; }
+  .card-polaroid .img img.photo { width: 100%; height: 100%; object-fit: cover; display: block; }
   .card-polaroid .cap {
     text-align: center; font-family: 'Special Elite', monospace; font-size: 10px; color: #2a2020;
     padding-top: 8px; letter-spacing: 0.06em; text-transform: uppercase;
@@ -101,21 +105,26 @@
     margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid rgba(192,0,26,0.25);
   }
   .card-id { background: var(--cream); color: #111; padding: 12px 14px; box-shadow: 3px 5px 16px rgba(0,0,0,0.6); font-family: 'Special Elite', monospace; border-left: 4px solid var(--red); }
+  .card-id.has-photo { display: flex; gap: 11px; align-items: flex-start; }
+  .card-id .mug { width: 60px; height: 75px; object-fit: cover; flex: none; border: 2px solid #fff; box-shadow: 0 1px 5px rgba(0,0,0,0.45); }
+  .card-id .id-body { min-width: 0; }
   .card-id .role { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--red); margin-bottom: 4px; }
   .card-id .name { font-size: 15px; font-weight: bold; color: var(--black); margin-bottom: 3px; }
   .card-id .detail { font-size: 11px; color: #555; line-height: 1.55; }
+  .card-postit .evidence-photo { width: 100%; display: block; margin-bottom: 9px; border: 1px solid rgba(0,0,0,0.28); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
   .card-clipping { background: #e8e0cc; padding: 13px 15px; font-family: 'Special Elite', monospace; box-shadow: 3px 5px 16px rgba(0,0,0,0.6); }
   .card-clipping .headline { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: #111; line-height: 1.25; margin-bottom: 6px; border-bottom: 2px solid #111; padding-bottom: 5px; }
+  .card-clipping .clip-photo { width: 100%; display: block; margin: 0 0 8px; border: 1px solid rgba(0,0,0,0.3); }
   .card-clipping .body { font-size: 10.5px; color: #333; line-height: 1.6; }
   #hud { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 24px; pointer-events: none; z-index: 200; }
-  #title-block { max-width: 420px; }
+  #title-block { max-width: 420px; background: rgba(13,11,11,0.82); border: 1px solid rgba(192,0,26,0.28); padding: 16px 18px 14px; border-radius: 3px; box-shadow: 0 6px 24px rgba(0,0,0,0.55); }
   .board-episode-tag { display: inline-flex; align-items: center; gap: 0.7rem; background: rgba(192,0,26,0.16); border: 1px solid rgba(192,0,26,0.35); padding: 0.4rem 0.9rem; margin-bottom: 0.7rem; }
   .board-episode-tag span { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; }
   .tag-label { color: var(--red); }
   .tag-ep { color: var(--cream-dim); }
   #title-text { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 26px; text-transform: uppercase; color: var(--cream); margin: 0 0 6px; line-height: 1.1; }
   #subhead { font-size: 12px; color: var(--cream-dim); line-height: 1.6; }
-  #hint { display: none; }
+  #hint { font-family: 'Special Elite', monospace; font-size: 11px; color: var(--cream-dim); background: rgba(13,11,11,0.6); border: 1px solid rgba(240,236,224,0.12); padding: 6px 12px; border-radius: 2px; margin-top: 10px; display: inline-block; letter-spacing: 0.04em; }
   #legend { position: fixed; bottom: 22px; left: 24px; z-index: 200; display: flex; flex-wrap: wrap; gap: 14px; pointer-events: none; background: rgba(13,11,11,0.55); padding: 8px 14px; border: 1px solid rgba(240,236,224,0.1); }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.1em; color: var(--cream-dim); text-transform: uppercase; }
   .legend-dot { width: 9px; height: 9px; border-radius: 50%; }
@@ -182,189 +191,310 @@
 </div>
 
 <script>
+/* BOARD-DATA-START */
 const WORLD_W = 2400;
-const WORLD_H = 1500;
+const WORLD_H = 1738;
 
-/* ============================================================
-   EPISODE 6 DATA — edit only this block to update the board.
-   Cards: polaroid | postit (y/r/w/pink) | typed | id | clipping
-   Strings: kind = confirmed | suspected | evidence | unverified
-   ============================================================ */
 const BOARD = {
-  tagEp: "Episode 6 — The Apartment",
-  title: "The Missing Manuscript",
-  subhead: "Two documented claims on Della's work. One anonymous threat. One syringe that doesn't belong.",
-
-  cards: [
-
-    /* --- VICTIM --- */
-    { id:'halloway', type:'polaroid', x:70, y:320, w:165, rotate:-2.5,
-      caption: 'PROF. JAMES HALLOWAY — VICTIM',
-      detail: "Rittenhouse Conservatory — pianist and jazz scholar. Bought Della Mercer's manuscript at an estate sale, had it authenticated, was writing a book. Found dead Friday morning (~9–9:30) by Marcus. Officially ruled a suicide; police call it 'not suspicious' and closed the case. Marcus — who knew him — says he was scared Thursday night, after the theft. Not upset about the theft. Scared."
+  "tagEp": "Episode 6",
+  "title": "The Board So Far",
+  "subhead": "Where the board stands at the end of this episode.",
+  "cards": [
+    {
+      "id": "timeline",
+      "type": "typed",
+      "w": 330,
+      "header": "Timeline",
+      "text": "<strong>Wednesday</strong> — Realty office walkthrough. Confirmed.<br><strong>Thursday midday</strong> — Someone from the realty office returns alone. Paperwork — listing contracts, confirmed physically present in a Diane Ashford Realty folder on the counter, predating any building involvement.<br><strong>Thursday, raining [confirmed via duck boots]</strong> — Matches Kelsey's Episode 4 sensory description; not yet connected by Lena.<br><strong>Thursday afternoon</strong> — Halloway discovers theft, calls police, speaks to Lena.<br><strong>Thursday evening</strong> — Halloway visibly frightened.<br><strong>Friday early morning</strong> — Halloway found dead. Ruled suicide/natural causes. Keys missing.",
+      "detail": "",
+      "x": 72,
+      "y": 98,
+      "rotate": 2.1
     },
-
-    /* --- TIMELINE --- */
-    { id:'timeline', type:'typed', x:285, y:305, w:340, rotate:-1, header: 'What We Know',
-      text: "WED: Diane Ashford Realty walkthrough — Diane + someone from her office.<br>THU MORNING: Someone from the office returns alone, dropping paperwork. Marcus assumed Diane.<br>THU AFTERNOON (raining): Halloway gets home, finds the manuscript gone. Calls police. Tells Lena.<br>THU NIGHT: Halloway frightened (per Marcus). Service entrance left unlatched — found 4am Fri, no log of who.<br>FRI ~9AM: Marcus finds Halloway dead. Keys missing from the apartment. A syringe on the counter.<br>FRI NIGHT: Death announced at Margaret's card game.",
-      detail: "Marcus assumed the Thursday solo visitor was Diane — but he's not certain, and the note in the Ashford folder is signed 'Kelsey.' The realty return, the frightened evening, the unlatched door, the missing keys, and the syringe all sit inside a 48-hour window the police never treated as suspicious."
+    {
+      "id": "service-entrance",
+      "type": "postit",
+      "color": "y",
+      "w": 195,
+      "text": "Service entrance used Thursday night — no log entry. Still unresolved.",
+      "detail": "",
+      "x": 80,
+      "y": 474,
+      "rotate": -1.6
     },
-
-    /* --- DELLA MERCER MANUSCRIPT (center anchor / MacGuffin) --- */
-    { id:'manuscript', type:'clipping', x:875, y:300, w:390, rotate:0.5,
-      headline: "THE DELLA MERCER MANUSCRIPT — MISSING",
-      body: "Original composition notes, Philadelphia jazz, 1930s–1950s. Appears to prove Della authored work long credited to other artists — a catalog potentially worth millions. Bought by Halloway at an estate sale and authenticated by conservatory scholars before the theft. His draft chapters and research notes are still in the apartment. The manuscript itself: gone from the cleared center of the desk."
+    {
+      "id": "cameras",
+      "type": "postit",
+      "color": "y",
+      "w": 195,
+      "text": "Cameras — dead end, closed.",
+      "detail": "",
+      "x": 80,
+      "y": 306,
+      "rotate": 0.7
     },
-
-    /* --- NAOMI MERCER (suspect, top right) --- */
-    { id:'naomi', type:'id', x:1490, y:308, w:232, rotate:-2,
-      role: 'Suspect — Nearest Kin',
-      name: 'Naomi Mercer',
-      detailLine: "Della's granddaughter. Her lawyer's letter asserts an estate claim and names an authenticator already retained.",
-      flag: '? Why is an authenticator already retained before any of this is settled?',
-      detail: "Formal legal approach — nearest-kin claim over Della's compositions and manuscripts. Her lawyer's letter was on Halloway's desk before he died; he received it and did not comply. No in-person appearance yet. Strong motive, real resources, doing everything correctly — which is its own kind of suspicious to Lena."
+    {
+      "id": "syringe",
+      "type": "postit",
+      "color": "y",
+      "w": 195,
+      "text": "<strong>Syringe on counter — reframed. Halloway used insulin pens, all accounted for in the fridge. The loose syringe was not his. Realized by Marcus, not Lena — his personal knowledge of Halloway's routine is what makes the catch land.</strong>",
+      "detail": "",
+      "x": 80,
+      "y": 930,
+      "rotate": 1.5
     },
-
-    /* --- CORNERSTONE RECORDS (suspect, top right) --- */
-    { id:'cornerstone', type:'id', x:1768, y:308, w:238, rotate:2,
-      role: 'Suspect — Corporate IP Claim',
-      name: 'Cornerstone Records',
-      detailLine: "Philadelphia jazz label. Represented by Harmon & Associates LLP (New York). Demand letter on Halloway's desk before he died.",
-      flag: '? Their legal claim predates the theft.',
-      detail: "Claim: Della's compositions were made under contract to Cornerstone, so the label owns the IP and the manuscripts must be returned. They have the most to lose if her authorship is confirmed. A second Harmon envelope — same firm, different letter, marked urgent — arrived by courier the Monday after the death."
+    {
+      "id": "body-position",
+      "type": "postit",
+      "color": "y",
+      "w": 195,
+      "text": "<strong>Body found on the kitchen floor, at the near end of the counter (Marcus, Episode 6) — on his back, \"like he'd gone down where he stood.\"</strong> Body, loose syringe (counter), and insulin pens (fridge) all within a few feet: the staged tableau that read as a cardiac/diabetic collapse.",
+      "detail": "",
+      "x": 80,
+      "y": 1242,
+      "rotate": 1.8,
+      "isNew": true
     },
-
-    /* --- THREATENING NOTE (red postit, far right) --- */
-    { id:'threat-note', type:'postit', color:'r', x:2055, y:308, w:207, rotate:-3,
-      text: '"Della belongs to me." Handwritten on a torn conservatory newsletter, sealed in a sandwich bag. Halloway bagged it himself.',
-      detail: "'Me' is singular — one person's claim, not a company's or an estate's. Possessive. Personal. It doesn't sound like Cornerstone's lawyers or Naomi's family; it sounds like someone who thinks Della is theirs. Author unknown. Written on the same newsletter that announced the manuscript in the first place — and Halloway bagged and kept it, which says he took it seriously."
+    {
+      "id": "victim",
+      "type": "polaroid",
+      "w": 185,
+      "caption": "JAMES HALLOWAY — DECEASED",
+      "detail": "Music/piano professor and jazz scholar at the Rittenhouse Conservatory. Announced he'd acquired a lost Della Mercer manuscript and was publishing a book on it. Found dead Friday morning, ruled suicide.",
+      "x": 1998,
+      "y": 84,
+      "rotate": -0.2
     },
-
-    /* --- ASHFORD FOLDER (yellow postit, mid-left) --- */
-    { id:'ashford', type:'postit', color:'y', x:640, y:640, w:232, rotate:-2,
-      text: 'Branded Diane Ashford Realty folder on the kitchen counter, listing contract inside. Already there before anyone from the building touched the apartment.',
-      detail: "Marcus brought the first mail batch on this visit; the folder predates that — left during or after the walkthrough, before Halloway's death. A handwritten note is clipped to the front."
+    {
+      "id": "urgent",
+      "type": "postit",
+      "color": "r",
+      "w": 180,
+      "text": "<strong>This was arranged.</strong> Replaces the previous \"Marcus: tomorrow\" — the episode's closing realization, landed via the insulin pens.",
+      "detail": "",
+      "x": 1995,
+      "y": 405,
+      "rotate": -2.4
     },
-
-    /* --- KELSEY (yellow postit, mid-right) --- */
-    { id:'kelsey', type:'postit', color:'y', x:1455, y:605, w:238, rotate:2.5,
-      text: '"— Kelsey" signed on the Ashford note. Same Kelsey from the phone call. Of course she dropped it off — she works there.',
-      detail: "Diane's assistant; she had reason to be in the building, so Lena filed her as mundane. But her sales pitch (Ep4) described inside sensory details — including the rainy-day sound on the neighboring roof — as if she'd been in the apartment herself. Whether she was the Thursday solo visitor is the dormant question. Not a suspect on this board yet."
+    {
+      "id": "theo",
+      "type": "id",
+      "w": 215,
+      "role": "Person of Interest",
+      "name": "Theo Thomas",
+      "detailLine": "No changes — still pinned at center, still wrong, still unresolved (offline since Episode…",
+      "flag": "",
+      "detail": "No changes — still pinned at center, still wrong, still unresolved (offline since Episode 4). The new threatening note (\"Della belongs to me\") is a plausible fit for his profile — possessive, conservatory-adjacent, excluded from the performance — even though Lena hasn't drawn that line explicitly yet.",
+      "x": 940,
+      "y": 440,
+      "rotate": 0.3
     },
-
-    /* --- RAIN BOOTS (yellow postit, mid-left) --- */
-    { id:'rainboots', type:'postit', color:'y', x:70, y:680, w:207, rotate:-3.5,
-      text: 'Duck boots at the apartment door — dark green, slightly muddy, not moved. Thursday was the last hard rain.',
-      detail: "Likely Halloway's own — stepped out of them in a hurry and never dealt with them. Either way, the mud confirms the Thursday window that everything else sits inside."
+    {
+      "id": "diane",
+      "type": "id",
+      "w": 215,
+      "role": "Person of Interest",
+      "name": "Diane Ashford Realty / Kelsey",
+      "detailLine": "Kelsey's name appears on a handwritten note on the listing contracts — registered by Lena…",
+      "flag": "",
+      "detail": "Kelsey's name appears on a handwritten note on the listing contracts — registered by Lena as \"oh, that's the Kelsey from the phone call,\" resolved as mundane (of course she dropped them off, she works there) rather than connected to the unsanctioned-visit reading. The deeper significance is still dormant.",
+      "x": 1057,
+      "y": 460,
+      "rotate": 1.2
     },
-
-    /* --- THE NEEDLE (red postit, CRITICAL) --- */
-    { id:'needle', type:'postit', color:'r', x:330, y:710, w:242, rotate:1.5,
-      text: 'THE SYRINGE. Marcus found it on the counter when he found Halloway. Gone by the time we visited. NOT one of his insulin pens — a loose syringe.',
-      detail: "Halloway's insulin pens were in the fridge — three of them, lined up, labeled, with a cold pack. What Marcus saw on the counter wasn't one of them — it was a syringe. He went quiet at the fridge. Neither of us said the word. He showed me where he found him, too — on the kitchen floor, right by that counter; body, syringe, and pens all within a few feet. The police never looked in the fridge."
+    {
+      "id": "claimant",
+      "type": "id",
+      "w": 215,
+      "role": "Person of Interest",
+      "name": "Naomi Mercer",
+      "detailLine": "New name, new suspect.",
+      "flag": "",
+      "detail": "New name, new suspect. Her lawyer's letter — glimpsed in Episode 1, read in full this episode — asserts a nearest-kin claim to Della's manuscripts and names an independent authenticator retained to verify them. No in-person appearance yet. Reads to Lena as \"another party with a claim,\" not yet as anything sympathetic.",
+      "x": 748,
+      "y": 472,
+      "rotate": -0.4,
+      "isNew": true
     },
-
-    /* --- NAOMI'S LAWYER'S LETTER (typed card, desk find) --- */
-    { id:'naomi-letter', type:'typed', x:1070, y:620, w:298, rotate:-1, header: "D-01 — NAOMI'S LAWYER'S LETTER",
-      text: "Law firm retained by Naomi Mercer. Estate claim: nearest kin, Della's compositions and physical manuscripts. Names and gives contact for an independent authenticator already brought in to verify.<br><br>Glimpsed on the desk in Episode 1 — read in full here.",
-      detail: "He received this and did not comply. The authenticator's contact is the live thread — reaching them tells us how far authentication got, who else was in contact, and whether anyone else has been asking about the manuscript."
+    {
+      "id": "manuscript",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "The manuscript <em>(absent)</em>.",
+      "detail": "",
+      "x": 480,
+      "y": 769,
+      "rotate": 2.8
     },
-
-    /* --- CORNERSTONE DEMAND LETTER (typed card, desk find) --- */
-    { id:'cornerstone-letter', type:'typed', x:1420, y:910, w:298, rotate:1, header: "D-05 — CORNERSTONE DEMAND LETTER",
-      text: "Harmon & Associates LLP, on behalf of Cornerstone Records. Formal IP claim — Della's compositions were produced under their agreements, so any materials must be returned immediately; all rights reserved.<br><br>On Halloway's desk, there before he died.",
-      detail: "A separate Harmon envelope — same firm, different letter, marked 'urgent' — was delivered by courier the Monday after the death (Lena photographed the return address in Marcus's office). Two letters, same sender, tightening."
+    {
+      "id": "newsletter",
+      "type": "clipping",
+      "w": 345,
+      "headline": "THE NEWSLETTER.",
+      "body": "The newsletter.",
+      "detail": "",
+      "x": 68,
+      "y": 783,
+      "rotate": 0.2
     },
-
-    /* --- AUTHENTICATOR LEAD (yellow postit) --- */
-    { id:'authenticator', type:'postit', color:'y', x:1075, y:980, w:232, rotate:2.5,
-      text: 'LEAD: The authenticator. Named in Naomi\'s letter. Contact info in hand. Who else have they spoken to?',
-      detail: "Someone verified the manuscript's authenticity before it was stolen. They know what it is, what it's worth, and who has been in contact. This is the next call to make."
+    {
+      "id": "folder",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "The Ashford folder.",
+      "detail": "",
+      "x": 80,
+      "y": 1140,
+      "rotate": -2.5
     },
-
-    /* --- HALLOWAY'S FEAR (yellow postit) --- */
-    { id:'fear', type:'postit', color:'y', x:340, y:950, w:232, rotate:-2.5,
-      text: "Marcus: Halloway was scared Thursday night — not upset about the theft, scared. Marcus knew him well enough to tell the difference.",
-      detail: "Robbed, receiving legal threats, and holding an anonymous note — he had reason to be. The police read it as distress over the theft. Marcus, who'd known the man for years, read it as fear."
+    {
+      "id": "demand-letter",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>The Cornerstone demand letter</strong> — contents read, fully activated as a legal threat. Lena connects the return address to the envelope Marcus is carrying (Episode 5 callback). Catalog-value question from Episode 3 starting to feel concrete.",
+      "detail": "",
+      "x": 512,
+      "y": 1140,
+      "rotate": 1.8
     },
-
-    /* --- OPEN Q: WHO SENT THE NOTE (pink postit) --- */
-    { id:'q-note', type:'postit', color:'pink', x:2005, y:610, w:218, rotate:3,
-      text: 'Who wrote "Della belongs to me"? Singular, possessive — an individual, not a company or an estate. Not the language of the two legal claims.',
-      detail: ""
+    {
+      "id": "threat-note",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>The threatening note</strong> — \"Della belongs to me.\" Singular, possessive — reads personal, not corporate. Author unknown to Lena. Bagged by Halloway himself, signaling he took it seriously.",
+      "detail": "",
+      "x": 296,
+      "y": 1140,
+      "rotate": 1.9,
+      "isNew": true
     },
-
-    /* --- OPEN Q: THEO (pink postit) --- */
-    { id:'q-theo', type:'postit', color:'pink', x:1745, y:605, w:218, rotate:-2,
-      text: 'THEO THOMAS — Lena\'s prime suspect, pinned at center. Conservatory student, cut from the Della ensemble, eidetic musical memory, saw the original scores. Went silent the moment she messaged him. Active 2 days ago.',
-      detail: "Lena reads the silence as guilt. It's more likely grief — dramatic irony she can't see yet. When shown his photo Marcus went quiet, not hostile: a recalibration, not a recognition of a killer. The thread isn't cold, but it isn't what she thinks it is."
-    },
-
-    /* --- POLICE STATUS (typed card, bottom left) --- */
-    { id:'police', type:'typed', x:80, y:1150, w:338, rotate:-1, header: 'Police Status',
-      text: "CASE: CLOSED. Ruled not suspicious. Theft filed separately — low priority. Cameras are display-only, nothing recorded. No one looked at the needle. No one looked in the fridge.",
-      detail: "The theft gave them a tidy story: a man with a break-in and missing valuables, found dead — unfortunate, not suspicious. Marcus told them about the service door, the missing keys, and the needle. None of it landed."
-    },
-
-    /* --- MISSING KEYS (yellow postit, left) --- */
-    { id:'keys', type:'postit', color:'y', x:120, y:895, w:205, rotate:-3,
-      text: "Halloway's keys — gone from the apartment when Marcus found him. Marcus reported it to police. Dismissed.",
-      detail: "Missing keys mean someone could have let themselves in and out. Sits alongside the unlatched service door: two separate ways in, neither one investigated."
-    },
-
-    /* --- "STEPPED ON SOME TOES" (yellow postit, right) --- */
-    { id:'toes', type:'postit', color:'y', x:1775, y:980, w:225, rotate:2.5,
-      text: '"Stepped on some toes with the book." Halloway said it to Marcus weeks ago, offhand, like a joke. Marcus thinks about it differently now.',
-      detail: "Unconnected for now — but it's Halloway himself saying the book had made him an enemy, weeks before anyone thought there was a case to investigate."
-    },
-
-    /* --- DELLA / NEWSLETTER (clipping, bottom center) --- */
-    { id:'della', type:'clipping', x:492, y:1128, w:422, rotate:0.5,
-      headline: "CONSERVATORY NEWSLETTER — THE SPARK",
-      body: "Halloway's announcement of a student ensemble to perform Della Mercer's recovered arrangements this spring. A public PDF — the document that set everything in motion, and the same newsletter a torn piece of which carried the handwritten threat. How Naomi and Cornerstone each learned of the find is still unknown."
-    },
-
+    {
+      "id": "toes-comment",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "\"Stepped on some toes\" comment — still unconnected.",
+      "detail": "",
+      "x": 728,
+      "y": 1140,
+      "rotate": 2.7
+    }
   ],
-
-  annotations: [
-    { x: 65, y: 290, text: 'Victim' },
-    { x: 862, y: 285, text: 'The MacGuffin' },
-    { x: 1474, y: 288, text: 'Suspects' },
-    { x: 65, y: 1108, text: 'Background' },
+  "annotations": [
+    {
+      "x": 60,
+      "y": 50,
+      "text": "Timeline"
+    },
+    {
+      "x": 1995,
+      "y": 50,
+      "text": "The victim"
+    },
+    {
+      "x": 760,
+      "y": 432,
+      "text": "Persons of interest"
+    },
+    {
+      "x": 80,
+      "y": 735,
+      "text": "Physical evidence"
+    }
   ],
-
-  strings: [
-    /* Halloway found the manuscript (confirmed) */
-    { from:[152, 450], to:[1065, 405], sag:60, kind:'confirmed' },
-    /* Naomi wants the manuscript (suspected) */
-    { from:[1606, 380], to:[1065, 405], sag:55, kind:'suspected' },
-    /* Cornerstone wants the manuscript (confirmed — demand letter) */
-    { from:[1880, 380], to:[1065, 405], sag:80, kind:'confirmed' },
-    /* Threatening note → manuscript ("Della belongs to us") */
-    { from:[2148, 375], to:[1065, 405], sag:115, kind:'suspected' },
-    /* Naomi → Naomi's lawyer's letter (confirmed) */
-    { from:[1606, 380], to:[1219, 750], sag:40, kind:'confirmed' },
-    /* Cornerstone → Cornerstone demand letter (confirmed) */
-    { from:[1880, 380], to:[1569, 1045], sag:85, kind:'confirmed' },
-    /* Kelsey → Ashford folder (confirmed — her name is on the note) */
-    { from:[1574, 670], to:[756, 745], sag:55, kind:'confirmed' },
-    /* Needle → Halloway (physical evidence — critical) */
-    { from:[451, 800], to:[152, 450], sag:60, kind:'evidence' },
-    /* Naomi letter → authenticator lead (the contact info is inside) */
-    { from:[1219, 815], to:[1191, 992], sag:22, kind:'confirmed' },
-    /* Halloway received / bagged the threatening note (confirmed) */
-    { from:[152, 450], to:[2148, 375], sag:200, kind:'confirmed' },
-    /* Rain boots → Thursday timeline (unverified — could be either person) */
-    { from:[172, 770], to:[455, 420], sag:80, kind:'unverified' },
-    /* Cornerstone letter → threatening note (suspected same source / escalation) */
-    { from:[1569, 950], to:[2148, 375], sag:80, kind:'suspected' },
-    /* Missing keys → Halloway (physical evidence — access to victim) */
-    { from:[222, 900], to:[152, 470], sag:45, kind:'evidence' },
+  "strings": [
+    {
+      "from": [
+        2090,
+        222
+      ],
+      "to": [
+        1047,
+        488
+      ],
+      "sag": 78,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        2090,
+        222
+      ],
+      "to": [
+        1164,
+        508
+      ],
+      "sag": 73,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        2090,
+        222
+      ],
+      "to": [
+        855,
+        520
+      ],
+      "sag": 88,
+      "kind": "confirmed"
+    },
+    {
+      "from": [
+        855,
+        520
+      ],
+      "to": [
+        2085,
+        486
+      ],
+      "sag": 86,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        855,
+        520
+      ],
+      "to": [
+        240,
+        839
+      ],
+      "sag": 59,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        237,
+        205
+      ],
+      "to": [
+        240,
+        839
+      ],
+      "sag": 56,
+      "kind": "evidence"
+    },
+    {
+      "from": [
+        237,
+        205
+      ],
+      "to": [
+        177,
+        533
+      ],
+      "sag": 41,
+      "kind": "unverified"
+    }
   ]
 };
-
-/* ============================================================
-   TEMPLATE ENGINE — do not edit below this line between episodes
-   ============================================================ */
+/* BOARD-DATA-END */
 
 const STRING_STYLE = {
   confirmed: { stroke: '#ed1c2e', width: 2, opacity: 0.75, dash: null },
@@ -406,23 +536,32 @@ function pinHTML(variant) {
 
 function cardInnerHTML(card) {
   if (card.type === 'polaroid') {
-    return `<div class="card-polaroid"><div class="img">case photo</div><div class="cap">${card.caption}</div></div>`;
+    const inner = card.image
+      ? `<img class="photo" src="${card.image}" alt="${card.caption}">`
+      : 'case photo';
+    return `<div class="card-polaroid"><div class="img${card.image ? ' has-photo' : ''}">${inner}</div><div class="cap">${card.caption}</div></div>`;
   }
   if (card.type === 'postit') {
-    return `<div class="card-postit ${card.color}">${card.text}</div>`;
+    const photo = card.image ? `<img class="evidence-photo" src="${card.image}" alt="">` : '';
+    return `<div class="card-postit ${card.color}">${photo}${card.text}</div>`;
   }
   if (card.type === 'typed') {
     return `<div class="card-typed"><div class="hdr">${card.header}</div>${card.text}</div>`;
   }
   if (card.type === 'id') {
-    return `<div class="card-id">
-      <div class="role">${card.role}</div>
-      <div class="name">${card.name}</div>
-      <div class="detail">${card.detailLine}${card.flag ? '<br><span style="color:var(--red);">' + card.flag + '</span>' : ''}</div>
+    const mug = card.image ? `<img class="mug" src="${card.image}" alt="${card.name}">` : '';
+    return `<div class="card-id${card.image ? ' has-photo' : ''}">
+      ${mug}
+      <div class="id-body">
+        <div class="role">${card.role}</div>
+        <div class="name">${card.name}</div>
+        <div class="detail">${card.detailLine}${card.flag ? '<br><span style="color:var(--red);">' + card.flag + '</span>' : ''}</div>
+      </div>
     </div>`;
   }
   if (card.type === 'clipping') {
-    return `<div class="card-clipping"><div class="headline">${card.headline}</div><div class="body">${card.body}</div></div>`;
+    const photo = card.image ? `<img class="clip-photo" src="${card.image}" alt="">` : '';
+    return `<div class="card-clipping"><div class="headline">${card.headline}</div>${photo}<div class="body">${card.body}</div></div>`;
   }
   return '';
 }
@@ -440,6 +579,7 @@ function renderCards() {
     html += `<div class="card" data-id="${card.id}" style="left:${card.x}px; top:${card.y}px; width:${card.w}px; transform: rotate(${card.rotate}deg);">
       ${pinHTML(pinVariantFor(card, i))}
       ${cardInnerHTML(card)}
+      ${card.isNew ? '<div class="new-tab">NEW</div>' : ''}
     </div>`;
   });
   layer.innerHTML = html;
@@ -494,8 +634,8 @@ function applyTransform() {
 
 function centerView() {
   const vw = viewport.clientWidth, vh = viewport.clientHeight;
-  scale = Math.min(vw / WORLD_W, vh / WORLD_H) * 0.92;
-  scale = Math.max(0.25, Math.min(scale, 1));
+  scale = Math.min(vw / WORLD_W, vh / WORLD_H) * 1.6;
+  scale = Math.max(0.35, Math.min(scale, 1));
   tx = (vw - WORLD_W * scale) / 2;
   ty = (vh - WORLD_H * scale) / 2;
   applyTransform();

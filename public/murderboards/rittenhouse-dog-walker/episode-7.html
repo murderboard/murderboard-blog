@@ -193,10 +193,10 @@
 <script>
 /* BOARD-DATA-START */
 const WORLD_W = 2400;
-const WORLD_H = 1526;
+const WORLD_H = 1738;
 
 const BOARD = {
-  "tagEp": "Episode 3",
+  "tagEp": "Episode 7",
   "title": "The Board So Far",
   "subhead": "Where the board stands at the end of this episode.",
   "cards": [
@@ -205,35 +205,55 @@ const BOARD = {
       "type": "typed",
       "w": 330,
       "header": "Timeline",
-      "text": "<strong>Wednesday</strong> — Realty office walkthrough. Confirmed by Marcus.<br><strong>Thursday morning</strong> — Someone from the realty office may have returned. Marcus uncertain. <em>[This is the theft window.]</em><br><strong>Thursday afternoon</strong> — Halloway home. Discovers theft. Calls police. Speaks to Lena.<br><strong>Thursday night</strong> — Unknown.<br><strong>Friday morning</strong> — Halloway found dead. Ruled suicide. Officer at 2D. Lena dismissed.<br><strong>This week, date uncertain</strong> — Service entrance left unlatched. Marcus mentioned it Saturday morning — doesn't know which morning.",
+      "text": "<strong>Wednesday</strong> — Realty office walkthrough. Confirmed.<br><strong>Thursday midday</strong> — Someone from the realty office returns alone. Paperwork — listing contracts, confirmed physically present in a Diane Ashford Realty folder on the counter, predating any building involvement.<br><strong>Thursday, raining [confirmed via duck boots]</strong> — Matches Kelsey's Episode 4 sensory description; not yet connected by Lena.<br><strong>Thursday afternoon</strong> — Halloway discovers theft, calls police, speaks to Lena.<br><strong>Thursday evening</strong> — Halloway visibly frightened.<br><strong>Friday early morning</strong> — Halloway found dead. Ruled suicide/natural causes. Keys missing.",
       "detail": "",
       "x": 72,
       "y": 98,
-      "rotate": 2.1,
-      "isNew": true
-    },
-    {
-      "id": "officer",
-      "type": "postit",
-      "color": "y",
-      "w": 195,
-      "text": "Officer posted at 2D Friday morning; door propped; Lena dismissed.",
-      "detail": "",
-      "x": 80,
-      "y": 330,
-      "rotate": 2.7
+      "rotate": 2.1
     },
     {
       "id": "service-entrance",
       "type": "postit",
       "color": "y",
       "w": 195,
-      "text": "<strong>Service entrance, unlatched.</strong> Marcus, sideways, in the lobby. He doesn't know which morning.",
-      "detail": "Thursday? Who used it? Who left it open?",
+      "text": "Service entrance used Thursday night — no log entry. Still unresolved.",
+      "detail": "",
       "x": 80,
       "y": 474,
-      "rotate": -1.6,
-      "isNew": true
+      "rotate": -1.6
+    },
+    {
+      "id": "cameras",
+      "type": "postit",
+      "color": "y",
+      "w": 195,
+      "text": "Cameras — dead end, closed.",
+      "detail": "",
+      "x": 80,
+      "y": 306,
+      "rotate": 0.7
+    },
+    {
+      "id": "syringe",
+      "type": "postit",
+      "color": "y",
+      "w": 195,
+      "text": "<strong>Syringe on counter — reframed. Halloway used insulin pens, all accounted for in the fridge. The loose syringe was not his. Realized by Marcus, not Lena — his personal knowledge of Halloway's routine is what makes the catch land.</strong>",
+      "detail": "",
+      "x": 80,
+      "y": 930,
+      "rotate": 1.5
+    },
+    {
+      "id": "body-position",
+      "type": "postit",
+      "color": "y",
+      "w": 195,
+      "text": "<strong>Body found on the kitchen floor, at the near end of the counter (Marcus, Episode 6) — on his back, \"like he'd gone down where he stood.\"</strong> Body, loose syringe (counter), and insulin pens (fridge) all within a few feet: the staged tableau that read as a cardiac/diabetic collapse.",
+      "detail": "",
+      "x": 80,
+      "y": 1242,
+      "rotate": 1.8
     },
     {
       "id": "victim",
@@ -250,7 +270,7 @@ const BOARD = {
       "type": "postit",
       "color": "r",
       "w": 180,
-      "text": "Finish the conversation with Marcus — tomorrow, first thing.",
+      "text": "<strong>This was arranged.</strong> Replaces the previous \"Marcus: tomorrow\" — the episode's closing realization, landed via the insulin pens.",
       "detail": "",
       "x": 1995,
       "y": 405,
@@ -262,141 +282,105 @@ const BOARD = {
       "w": 215,
       "role": "Person of Interest",
       "name": "Theo Thomas",
-      "detailLine": "Third-year student, Rittenhouse Conservatory.",
+      "detailLine": "No changes — still pinned at center, still wrong, still unresolved (offline since Episode…",
       "flag": "",
-      "detail": "Third-year student, Rittenhouse Conservatory. Possibly studied under Halloway. Played variations on Della Mercer's melodic themes at Andy's Jazz Club tonight — unprompted, unannounced. Personal website: work focuses on \"mid-century composers whose contributions have been historically underrecognized.\" <em>[He knows about Della. How well did he know Halloway? Did he know about the manuscript?]</em> — <strong>Pinned at the center of the board this episode. First major suspect.</strong>",
+      "detail": "No changes — still pinned at center, still wrong, still unresolved (offline since Episode 4). The new threatening note (\"Della belongs to me\") is a plausible fit for his profile — possessive, conservatory-adjacent, excluded from the performance — even though Lena hasn't drawn that line explicitly yet.",
       "x": 940,
       "y": 440,
-      "rotate": 0.3,
-      "isNew": true
+      "rotate": 0.3
     },
     {
-      "id": "realty-visitor",
+      "id": "diane",
       "type": "id",
       "w": 215,
       "role": "Person of Interest",
-      "name": "Unknown woman from the realty office",
-      "detailLine": "Marcus thinks someone from Diane Ashford Realty came back Thursday morning.",
+      "name": "Diane Ashford Realty / Kelsey",
+      "detailLine": "Kelsey's name appears on a handwritten note on the listing contracts — registered by Lena…",
       "flag": "",
-      "detail": "Marcus thinks someone from Diane Ashford Realty came back Thursday morning. Might be the same person as Wednesday. Might not. <em>[Who?]</em>",
-      "x": 700,
-      "y": 440,
-      "rotate": 2.7
+      "detail": "Kelsey's name appears on a handwritten note on the listing contracts — registered by Lena as \"oh, that's the Kelsey from the phone call,\" resolved as mundane (of course she dropped them off, she works there) rather than connected to the unsanctioned-visit reading. The deeper significance is still dormant.",
+      "x": 1057,
+      "y": 460,
+      "rotate": 1.2
     },
     {
-      "id": "marcus",
+      "id": "claimant",
       "type": "id",
       "w": 215,
       "role": "Person of Interest",
-      "name": "Marcus",
-      "detailLine": "Didn't get to finish the conversation this morning (Roscoe interrupted).",
-      "flag": "STILL OPEN",
-      "detail": "Didn't get to finish the conversation this morning (Roscoe interrupted). He wanted to say more. So did she. <em>[Tomorrow. First thing.]</em>",
-      "x": 1300,
-      "y": 440,
-      "rotate": -2.7
+      "name": "Naomi Mercer",
+      "detailLine": "New name, new suspect.",
+      "flag": "",
+      "detail": "New name, new suspect. Her lawyer's letter — glimpsed in Episode 1, read in full this episode — asserts a nearest-kin claim to Della's manuscripts and names an independent authenticator retained to verify them. No in-person appearance yet. Reads to Lena as \"another party with a claim,\" not yet as anything sympathetic.",
+      "x": 748,
+      "y": 472,
+      "rotate": -0.4,
+      "isNew": true
     },
     {
       "id": "manuscript",
       "type": "postit",
       "color": "w",
       "w": 185,
-      "text": "<strong>The manuscript</strong> <em>(absent)</em> — Della Mercer's original composition notes. Gone.",
+      "text": "The manuscript <em>(absent)</em>.",
       "detail": "",
       "x": 480,
       "y": 769,
       "rotate": 2.8
     },
     {
-      "id": "letter",
-      "type": "postit",
-      "color": "w",
-      "w": 185,
-      "text": "<strong>The lawyer's letter</strong> — Still on the desk, still unread properly.",
-      "detail": "",
-      "x": 731,
-      "y": 763,
-      "rotate": 0.2
-    },
-    {
       "id": "newsletter",
       "type": "clipping",
       "w": 345,
-      "headline": "THE CONSERVATORY NEWSLETTER",
-      "body": "Public; named Halloway, the manuscript, the auditions.",
+      "headline": "THE NEWSLETTER.",
+      "body": "The newsletter.",
       "detail": "",
       "x": 68,
       "y": 783,
       "rotate": 0.2
     },
     {
-      "id": "card",
-      "type": "postit",
-      "color": "w",
-      "w": 185,
-      "text": "<strong>The business card</strong> — Cream card stock, Diane Ashford Realty.",
-      "detail": "",
-      "x": 972,
-      "y": 777,
-      "rotate": 2.6
-    },
-    {
       "id": "folder",
       "type": "postit",
       "color": "w",
       "w": 185,
-      "text": "<strong>The branded folder on the counter</strong> — Out of place, unopened.",
+      "text": "The Ashford folder.",
       "detail": "",
       "x": 80,
       "y": 1140,
       "rotate": -2.5
     },
     {
-      "id": "cornerstone-records",
+      "id": "demand-letter",
       "type": "postit",
       "color": "w",
       "w": 185,
-      "text": "<strong>Cornerstone Records </strong> — Label credit on a 1962 Della Mercer reissue. Founded by Victor Reese, Philadelphia. Absorbed into a larger company in the seventies.",
-      "detail": "What happened to the catalog? Where did the rights go?",
+      "text": "<strong>The Cornerstone demand letter</strong> — contents read, fully activated as a legal threat. Lena connects the return address to the envelope Marcus is carrying (Episode 5 callback). Catalog-value question from Episode 3 starting to feel concrete.",
+      "detail": "",
+      "x": 512,
+      "y": 1140,
+      "rotate": 1.8
+    },
+    {
+      "id": "threat-note",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>The threatening note</strong> — \"Della belongs to me.\" Singular, possessive — reads personal, not corporate. Author unknown to Lena. Bagged by Halloway himself, signaling he took it seriously.",
+      "detail": "",
       "x": 296,
       "y": 1140,
-      "rotate": -0.8,
-      "isNew": true
+      "rotate": 1.9
     },
     {
-      "id": "q-he-knows-about-della-how-well",
+      "id": "toes-comment",
       "type": "postit",
-      "color": "pink",
-      "w": 200,
-      "text": "He knows about Della. How well did he know Halloway? Did he know about the manuscript?",
+      "color": "w",
+      "w": 185,
+      "text": "\"Stepped on some toes\" comment — still unconnected.",
       "detail": "",
-      "x": 1180,
-      "y": 830,
-      "rotate": 0.6,
-      "isNew": true
-    },
-    {
-      "id": "q-who",
-      "type": "postit",
-      "color": "pink",
-      "w": 200,
-      "text": "Who?",
-      "detail": "",
-      "x": 756,
-      "y": 643,
-      "rotate": 0.5
-    },
-    {
-      "id": "q-what-happened-to-the-catalog-where",
-      "type": "postit",
-      "color": "pink",
-      "w": 200,
-      "text": "What happened to the catalog? Where did the rights go?",
-      "detail": "",
-      "x": 1420,
-      "y": 830,
-      "rotate": 0.8,
-      "isNew": true
+      "x": 728,
+      "y": 1140,
+      "rotate": 2.7
     }
   ],
   "annotations": [
@@ -417,7 +401,7 @@ const BOARD = {
     },
     {
       "x": 80,
-      "y": 729,
+      "y": 735,
       "text": "Physical evidence"
     }
   ],
@@ -432,54 +416,54 @@ const BOARD = {
         488
       ],
       "sag": 78,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        2090,
+        222
+      ],
+      "to": [
+        1164,
+        508
+      ],
+      "sag": 73,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        2090,
+        222
+      ],
+      "to": [
+        855,
+        520
+      ],
+      "sag": 88,
       "kind": "confirmed"
     },
     {
       "from": [
-        2090,
-        222
-      ],
-      "to": [
-        807,
-        488
-      ],
-      "sag": 90,
-      "kind": "suspected"
-    },
-    {
-      "from": [
-        2090,
-        222
-      ],
-      "to": [
-        1407,
-        502
-      ],
-      "sag": 61,
-      "kind": "suspected"
-    },
-    {
-      "from": [
-        1047,
-        488
+        855,
+        520
       ],
       "to": [
         2085,
-        453
+        486
       ],
-      "sag": 76,
+      "sag": 86,
       "kind": "suspected"
     },
     {
       "from": [
-        1047,
-        488
+        855,
+        520
       ],
       "to": [
         240,
         839
       ],
-      "sag": 69,
+      "sag": 59,
       "kind": "suspected"
     },
     {
@@ -501,9 +485,9 @@ const BOARD = {
       ],
       "to": [
         177,
-        389
+        533
       ],
-      "sag": 34,
+      "sag": 41,
       "kind": "unverified"
     }
   ]

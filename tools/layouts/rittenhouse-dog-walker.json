@@ -1,67 +1,187 @@
 {
-  "meta": {
-    "clipping_id": "cs-the-conservatory-newsletter"
-  },
   "cards": {
-    "timeline": {
-      "x": 75,
-      "y": 98,
-      "rotate": 0.3
-    },
-    "bld-x": {
+    "body-position": {
+      "first_seen_episode": 6,
+      "rotate": 1.8,
       "x": 80,
-      "y": 400,
-      "rotate": -2.2
+      "y": 1242
     },
-    "victim": {
-      "x": 1998,
-      "y": 78,
-      "rotate": 0.3
+    "cameras": {
+      "first_seen_episode": 5,
+      "rotate": 0.7,
+      "x": 80,
+      "y": 306
     },
-    "urgent": {
-      "x": 1989,
-      "y": 414,
-      "rotate": 0.2
+    "card": {
+      "first_seen_episode": 1,
+      "rotate": 2.6,
+      "x": 972,
+      "y": 777
     },
-    "sus-unknown-client": {
-      "x": 700,
-      "y": 440,
-      "rotate": 2.1
+    "claimant": {
+      "first_seen_episode": 1,
+      "rotate": -0.4,
+      "x": 748,
+      "y": 472
     },
-    "sus-diane-ashford-realtor": {
-      "x": 940,
-      "y": 440,
-      "rotate": 1.6
+    "cornerstone-records": {
+      "first_seen_episode": 3,
+      "rotate": -0.8,
+      "x": 296,
+      "y": 1140
     },
-    "cs-the-manuscript-absent": {
-      "x": 481,
-      "y": 864,
-      "rotate": 1.4
+    "demand-letter": {
+      "first_seen_episode": 5,
+      "rotate": 1.8,
+      "x": 512,
+      "y": 1140
     },
-    "cs-the-lawyers-letter": {
-      "x": 726,
-      "y": 866,
-      "rotate": 2.8
+    "desk": {
+      "first_seen_episode": 1,
+      "rotate": -1.5,
+      "x": 92,
+      "y": 290
     },
-    "cs-the-conservatory-newsletter": {
-      "x": 952,
-      "y": 863,
-      "rotate": -2.4
+    "desk-document": {
+      "first_seen_episode": 2,
+      "rotate": 2.0,
+      "x": 296,
+      "y": 1140
     },
-    "cs-the-business-card": {
-      "x": 1320,
-      "y": 867,
-      "rotate": -1.7
+    "diane": {
+      "first_seen_episode": 1,
+      "rotate": 1.2,
+      "x": 1057,
+      "y": 460
+    },
+    "folder": {
+      "first_seen_episode": 2,
+      "rotate": -2.5,
+      "x": 80,
+      "y": 1140
+    },
+    "letter": {
+      "first_seen_episode": 1,
+      "rotate": 0.2,
+      "x": 731,
+      "y": 763
+    },
+    "manuscript": {
+      "first_seen_episode": 1,
+      "rotate": 2.8,
+      "x": 480,
+      "y": 769
+    },
+    "marcus": {
+      "first_seen_episode": 2,
+      "rotate": -2.7,
+      "x": 1300,
+      "y": 440
+    },
+    "newsletter": {
+      "first_seen_episode": 1,
+      "rotate": 0.2,
+      "x": 68,
+      "y": 783
+    },
+    "officer": {
+      "first_seen_episode": 2,
+      "rotate": 2.7,
+      "x": 80,
+      "y": 330
+    },
+    "q-he-knows-about-della-how-well": {
+      "first_seen_episode": 3,
+      "rotate": 0.6,
+      "x": 1180,
+      "y": 830
+    },
+    "q-what-happened-to-the-catalog-where": {
+      "first_seen_episode": 3,
+      "rotate": 0.8,
+      "x": 1420,
+      "y": 830
+    },
+    "q-what-is-it-who-left-it": {
+      "first_seen_episode": 2,
+      "rotate": 1.4,
+      "x": 1180,
+      "y": 830
     },
     "q-who": {
-      "x": 1046,
-      "y": 665,
-      "rotate": -1.2
+      "first_seen_episode": 1,
+      "rotate": 0.5,
+      "x": 756,
+      "y": 643
     },
     "q-why-was-she-there": {
-      "x": 1396,
-      "y": 830,
-      "rotate": -1.5
+      "first_seen_episode": 1,
+      "rotate": -2.8,
+      "x": 1031,
+      "y": 646
+    },
+    "q-why-was-she-there-if-nothings": {
+      "first_seen_episode": 4,
+      "rotate": -1.6,
+      "x": 1180,
+      "y": 830
+    },
+    "realty-visitor": {
+      "first_seen_episode": 2,
+      "rotate": 2.7,
+      "x": 700,
+      "y": 440
+    },
+    "service-entrance": {
+      "first_seen_episode": 3,
+      "rotate": -1.6,
+      "x": 80,
+      "y": 474
+    },
+    "syringe": {
+      "first_seen_episode": 5,
+      "rotate": 1.5,
+      "x": 80,
+      "y": 930
+    },
+    "theo": {
+      "first_seen_episode": 3,
+      "rotate": 0.3,
+      "x": 940,
+      "y": 440
+    },
+    "threat-note": {
+      "first_seen_episode": 6,
+      "rotate": 1.9,
+      "x": 296,
+      "y": 1140
+    },
+    "timeline": {
+      "first_seen_episode": 1,
+      "rotate": 2.1,
+      "x": 72,
+      "y": 98
+    },
+    "toes-comment": {
+      "first_seen_episode": 5,
+      "rotate": 2.7,
+      "x": 728,
+      "y": 1140
+    },
+    "urgent": {
+      "first_seen_episode": 1,
+      "rotate": -2.4,
+      "x": 1995,
+      "y": 405
+    },
+    "victim": {
+      "first_seen_episode": 1,
+      "rotate": -0.2,
+      "x": 1998,
+      "y": 84
     }
+  },
+  "meta": {
+    "clipping_id": "newsletter"
   }
 }

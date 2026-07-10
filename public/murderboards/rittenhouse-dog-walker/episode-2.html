@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Murder Board — Episode 6</title>
+<title>Murder Board</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Special+Elite&display=swap" rel="stylesheet">
@@ -15,7 +15,8 @@
     BOARD.title, BOARD.subhead, BOARD.cards, and BOARD.strings only.
     Everything above that in this file (styles, layout engine,
     pan/zoom, lightbox) is the reusable template and matches the
-    Murder Board brand system -- it shouldn't need to change between episodes.
+    Murder Board brand system (see the Claude Design project) --
+    it shouldn't need to change between episodes.
     ============================================================
   */
   * { box-sizing: border-box; }
@@ -67,6 +68,7 @@
   }
   .card { position: absolute; cursor: pointer; transition: filter 0.15s ease; user-select: none; }
   .card:hover { filter: brightness(1.12); z-index: 50; }
+  .new-tab { position: absolute; top: -9px; right: -8px; background: var(--red); color: #fff; font-size: 8px; letter-spacing: 0.14em; padding: 2px 5px 1px; transform: rotate(3deg); box-shadow: 0 2px 6px rgba(0,0,0,0.55); z-index: 22; font-family: 'Special Elite', monospace; }
   .pin {
     position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
     width: 13px; height: 13px; border-radius: 50%; background: var(--red);
@@ -83,6 +85,8 @@
     background: #1c1515; aspect-ratio: 4/5; display: flex; align-items: center; justify-content: center;
     font-family: monospace; font-size: 10px; color: #4a3838; text-align: center; padding: 6px; line-height: 1.5;
   }
+  .card-polaroid .img.has-photo { padding: 0; overflow: hidden; }
+  .card-polaroid .img img.photo { width: 100%; height: 100%; object-fit: cover; display: block; }
   .card-polaroid .cap {
     text-align: center; font-family: 'Special Elite', monospace; font-size: 10px; color: #2a2020;
     padding-top: 8px; letter-spacing: 0.06em; text-transform: uppercase;
@@ -101,21 +105,26 @@
     margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid rgba(192,0,26,0.25);
   }
   .card-id { background: var(--cream); color: #111; padding: 12px 14px; box-shadow: 3px 5px 16px rgba(0,0,0,0.6); font-family: 'Special Elite', monospace; border-left: 4px solid var(--red); }
+  .card-id.has-photo { display: flex; gap: 11px; align-items: flex-start; }
+  .card-id .mug { width: 60px; height: 75px; object-fit: cover; flex: none; border: 2px solid #fff; box-shadow: 0 1px 5px rgba(0,0,0,0.45); }
+  .card-id .id-body { min-width: 0; }
   .card-id .role { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--red); margin-bottom: 4px; }
   .card-id .name { font-size: 15px; font-weight: bold; color: var(--black); margin-bottom: 3px; }
   .card-id .detail { font-size: 11px; color: #555; line-height: 1.55; }
+  .card-postit .evidence-photo { width: 100%; display: block; margin-bottom: 9px; border: 1px solid rgba(0,0,0,0.28); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
   .card-clipping { background: #e8e0cc; padding: 13px 15px; font-family: 'Special Elite', monospace; box-shadow: 3px 5px 16px rgba(0,0,0,0.6); }
   .card-clipping .headline { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: #111; line-height: 1.25; margin-bottom: 6px; border-bottom: 2px solid #111; padding-bottom: 5px; }
+  .card-clipping .clip-photo { width: 100%; display: block; margin: 0 0 8px; border: 1px solid rgba(0,0,0,0.3); }
   .card-clipping .body { font-size: 10.5px; color: #333; line-height: 1.6; }
   #hud { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 24px; pointer-events: none; z-index: 200; }
-  #title-block { max-width: 420px; }
+  #title-block { max-width: 420px; background: rgba(13,11,11,0.82); border: 1px solid rgba(192,0,26,0.28); padding: 16px 18px 14px; border-radius: 3px; box-shadow: 0 6px 24px rgba(0,0,0,0.55); }
   .board-episode-tag { display: inline-flex; align-items: center; gap: 0.7rem; background: rgba(192,0,26,0.16); border: 1px solid rgba(192,0,26,0.35); padding: 0.4rem 0.9rem; margin-bottom: 0.7rem; }
   .board-episode-tag span { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; }
   .tag-label { color: var(--red); }
   .tag-ep { color: var(--cream-dim); }
   #title-text { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 26px; text-transform: uppercase; color: var(--cream); margin: 0 0 6px; line-height: 1.1; }
   #subhead { font-size: 12px; color: var(--cream-dim); line-height: 1.6; }
-  #hint { display: none; }
+  #hint { font-family: 'Special Elite', monospace; font-size: 11px; color: var(--cream-dim); background: rgba(13,11,11,0.6); border: 1px solid rgba(240,236,224,0.12); padding: 6px 12px; border-radius: 2px; margin-top: 10px; display: inline-block; letter-spacing: 0.04em; }
   #legend { position: fixed; bottom: 22px; left: 24px; z-index: 200; display: flex; flex-wrap: wrap; gap: 14px; pointer-events: none; background: rgba(13,11,11,0.55); padding: 8px 14px; border: 1px solid rgba(240,236,224,0.1); }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.1em; color: var(--cream-dim); text-transform: uppercase; }
   .legend-dot { width: 9px; height: 9px; border-radius: 50%; }
@@ -182,245 +191,315 @@
 </div>
 
 <script>
+/* BOARD-DATA-START */
 const WORLD_W = 2400;
-const WORLD_H = 1500;
+const WORLD_H = 1548;
 
-/* ============================================================
-   EPISODE DATA — edit only this block to update the board.
-   Cards: polaroid | postit (y/r/w/pink) | typed | id | clipping
-   Strings: kind = confirmed | suspected | evidence | unverified
-   ============================================================ */
 const BOARD = {
-  "tagEp": "Episode 2 — The Murder Board",
-  "title": "The Missing Manuscript",
-  "subhead": "Two realty visits, a folder that doesn't belong, and a doorman who notices things. Still just accumulation.",
+  "tagEp": "Episode 2",
+  "title": "The Board So Far",
+  "subhead": "Where the board stands at the end of this episode.",
   "cards": [
-    {
-      "id": "halloway",
-      "type": "polaroid",
-      "x": 95,
-      "y": 330,
-      "w": 180,
-      "rotate": -2.5,
-      "caption": "PROF. HALLOWAY — FOUND FRIDAY",
-      "detail": "Ruled a suicide. There's an officer at 2D and I got dismissed. Nobody's connecting the death to the theft. I am."
-    },
     {
       "id": "timeline",
       "type": "typed",
-      "x": 300,
-      "y": 315,
-      "w": 345,
-      "rotate": -1,
-      "header": "What We Know",
-      "text": "WED: Realty walkthrough. Confirmed (Marcus).<br>THU MORNING: Someone from the office came back? Marcus unsure. <em>Theft window.</em><br>THU AFTERNOON: Finds it gone. Police. Tells me.<br>FRI MORNING: Found dead. Ruled suicide. Officer at 2D.",
-      "detail": "Two realty visits, not one. The second one is the one that matters."
+      "w": 330,
+      "header": "Timeline",
+      "text": "<strong>Wednesday</strong> — Realty office walkthrough. Confirmed by Marcus.<br><strong>Thursday morning</strong> — Someone from the realty office may have returned. Marcus uncertain. <em>[This is the theft window.]</em><br><strong>Thursday afternoon</strong> — Halloway home. Discovers theft. Calls police. Speaks to Lena.<br><strong>Thursday night</strong> — Unknown.<br><strong>Friday morning</strong> — Halloway found dead. Ruled suicide. Officer posted at 2D, door propped.<br><strong>The next morning (Ep2)</strong> — Lena passes the officer and is dismissed; Marcus tells her about the realty visits and the folder on the counter.",
+      "detail": "",
+      "x": 72,
+      "y": 98,
+      "rotate": 2.1,
+      "isNew": true
     },
     {
-      "id": "manuscript",
-      "type": "clipping",
-      "x": 885,
-      "y": 325,
-      "w": 375,
-      "rotate": 0.5,
-      "headline": "THE MISSING MANUSCRIPT",
-      "body": "Della Mercer's composition notes. Authenticated. Gone. Still the one thing actually taken."
-    },
-    {
-      "id": "lawyer",
-      "type": "typed",
-      "x": 1465,
-      "y": 320,
-      "w": 295,
-      "rotate": -1.5,
-      "header": "THE LAWYER'S LETTER",
-      "text": "Still on the desk Friday, visible through the open door. Still unread. A formal ownership claim — client's name I never got.",
-      "detail": "Next to it: something else formal-looking. Couldn't tell what from the doorway."
-    },
-    {
-      "id": "folder",
+      "id": "officer",
       "type": "postit",
       "color": "y",
-      "x": 640,
-      "y": 650,
-      "w": 235,
-      "rotate": -2,
-      "text": "BRANDED FOLDER on the kitchen counter. Corporate logo — a realty office? Marcus saw it, didn't open it. Doesn't belong with the rest of the mess.",
-      "detail": "Marcus: 'Everything else looked lived in. This looked like it hadn't been part of it.'"
+      "w": 195,
+      "text": "Officer posted at 2D after the Friday-morning discovery, door propped open. When Lena passes the next morning he takes her statement and dismisses her. \"The matter is being handled.\"",
+      "detail": "They are not handling the theft. They are not connecting it to the death.",
+      "x": 80,
+      "y": 330,
+      "rotate": 2.7,
+      "isNew": true
     },
     {
-      "id": "formal",
-      "type": "postit",
-      "color": "w",
-      "x": 1075,
-      "y": 655,
-      "w": 215,
-      "rotate": 2,
-      "text": "Something formal on the desk, right next to the lawyer's letter. Couldn't read it from the doorway. [what?]",
-      "detail": ""
-    },
-    {
-      "id": "realty-woman",
-      "type": "id",
-      "x": 1465,
-      "y": 640,
-      "w": 235,
-      "rotate": 2,
-      "role": "Suspect?",
-      "name": "The realty visitor",
-      "detailLine": "Came back Thursday morning — the theft window.",
-      "flag": "? Same woman as Wednesday, or someone else?",
-      "detail": "Marcus 'didn't get a good look. Just… someone.'"
-    },
-    {
-      "id": "diane",
-      "type": "id",
-      "x": 1800,
-      "y": 320,
-      "w": 235,
-      "rotate": 2,
-      "role": "realtor?",
-      "name": "Diane Ashford",
-      "detailLine": "Her card was in his foyer. 'She does most of the building.'",
-      "flag": "? Why here, and when?",
-      "detail": ""
-    },
-    {
-      "id": "marcus",
-      "type": "id",
-      "x": 1775,
-      "y": 645,
-      "w": 240,
-      "rotate": -2,
-      "role": "Ally / Witness",
-      "name": "Marcus",
-      "detailLine": "Doorman. Criminal justice at night. Found the body.",
-      "flag": "Saw the police brush me off — and wasn’t surprised.",
-      "detail": "Volunteered the realty visits unprompted. He's been paying attention longer than I have."
-    },
-    {
-      "id": "newsletter",
-      "type": "clipping",
-      "x": 90,
-      "y": 1120,
-      "w": 355,
-      "rotate": -1,
-      "headline": "CONSERVATORY NEWSLETTER",
-      "body": "Public. Named Halloway and the manuscript, announced the auditions. This is how the world found out."
+      "id": "victim",
+      "type": "polaroid",
+      "w": 185,
+      "caption": "JAMES HALLOWAY — DECEASED",
+      "detail": "Music/piano professor and jazz scholar at the Rittenhouse Conservatory. Announced he'd acquired a lost Della Mercer manuscript and was publishing a book on it. Found dead Friday morning, ruled suicide.",
+      "x": 1998,
+      "y": 84,
+      "rotate": -0.2
     },
     {
       "id": "urgent",
       "type": "postit",
+      "color": "r",
+      "w": 180,
+      "text": "What is the branded folder on the counter? Who left it there? Real estate logo — Diane Ashford Realty?",
+      "detail": "Why don't the police seem to care about the theft?",
+      "x": 1995,
+      "y": 405,
+      "rotate": -2.4
+    },
+    {
+      "id": "realty-visitor",
+      "type": "id",
+      "w": 215,
+      "role": "Person of Interest",
+      "name": "Unknown woman from the realty office",
+      "detailLine": "Marcus thinks someone from Diane Ashford Realty came back Thursday morning, the day of th…",
+      "flag": "",
+      "detail": "[NEW] Marcus thinks someone from Diane Ashford Realty came back Thursday morning, the day of the theft. Might be the same person as Wednesday. Might not. <em>[Who?]</em>",
+      "x": 700,
+      "y": 440,
+      "rotate": 2.7,
+      "isNew": true
+    },
+    {
+      "id": "diane",
+      "type": "id",
+      "w": 215,
+      "role": "Person of Interest",
+      "name": "Diane Ashford (realtor?)",
+      "detailLine": "Business card in Halloway's foyer.",
+      "flag": "",
+      "detail": "Business card in Halloway's foyer. Diane Ashford Realty. Margaret: \"She does most of the building.\" <em>[Why was she there?]</em>",
+      "x": 1057,
+      "y": 460,
+      "rotate": 1.2
+    },
+    {
+      "id": "marcus",
+      "type": "id",
+      "w": 215,
+      "role": "Person of Interest",
+      "name": "Marcus",
+      "detailLine": "Been in the building years.",
+      "flag": "",
+      "detail": "Been in the building years. Noticed the police dismissal without surprise. Volunteered information about the realty visits unprompted. <em>[He's paying attention. He's been paying attention longer than she has.]</em>",
+      "x": 1300,
+      "y": 440,
+      "rotate": -2.7,
+      "isNew": true
+    },
+    {
+      "id": "manuscript",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>The manuscript</strong> <em>(absent)</em> — Della Mercer's original composition notes. Gone.",
+      "detail": "",
+      "x": 480,
+      "y": 769,
+      "rotate": 2.8
+    },
+    {
+      "id": "letter",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>The lawyer's letter</strong> — Confirmed: still on the desk, visible through the open door as Lena passes the next morning. Still unread.",
+      "detail": "",
+      "x": 731,
+      "y": 763,
+      "rotate": 0.2,
+      "isNew": true
+    },
+    {
+      "id": "newsletter",
+      "type": "clipping",
+      "w": 345,
+      "headline": "THE CONSERVATORY NEWSLETTER",
+      "body": "Public. Named Halloway, named the manuscript.",
+      "detail": "",
+      "x": 68,
+      "y": 783,
+      "rotate": 0.2
+    },
+    {
+      "id": "card",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>The business card</strong> — Cream card stock. Diane Ashford Realty. Console table, foyer.",
+      "detail": "",
+      "x": 972,
+      "y": 777,
+      "rotate": 2.6
+    },
+    {
+      "id": "folder",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>The branded folder on the counter</strong> — Corporate-looking, with a logo. Out of place among Halloway's academic clutter. Marcus noticed it during a building check; didn't open it.",
+      "detail": "What is it? Who left it?",
+      "x": 80,
+      "y": 1140,
+      "rotate": -2.5,
+      "isNew": true
+    },
+    {
+      "id": "desk-document",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>Something formal on the desk</strong> — Next to the lawyer's letter. Couldn't tell from the doorway.",
+      "detail": "",
+      "x": 296,
+      "y": 1140,
+      "rotate": 2.0,
+      "isNew": true
+    },
+    {
+      "id": "q-who",
+      "type": "postit",
       "color": "pink",
-      "x": 900,
-      "y": 1090,
-      "w": 255,
-      "rotate": 2,
-      "text": "What IS that folder, and who left it? And why do the police not care about the theft at all?",
-      "detail": ""
+      "w": 200,
+      "text": "Who?",
+      "detail": "",
+      "x": 756,
+      "y": 643,
+      "rotate": 0.5
+    },
+    {
+      "id": "q-why-was-she-there",
+      "type": "postit",
+      "color": "pink",
+      "w": 200,
+      "text": "Why was she there?",
+      "detail": "",
+      "x": 1031,
+      "y": 646,
+      "rotate": -2.8
+    },
+    {
+      "id": "q-what-is-it-who-left-it",
+      "type": "postit",
+      "color": "pink",
+      "w": 200,
+      "text": "What is it? Who left it?",
+      "detail": "",
+      "x": 1180,
+      "y": 830,
+      "rotate": 1.4,
+      "isNew": true
     }
   ],
   "annotations": [
     {
-      "x": 90,
-      "y": 310,
-      "text": "Victim"
+      "x": 60,
+      "y": 50,
+      "text": "Timeline"
     },
     {
-      "x": 878,
-      "y": 300,
-      "text": "The MacGuffin"
+      "x": 1995,
+      "y": 50,
+      "text": "The victim"
     },
     {
-      "x": 1462,
-      "y": 295,
-      "text": "Suspects"
+      "x": 760,
+      "y": 432,
+      "text": "Persons of interest"
     },
     {
-      "x": 85,
-      "y": 1095,
-      "text": "Background"
+      "x": 80,
+      "y": 729,
+      "text": "Physical evidence"
     }
   ],
   "strings": [
     {
       "from": [
-        185,
-        340
+        2090,
+        222
       ],
       "to": [
-        1072,
-        360
+        807,
+        488
       ],
-      "sag": 55,
+      "sag": 90,
       "kind": "confirmed"
     },
     {
       "from": [
-        1610,
-        355
+        2090,
+        222
       ],
       "to": [
-        1072,
-        360
+        1164,
+        508
       ],
-      "sag": 55,
+      "sag": 73,
       "kind": "suspected"
     },
     {
       "from": [
-        755,
-        655
+        2090,
+        222
       ],
       "to": [
-        1072,
-        400
+        1407,
+        488
       ],
-      "sag": 60,
+      "sag": 61,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        807,
+        488
+      ],
+      "to": [
+        2085,
+        475
+      ],
+      "sag": 88,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        807,
+        488
+      ],
+      "to": [
+        240,
+        839
+      ],
+      "sag": 58,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        237,
+        205
+      ],
+      "to": [
+        240,
+        839
+      ],
+      "sag": 56,
+      "kind": "evidence"
+    },
+    {
+      "from": [
+        237,
+        205
+      ],
+      "to": [
+        177,
+        444
+      ],
+      "sag": 37,
       "kind": "unverified"
-    },
-    {
-      "from": [
-        1580,
-        660
-      ],
-      "to": [
-        820,
-        690
-      ],
-      "sag": 55,
-      "kind": "suspected"
-    },
-    {
-      "from": [
-        1917,
-        360
-      ],
-      "to": [
-        1582,
-        660
-      ],
-      "sag": 35,
-      "kind": "suspected"
-    },
-    {
-      "from": [
-        268,
-        1120
-      ],
-      "to": [
-        1072,
-        410
-      ],
-      "sag": 120,
-      "kind": "confirmed"
     }
   ]
 };
-
-/* ============================================================
-   TEMPLATE ENGINE — do not edit below this line between episodes
-   ============================================================ */
+/* BOARD-DATA-END */
 
 const STRING_STYLE = {
   confirmed: { stroke: '#ed1c2e', width: 2, opacity: 0.75, dash: null },
@@ -462,23 +541,32 @@ function pinHTML(variant) {
 
 function cardInnerHTML(card) {
   if (card.type === 'polaroid') {
-    return `<div class="card-polaroid"><div class="img">case photo</div><div class="cap">${card.caption}</div></div>`;
+    const inner = card.image
+      ? `<img class="photo" src="${card.image}" alt="${card.caption}">`
+      : 'case photo';
+    return `<div class="card-polaroid"><div class="img${card.image ? ' has-photo' : ''}">${inner}</div><div class="cap">${card.caption}</div></div>`;
   }
   if (card.type === 'postit') {
-    return `<div class="card-postit ${card.color}">${card.text}</div>`;
+    const photo = card.image ? `<img class="evidence-photo" src="${card.image}" alt="">` : '';
+    return `<div class="card-postit ${card.color}">${photo}${card.text}</div>`;
   }
   if (card.type === 'typed') {
     return `<div class="card-typed"><div class="hdr">${card.header}</div>${card.text}</div>`;
   }
   if (card.type === 'id') {
-    return `<div class="card-id">
-      <div class="role">${card.role}</div>
-      <div class="name">${card.name}</div>
-      <div class="detail">${card.detailLine}${card.flag ? '<br><span style="color:var(--red);">' + card.flag + '</span>' : ''}</div>
+    const mug = card.image ? `<img class="mug" src="${card.image}" alt="${card.name}">` : '';
+    return `<div class="card-id${card.image ? ' has-photo' : ''}">
+      ${mug}
+      <div class="id-body">
+        <div class="role">${card.role}</div>
+        <div class="name">${card.name}</div>
+        <div class="detail">${card.detailLine}${card.flag ? '<br><span style="color:var(--red);">' + card.flag + '</span>' : ''}</div>
+      </div>
     </div>`;
   }
   if (card.type === 'clipping') {
-    return `<div class="card-clipping"><div class="headline">${card.headline}</div><div class="body">${card.body}</div></div>`;
+    const photo = card.image ? `<img class="clip-photo" src="${card.image}" alt="">` : '';
+    return `<div class="card-clipping"><div class="headline">${card.headline}</div>${photo}<div class="body">${card.body}</div></div>`;
   }
   return '';
 }
@@ -496,6 +584,7 @@ function renderCards() {
     html += `<div class="card" data-id="${card.id}" style="left:${card.x}px; top:${card.y}px; width:${card.w}px; transform: rotate(${card.rotate}deg);">
       ${pinHTML(pinVariantFor(card, i))}
       ${cardInnerHTML(card)}
+      ${card.isNew ? '<div class="new-tab">NEW</div>' : ''}
     </div>`;
   });
   layer.innerHTML = html;
@@ -550,8 +639,8 @@ function applyTransform() {
 
 function centerView() {
   const vw = viewport.clientWidth, vh = viewport.clientHeight;
-  scale = Math.min(vw / WORLD_W, vh / WORLD_H) * 0.92;
-  scale = Math.max(0.25, Math.min(scale, 1));
+  scale = Math.min(vw / WORLD_W, vh / WORLD_H) * 1.6;
+  scale = Math.max(0.35, Math.min(scale, 1));
   tx = (vw - WORLD_W * scale) / 2;
   ty = (vh - WORLD_H * scale) / 2;
   applyTransform();

@@ -191,11 +191,12 @@
 </div>
 
 <script>
+/* BOARD-DATA-START */
 const WORLD_W = 2400;
 const WORLD_H = 1500;
 
 const BOARD = {
-  "tagEp": "Episode 1 — The Card Game",
+  "tagEp": "Episode 1",
   "title": "The Board So Far",
   "subhead": "Where the board stands at the end of this episode.",
   "cards": [
@@ -206,31 +207,33 @@ const BOARD = {
       "header": "Timeline",
       "text": "<strong>Thursday morning</strong> — Unknown. Realtor visit? Legal filing?<br><strong>Thursday afternoon</strong> — Halloway home. Discovers theft. Calls police. Speaks to Lena.<br><strong>Thursday night</strong> — Unknown.<br><strong>Friday morning</strong> — Halloway found dead. Ruled suicide.",
       "detail": "",
-      "x": 75,
+      "x": 72,
       "y": 98,
-      "rotate": 0.3
+      "rotate": 2.1,
+      "isNew": true
     },
     {
-      "id": "bld-x",
+      "id": "desk",
       "type": "postit",
       "color": "y",
       "w": 195,
-      "text": "",
-      "detail": "No crime scene photo yet — sketched the desk from memory: the cleared space in the center, the papers still organized around the edges, the lawyer's letter on top of the stack.",
-      "x": 80,
-      "y": 400,
-      "rotate": -2.2
+      "text": "<strong>The desk, from memory</strong> — cleared space in the center, papers still organized around the edges, the lawyer's letter on top of the stack.",
+      "detail": "No crime scene photo yet — sketched from memory.",
+      "x": 92,
+      "y": 290,
+      "rotate": -1.5,
+      "isNew": true
     },
     {
       "id": "victim",
       "type": "polaroid",
       "w": 185,
       "caption": "JAMES HALLOWAY — DECEASED",
-      "detail": "Music/piano professor and jazz scholar at the Rittenhouse Conservatory. Recently announced he'd acquired a lost Della Mercer jazz manuscript and was publishing a book about it. Found dead Friday morning.",
-      "image": "assets/people/JamesHalloway.jpg",
+      "detail": "Music/piano professor and jazz scholar at the Rittenhouse Conservatory. Announced he'd acquired a lost Della Mercer manuscript and was publishing a book on it. Found dead Friday morning, ruled suicide.",
       "x": 1998,
-      "y": 78,
-      "rotate": 0.3
+      "y": 84,
+      "rotate": -0.2,
+      "isNew": true
     },
     {
       "id": "urgent",
@@ -239,12 +242,13 @@ const BOARD = {
       "w": 180,
       "text": "Who is the client behind the lawyer's letter? When exactly was it filed? Why was Diane Ashford in the building? If the manuscript was stolen Thursday and he was dead by Friday — was he killed because of what he knew, or what he had?",
       "detail": "",
-      "x": 1989,
-      "y": 414,
-      "rotate": 0.2
+      "x": 1995,
+      "y": 405,
+      "rotate": -2.4,
+      "isNew": true
     },
     {
-      "id": "sus-unknown-client",
+      "id": "claimant",
       "type": "id",
       "w": 215,
       "role": "Person of Interest",
@@ -252,66 +256,72 @@ const BOARD = {
       "detailLine": "Someone filed a formal legal claim on the manuscript before the theft was reported.",
       "flag": "",
       "detail": "Someone filed a formal legal claim on the manuscript before the theft was reported. Name not on the letter Lena saw. <em>[Who?]</em>",
-      "x": 700,
-      "y": 440,
-      "rotate": 2.1
+      "x": 748,
+      "y": 472,
+      "rotate": -0.4,
+      "isNew": true
     },
     {
-      "id": "sus-diane-ashford-realtor",
+      "id": "diane",
       "type": "id",
       "w": 215,
-      "role": "Witness / Suspect — Realtor",
+      "role": "Person of Interest",
       "name": "Diane Ashford (realtor?)",
       "detailLine": "Business card in Halloway's foyer.",
       "flag": "",
       "detail": "Business card in Halloway's foyer. Diane Ashford Realty. Margaret: \"She does most of the building.\" <em>[Why was she there?]</em>",
-      "x": 940,
-      "y": 440,
-      "rotate": 1.6
+      "x": 1057,
+      "y": 460,
+      "rotate": 1.2,
+      "isNew": true
     },
     {
-      "id": "cs-the-manuscript-absent",
+      "id": "manuscript",
       "type": "postit",
       "color": "w",
       "w": 185,
       "text": "<strong>The manuscript</strong> <em>(absent)</em> — Della Mercer's original composition notes. Authenticated. Significant enough for a legal claim and a newsletter announcement. Gone.",
       "detail": "",
-      "x": 481,
-      "y": 864,
-      "rotate": 1.4
+      "x": 480,
+      "y": 769,
+      "rotate": 2.8,
+      "isNew": true
     },
     {
-      "id": "cs-the-lawyers-letter",
+      "id": "letter",
       "type": "postit",
       "color": "w",
       "w": 185,
       "text": "<strong>The lawyer's letter</strong> — Law firm letterhead. Formal ownership claim. Date on letterhead — before the theft was reported?",
       "detail": "Didn't read it properly. Can't confirm yet.",
-      "x": 726,
-      "y": 866,
-      "rotate": 2.8
+      "x": 731,
+      "y": 763,
+      "rotate": 0.2,
+      "isNew": true
     },
     {
-      "id": "cs-the-conservatory-newsletter",
+      "id": "newsletter",
       "type": "clipping",
       "w": 345,
       "headline": "THE CONSERVATORY NEWSLETTER",
       "body": "Public. Named Halloway, named the manuscript, announced auditions for a student ensemble to perform the recovered works. Anyone with a Google alert could have seen it.",
       "detail": "",
-      "x": 952,
-      "y": 863,
-      "rotate": -2.4
+      "x": 68,
+      "y": 783,
+      "rotate": 0.2,
+      "isNew": true
     },
     {
-      "id": "cs-the-business-card",
+      "id": "card",
       "type": "postit",
       "color": "w",
       "w": 185,
       "text": "<strong>The business card</strong> — Cream card stock. Diane Ashford Realty. Console table, foyer. Under a grocery receipt.",
       "detail": "",
-      "x": 1320,
-      "y": 867,
-      "rotate": -1.7
+      "x": 972,
+      "y": 777,
+      "rotate": 2.6,
+      "isNew": true
     },
     {
       "id": "q-who",
@@ -320,9 +330,10 @@ const BOARD = {
       "w": 200,
       "text": "Who?",
       "detail": "",
-      "x": 1046,
-      "y": 665,
-      "rotate": -1.2
+      "x": 756,
+      "y": 643,
+      "rotate": 0.5,
+      "isNew": true
     },
     {
       "id": "q-why-was-she-there",
@@ -331,9 +342,10 @@ const BOARD = {
       "w": 200,
       "text": "Why was she there?",
       "detail": "",
-      "x": 1396,
-      "y": 830,
-      "rotate": -1.5
+      "x": 1031,
+      "y": 646,
+      "rotate": -2.8,
+      "isNew": true
     }
   ],
   "annotations": [
@@ -354,7 +366,7 @@ const BOARD = {
     },
     {
       "x": 80,
-      "y": 829,
+      "y": 729,
       "text": "Physical evidence"
     }
   ],
@@ -362,77 +374,78 @@ const BOARD = {
     {
       "from": [
         2090,
-        216
+        222
       ],
       "to": [
-        807,
-        488
+        855,
+        520
       ],
-      "sag": 90,
+      "sag": 88,
       "kind": "confirmed"
     },
     {
       "from": [
         2090,
-        216
+        222
       ],
       "to": [
-        1047,
-        488
+        1164,
+        508
       ],
-      "sag": 78,
+      "sag": 73,
       "kind": "suspected"
     },
     {
       "from": [
-        807,
-        488
+        855,
+        520
       ],
       "to": [
-        2079,
-        561
+        2085,
+        552
       ],
-      "sag": 88,
+      "sag": 86,
       "kind": "suspected"
     },
     {
       "from": [
-        807,
-        488
+        855,
+        520
       ],
       "to": [
-        1124,
-        936
-      ],
-      "sag": 52,
-      "kind": "suspected"
-    },
-    {
-      "from": [
         240,
+        856
+      ],
+      "sag": 60,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        237,
         181
       ],
       "to": [
-        1124,
-        936
+        240,
+        856
       ],
-      "sag": 83,
+      "sag": 58,
       "kind": "evidence"
     },
     {
       "from": [
-        240,
+        237,
         181
       ],
       "to": [
-        177,
-        426
+        189,
+        382
       ],
-      "sag": 37,
+      "sag": 35,
       "kind": "unverified"
     }
   ]
 };
+/* BOARD-DATA-END */
 
 const STRING_STYLE = {
   confirmed: { stroke: '#ed1c2e', width: 2, opacity: 0.75, dash: null },

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Murder Board — Episode 6</title>
+<title>Murder Board</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Special+Elite&display=swap" rel="stylesheet">
@@ -15,7 +15,8 @@
     BOARD.title, BOARD.subhead, BOARD.cards, and BOARD.strings only.
     Everything above that in this file (styles, layout engine,
     pan/zoom, lightbox) is the reusable template and matches the
-    Murder Board brand system -- it shouldn't need to change between episodes.
+    Murder Board brand system (see the Claude Design project) --
+    it shouldn't need to change between episodes.
     ============================================================
   */
   * { box-sizing: border-box; }
@@ -67,6 +68,7 @@
   }
   .card { position: absolute; cursor: pointer; transition: filter 0.15s ease; user-select: none; }
   .card:hover { filter: brightness(1.12); z-index: 50; }
+  .new-tab { position: absolute; top: -9px; right: -8px; background: var(--red); color: #fff; font-size: 8px; letter-spacing: 0.14em; padding: 2px 5px 1px; transform: rotate(3deg); box-shadow: 0 2px 6px rgba(0,0,0,0.55); z-index: 22; font-family: 'Special Elite', monospace; }
   .pin {
     position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
     width: 13px; height: 13px; border-radius: 50%; background: var(--red);
@@ -83,6 +85,8 @@
     background: #1c1515; aspect-ratio: 4/5; display: flex; align-items: center; justify-content: center;
     font-family: monospace; font-size: 10px; color: #4a3838; text-align: center; padding: 6px; line-height: 1.5;
   }
+  .card-polaroid .img.has-photo { padding: 0; overflow: hidden; }
+  .card-polaroid .img img.photo { width: 100%; height: 100%; object-fit: cover; display: block; }
   .card-polaroid .cap {
     text-align: center; font-family: 'Special Elite', monospace; font-size: 10px; color: #2a2020;
     padding-top: 8px; letter-spacing: 0.06em; text-transform: uppercase;
@@ -101,21 +105,26 @@
     margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid rgba(192,0,26,0.25);
   }
   .card-id { background: var(--cream); color: #111; padding: 12px 14px; box-shadow: 3px 5px 16px rgba(0,0,0,0.6); font-family: 'Special Elite', monospace; border-left: 4px solid var(--red); }
+  .card-id.has-photo { display: flex; gap: 11px; align-items: flex-start; }
+  .card-id .mug { width: 60px; height: 75px; object-fit: cover; flex: none; border: 2px solid #fff; box-shadow: 0 1px 5px rgba(0,0,0,0.45); }
+  .card-id .id-body { min-width: 0; }
   .card-id .role { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--red); margin-bottom: 4px; }
   .card-id .name { font-size: 15px; font-weight: bold; color: var(--black); margin-bottom: 3px; }
   .card-id .detail { font-size: 11px; color: #555; line-height: 1.55; }
+  .card-postit .evidence-photo { width: 100%; display: block; margin-bottom: 9px; border: 1px solid rgba(0,0,0,0.28); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
   .card-clipping { background: #e8e0cc; padding: 13px 15px; font-family: 'Special Elite', monospace; box-shadow: 3px 5px 16px rgba(0,0,0,0.6); }
   .card-clipping .headline { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: #111; line-height: 1.25; margin-bottom: 6px; border-bottom: 2px solid #111; padding-bottom: 5px; }
+  .card-clipping .clip-photo { width: 100%; display: block; margin: 0 0 8px; border: 1px solid rgba(0,0,0,0.3); }
   .card-clipping .body { font-size: 10.5px; color: #333; line-height: 1.6; }
   #hud { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 24px; pointer-events: none; z-index: 200; }
-  #title-block { max-width: 420px; }
+  #title-block { max-width: 420px; background: rgba(13,11,11,0.82); border: 1px solid rgba(192,0,26,0.28); padding: 16px 18px 14px; border-radius: 3px; box-shadow: 0 6px 24px rgba(0,0,0,0.55); }
   .board-episode-tag { display: inline-flex; align-items: center; gap: 0.7rem; background: rgba(192,0,26,0.16); border: 1px solid rgba(192,0,26,0.35); padding: 0.4rem 0.9rem; margin-bottom: 0.7rem; }
   .board-episode-tag span { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; }
   .tag-label { color: var(--red); }
   .tag-ep { color: var(--cream-dim); }
   #title-text { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 26px; text-transform: uppercase; color: var(--cream); margin: 0 0 6px; line-height: 1.1; }
   #subhead { font-size: 12px; color: var(--cream-dim); line-height: 1.6; }
-  #hint { display: none; }
+  #hint { font-family: 'Special Elite', monospace; font-size: 11px; color: var(--cream-dim); background: rgba(13,11,11,0.6); border: 1px solid rgba(240,236,224,0.12); padding: 6px 12px; border-radius: 2px; margin-top: 10px; display: inline-block; letter-spacing: 0.04em; }
   #legend { position: fixed; bottom: 22px; left: 24px; z-index: 200; display: flex; flex-wrap: wrap; gap: 14px; pointer-events: none; background: rgba(13,11,11,0.55); padding: 8px 14px; border: 1px solid rgba(240,236,224,0.1); }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.1em; color: var(--cream-dim); text-transform: uppercase; }
   .legend-dot { width: 9px; height: 9px; border-radius: 50%; }
@@ -182,328 +191,287 @@
 </div>
 
 <script>
+/* BOARD-DATA-START */
 const WORLD_W = 2400;
-const WORLD_H = 1500;
+const WORLD_H = 1548;
 
-/* ============================================================
-   EPISODE DATA — edit only this block to update the board.
-   Cards: polaroid | postit (y/r/w/pink) | typed | id | clipping
-   Strings: kind = confirmed | suspected | evidence | unverified
-   ============================================================ */
 const BOARD = {
-  "tagEp": "Episode 5 — The Doorman",
-  "title": "The Missing Manuscript",
-  "subhead": "The doorman finally talks. Cameras that don't record, keys that are gone, and a needle nobody looked at twice.",
+  "tagEp": "Episode 5",
+  "title": "The Board So Far",
+  "subhead": "Where the board stands at the end of this episode.",
   "cards": [
-    {
-      "id": "halloway",
-      "type": "polaroid",
-      "x": 70,
-      "y": 325,
-      "w": 170,
-      "rotate": -2.5,
-      "caption": "PROF. HALLOWAY — FOUND FRIDAY",
-      "detail": "The victim. Diabetic. Found Friday morning. Ruled not suspicious. Keys gone from the apartment."
-    },
     {
       "id": "timeline",
       "type": "typed",
-      "x": 258,
-      "y": 305,
-      "w": 340,
-      "rotate": -1,
-      "header": "What We Know",
-      "text": "WED: Walkthrough (Diane + one).<br>THU MIDDAY: Someone returns ALONE with paperwork — listing contracts. Marcus thinks Diane.<br>THU EVE: Halloway visibly frightened (Marcus).<br>FRI EARLY AM: Found dead. Keys missing.",
-      "detail": "Confirmations that only raised new questions. The frightened Thursday is Marcus’s read, not mine."
-    },
-    {
-      "id": "manuscript",
-      "type": "clipping",
-      "x": 700,
-      "y": 328,
-      "w": 350,
-      "rotate": 0.5,
-      "headline": "THE MISSING MANUSCRIPT",
-      "body": "Della Mercer's authenticated composition notes. Gone. Catalog worth $??? — starting to feel like a lot."
-    },
-    {
-      "id": "theo",
-      "type": "polaroid",
-      "x": 1085,
-      "y": 520,
-      "w": 200,
-      "rotate": -2,
-      "caption": "THEO THOMAS — SUSPECT",
-      "detail": "Still pinned at the center. Marcus went quiet when I showed him the photo — not hostile, just careful. I didn’t let it move me. (It should have.)"
-    },
-    {
-      "id": "theo-case",
-      "type": "postit",
-      "color": "r",
-      "x": 1330,
-      "y": 635,
-      "w": 225,
-      "rotate": 3,
-      "text": "CASE AGAINST THEO: early score access, eidetic memory, cut from the ensemble, went offline on Halloway’s death.",
-      "detail": "No change this episode. Dramatic irony, sitting there."
-    },
-    {
-      "id": "lawyer",
-      "type": "typed",
-      "x": 1490,
-      "y": 312,
-      "w": 280,
-      "rotate": -1.5,
-      "header": "THE LAWYER'S LETTER",
-      "text": "Formal ownership claim on the manuscript. Client still unnamed.",
-      "detail": ""
-    },
-    {
-      "id": "marcus",
-      "type": "id",
-      "x": 1780,
-      "y": 312,
-      "w": 235,
-      "rotate": 2,
-      "role": "Ally",
-      "name": "Marcus",
-      "detailLine": "Finally sat down and told me everything.",
-      "flag": "Offered to take me up to the apartment. Tomorrow.",
-      "detail": ""
-    },
-    {
-      "id": "building",
-      "type": "typed",
-      "x": 65,
-      "y": 640,
       "w": 330,
-      "rotate": -1,
-      "header": "Building Notes",
-      "text": "SERVICE ENTRANCE used Thursday night — NO LOG ENTRY. Reported. Dismissed.<br>CAMERAS on every floor — DON’T RECORD. Dead end.<br>NEEDLE on the counter when Marcus found him. Insulin?",
-      "detail": "Three things Marcus reported to police. All dismissed."
+      "header": "Timeline",
+      "text": "<strong>Wednesday</strong> — Realty office walkthrough. Confirmed.<br><strong>Thursday midday</strong> — Someone from the realty office returns alone. Paperwork — listing contracts. <em>(Partial confirmation — replaces the previous flat \"???\")</em><br><strong>Thursday, between midday and 5pm </strong> — Halloway visibly frightened after discovering the theft. <em>(Marcus's memory, not Lena's own observation — worth tracking the distinction.)</em><br><strong>Thursday afternoon</strong> — Halloway discovers theft, calls police, speaks to Lena.<br><strong>Friday early morning [UPDATED]</strong> — Halloway found dead. Ruled suicide. <strong>Keys missing from apartment.</strong>",
+      "detail": "",
+      "x": 72,
+      "y": 98,
+      "rotate": 2.1,
+      "isNew": true
     },
     {
-      "id": "keys",
-      "type": "postit",
-      "color": "r",
-      "x": 430,
-      "y": 665,
-      "w": 220,
-      "rotate": 2,
-      "text": "HALLOWAY'S KEYS — gone from the apartment when Marcus found him. Reported. Dismissed.",
-      "detail": "A way in and out that took the means of access with it."
-    },
-    {
-      "id": "fear",
+      "id": "service-entrance",
       "type": "postit",
       "color": "y",
-      "x": 1100,
-      "y": 830,
-      "w": 230,
-      "rotate": -2,
-      "text": "Marcus: Halloway was scared Thursday evening — not upset about the theft, scared. Marcus knew the difference.",
-      "detail": ""
+      "w": 195,
+      "text": "<strong>Service entrance used Thursday night — NO LOG ENTRY. Reported to police. Dismissed.</strong> <em>(Sharpened — the \"is it related???\" question is now angrier, still unresolved.)</em>",
+      "detail": "",
+      "x": 80,
+      "y": 474,
+      "rotate": -1.6
     },
     {
-      "id": "diane",
-      "type": "id",
-      "x": 1490,
-      "y": 890,
-      "w": 235,
-      "rotate": 2,
-      "role": "realtor",
-      "name": "Diane Ashford / Kelsey",
-      "detailLine": "Someone from the office returned alone with contracts. Marcus thinks Diane. Kelsey had been inside, unsigned.",
-      "flag": "? Who exactly came back Thursday?",
-      "detail": ""
-    },
-    {
-      "id": "envelope",
-      "type": "postit",
-      "color": "pink",
-      "x": 1780,
-      "y": 610,
-      "w": 225,
-      "rotate": -2,
-      "text": "“Official and urgent” envelope for 2D — Harmon & Associates LLP, on behalf of CORNERSTONE RECORDS. Photographed the return address. Unopened.",
-      "detail": "That name snagged on something. Cornerstone — from my own research."
-    },
-    {
-      "id": "toes",
+      "id": "cameras",
       "type": "postit",
       "color": "y",
-      "x": 1780,
-      "y": 855,
-      "w": 225,
-      "rotate": 2.5,
-      "text": "Halloway told Marcus weeks ago he’d “stepped on some toes” with the book. Said like a joke. Doesn’t connect to anything yet.",
-      "detail": ""
+      "w": 195,
+      "text": "<strong>Cameras on all floors — DON'T RECORD.</strong> <em>(Dead end — noted as closed.)</em>",
+      "detail": "",
+      "x": 80,
+      "y": 306,
+      "rotate": 0.7,
+      "isNew": true
     },
     {
-      "id": "cornerstone",
-      "type": "id",
-      "x": 280,
-      "y": 1085,
-      "w": 300,
-      "rotate": -1,
-      "role": "Label / catalog",
-      "name": "Cornerstone Records",
-      "detailLine": "Founder Victor Reese. Absorbed in the ’70s. Now on an envelope to a dead man.",
-      "flag": "? What are they after?",
-      "detail": ""
+      "id": "syringe",
+      "type": "postit",
+      "color": "y",
+      "w": 195,
+      "text": "<strong>Needle on counter — Halloway was diabetic. Insulin?</strong> <em>(Small, slightly uncertain.)</em>",
+      "detail": "",
+      "x": 80,
+      "y": 930,
+      "rotate": 1.5,
+      "isNew": true
     },
     {
-      "id": "newsletter",
-      "type": "clipping",
-      "x": 720,
-      "y": 1095,
-      "w": 345,
-      "rotate": -1,
-      "headline": "CONSERVATORY NEWSLETTER",
-      "body": "Public. Named the manuscript and the auditions. How everyone found out."
+      "id": "victim",
+      "type": "polaroid",
+      "w": 185,
+      "caption": "JAMES HALLOWAY — DECEASED",
+      "detail": "Music/piano professor and jazz scholar at the Rittenhouse Conservatory. Announced he'd acquired a lost Della Mercer manuscript and was publishing a book on it. Found dead Friday morning, ruled suicide.",
+      "x": 1998,
+      "y": 84,
+      "rotate": -0.2
     },
     {
       "id": "urgent",
       "type": "postit",
-      "color": "pink",
-      "x": 1180,
-      "y": 1085,
-      "w": 240,
-      "rotate": 2,
-      "text": "The desk. I need to see the documents on the desk. Marcus: tomorrow.",
-      "detail": ""
+      "color": "r",
+      "w": 180,
+      "text": "~~I really need to see the documents on the desk~~ → <strong>Marcus: tomorrow.</strong> Two words. That's this episode's closing energy.",
+      "detail": "",
+      "x": 1995,
+      "y": 405,
+      "rotate": -2.4
+    },
+    {
+      "id": "theo",
+      "type": "id",
+      "w": 215,
+      "role": "Person of Interest",
+      "name": "Theo Thomas",
+      "detailLine": "No changes this episode.",
+      "flag": "",
+      "detail": "No changes this episode. Marcus's reaction to the photo (\"I don't recall Professor Halloway bringing students to the building, that I saw\") doesn't move Lena off him — dramatic irony sitting there visibly.",
+      "x": 940,
+      "y": 440,
+      "rotate": 0.3
+    },
+    {
+      "id": "diane",
+      "type": "id",
+      "w": 215,
+      "role": "Person of Interest",
+      "name": "Diane Ashford Realty / Kelsey",
+      "detailLine": "\"Was she there Wed & Thurs??\" gets a partial answer: Marcus confirms someone returned alo…",
+      "flag": "",
+      "detail": "<strong>\"Was she there Wed & Thurs??\" gets a partial answer: Marcus confirms someone returned alone with paperwork. Thinks it was Diane.</strong> <em>(The ambiguity has moved from \"did this happen\" to \"who exactly was it.\")</em>",
+      "x": 1057,
+      "y": 460,
+      "rotate": 1.2
+    },
+    {
+      "id": "manuscript",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "The manuscript <em>(absent)</em>.",
+      "detail": "",
+      "x": 480,
+      "y": 769,
+      "rotate": 2.8
+    },
+    {
+      "id": "letter",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "The lawyer's letter.",
+      "detail": "",
+      "x": 731,
+      "y": 763,
+      "rotate": 0.2
+    },
+    {
+      "id": "newsletter",
+      "type": "clipping",
+      "w": 345,
+      "headline": "THE NEWSLETTER.",
+      "body": "The newsletter.",
+      "detail": "",
+      "x": 68,
+      "y": 783,
+      "rotate": 0.2
+    },
+    {
+      "id": "folder",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "The branded folder.",
+      "detail": "",
+      "x": 80,
+      "y": 1140,
+      "rotate": -2.5
+    },
+    {
+      "id": "cornerstone-records",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "Cornerstone Records / Victor Reese — noted.",
+      "detail": "",
+      "x": 296,
+      "y": 1140,
+      "rotate": -0.8
+    },
+    {
+      "id": "demand-letter",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>An \"official and urgent\" envelope for 2D — Harmon & Associates LLP, on behalf of Cornerstone Records.</strong> Lena photographed the return address; unopened. See <strong>The Cornerstone demand letter</strong>.",
+      "detail": "",
+      "x": 512,
+      "y": 1140,
+      "rotate": 1.8,
+      "isNew": true
+    },
+    {
+      "id": "toes-comment",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>Halloway said he'd \"stepped on some toes\" with the book.</strong> Doesn't connect to anything yet. Just sits there.",
+      "detail": "",
+      "x": 728,
+      "y": 1140,
+      "rotate": 2.7,
+      "isNew": true
     }
   ],
   "annotations": [
     {
-      "x": 65,
-      "y": 305,
-      "text": "Victim"
+      "x": 60,
+      "y": 50,
+      "text": "Timeline"
     },
     {
-      "x": 695,
-      "y": 305,
-      "text": "The MacGuffin"
+      "x": 1995,
+      "y": 50,
+      "text": "The victim"
     },
     {
-      "x": 1120,
-      "y": 498,
-      "text": "The Student"
+      "x": 760,
+      "y": 432,
+      "text": "Persons of interest"
     },
     {
-      "x": 1485,
-      "y": 868,
-      "text": "The Realty Office"
-    },
-    {
-      "x": 275,
-      "y": 1062,
-      "text": "Background"
+      "x": 80,
+      "y": 729,
+      "text": "Physical evidence"
     }
   ],
   "strings": [
     {
       "from": [
-        155,
-        338
+        2090,
+        222
       ],
       "to": [
-        875,
-        372
+        1047,
+        488
       ],
-      "sag": 55,
+      "sag": 78,
       "kind": "confirmed"
     },
     {
       "from": [
-        875,
-        412
+        2090,
+        222
       ],
       "to": [
-        1185,
-        520
+        1164,
+        508
       ],
-      "sag": 30,
-      "kind": "confirmed"
-    },
-    {
-      "from": [
-        1442,
-        645
-      ],
-      "to": [
-        1230,
-        540
-      ],
-      "sag": 20,
-      "kind": "confirmed"
-    },
-    {
-      "from": [
-        1610,
-        360
-      ],
-      "to": [
-        875,
-        372
-      ],
-      "sag": 60,
+      "sag": 73,
       "kind": "suspected"
     },
     {
       "from": [
-        540,
-        680
+        1047,
+        488
+      ],
+      "to": [
+        2085,
+        486
+      ],
+      "sag": 76,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        1047,
+        488
       ],
       "to": [
         240,
-        375
+        839
       ],
-      "sag": 60,
+      "sag": 69,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        237,
+        193
+      ],
+      "to": [
+        240,
+        839
+      ],
+      "sag": 57,
       "kind": "evidence"
     },
     {
       "from": [
-        1607,
-        890
+        237,
+        193
       ],
       "to": [
-        875,
-        415
+        177,
+        577
       ],
-      "sag": 170,
+      "sag": 44,
       "kind": "unverified"
-    },
-    {
-      "from": [
-        1892,
-        625
-      ],
-      "to": [
-        430,
-        1085
-      ],
-      "sag": 150,
-      "kind": "suspected"
-    },
-    {
-      "from": [
-        430,
-        1085
-      ],
-      "to": [
-        875,
-        415
-      ],
-      "sag": 95,
-      "kind": "suspected"
     }
   ]
 };
-
-/* ============================================================
-   TEMPLATE ENGINE — do not edit below this line between episodes
-   ============================================================ */
+/* BOARD-DATA-END */
 
 const STRING_STYLE = {
   confirmed: { stroke: '#ed1c2e', width: 2, opacity: 0.75, dash: null },
@@ -545,23 +513,32 @@ function pinHTML(variant) {
 
 function cardInnerHTML(card) {
   if (card.type === 'polaroid') {
-    return `<div class="card-polaroid"><div class="img">case photo</div><div class="cap">${card.caption}</div></div>`;
+    const inner = card.image
+      ? `<img class="photo" src="${card.image}" alt="${card.caption}">`
+      : 'case photo';
+    return `<div class="card-polaroid"><div class="img${card.image ? ' has-photo' : ''}">${inner}</div><div class="cap">${card.caption}</div></div>`;
   }
   if (card.type === 'postit') {
-    return `<div class="card-postit ${card.color}">${card.text}</div>`;
+    const photo = card.image ? `<img class="evidence-photo" src="${card.image}" alt="">` : '';
+    return `<div class="card-postit ${card.color}">${photo}${card.text}</div>`;
   }
   if (card.type === 'typed') {
     return `<div class="card-typed"><div class="hdr">${card.header}</div>${card.text}</div>`;
   }
   if (card.type === 'id') {
-    return `<div class="card-id">
-      <div class="role">${card.role}</div>
-      <div class="name">${card.name}</div>
-      <div class="detail">${card.detailLine}${card.flag ? '<br><span style="color:var(--red);">' + card.flag + '</span>' : ''}</div>
+    const mug = card.image ? `<img class="mug" src="${card.image}" alt="${card.name}">` : '';
+    return `<div class="card-id${card.image ? ' has-photo' : ''}">
+      ${mug}
+      <div class="id-body">
+        <div class="role">${card.role}</div>
+        <div class="name">${card.name}</div>
+        <div class="detail">${card.detailLine}${card.flag ? '<br><span style="color:var(--red);">' + card.flag + '</span>' : ''}</div>
+      </div>
     </div>`;
   }
   if (card.type === 'clipping') {
-    return `<div class="card-clipping"><div class="headline">${card.headline}</div><div class="body">${card.body}</div></div>`;
+    const photo = card.image ? `<img class="clip-photo" src="${card.image}" alt="">` : '';
+    return `<div class="card-clipping"><div class="headline">${card.headline}</div>${photo}<div class="body">${card.body}</div></div>`;
   }
   return '';
 }
@@ -579,6 +556,7 @@ function renderCards() {
     html += `<div class="card" data-id="${card.id}" style="left:${card.x}px; top:${card.y}px; width:${card.w}px; transform: rotate(${card.rotate}deg);">
       ${pinHTML(pinVariantFor(card, i))}
       ${cardInnerHTML(card)}
+      ${card.isNew ? '<div class="new-tab">NEW</div>' : ''}
     </div>`;
   });
   layer.innerHTML = html;
@@ -633,8 +611,8 @@ function applyTransform() {
 
 function centerView() {
   const vw = viewport.clientWidth, vh = viewport.clientHeight;
-  scale = Math.min(vw / WORLD_W, vh / WORLD_H) * 0.92;
-  scale = Math.max(0.25, Math.min(scale, 1));
+  scale = Math.min(vw / WORLD_W, vh / WORLD_H) * 1.6;
+  scale = Math.max(0.35, Math.min(scale, 1));
   tx = (vw - WORLD_W * scale) / 2;
   ty = (vh - WORLD_H * scale) / 2;
   applyTransform();
