@@ -418,6 +418,37 @@ class DryRunLint(unittest.TestCase):
         self.assertIn("something off", noisy)
 
 
+class SummaryAndDetail(unittest.TestCase):
+    def _card(self, board, cid):
+        return next(c for c in board["cards"] if c["id"] == cid)
+
+    def test_summary_section_sets_subhead(self):
+        md = VICTIM + ("## Summary\nTwo clusters, no thread between them yet.\n\n"
+                       "## Suspects\n### Theo Thomas  %%id: theo%%\nx\n")
+        board, *_ = _build(md, episode=1)
+        self.assertEqual(board["subhead"], "Two clusters, no thread between them yet.")
+
+    def test_continuation_lines_become_modal_detail(self):
+        md = VICTIM + (
+            "## Cornerstone / Central Object\n"
+            "- **The manuscript** *(absent)* — Gone.          %%id: manuscript%%\n"
+            "  Authenticated by two scholars; the only known copy. *[Where is it now?]*\n"
+            "- **The business card** — On the counter.          %%id: card%%\n")
+        board, *_ = _build(md, episode=1)
+        detail = self._card(board, "manuscript")["detail"]
+        self.assertIn("Authenticated by two scholars", detail)
+        self.assertIn("Where is it now?", detail)   # aside unwrapped, no brackets shown raw
+        self.assertNotIn("*[", detail)
+
+    def test_building_note_continuation_detail(self):
+        md = VICTIM + (
+            "## Building / Location Notes\n"
+            "- Service entrance unlatched.          %%id: service-entrance%%\n"
+            "  No log entry Thursday night. Reported and dismissed.\n")
+        board, *_ = _build(md, episode=1)
+        self.assertIn("No log entry", self._card(board, "service-entrance")["detail"])
+
+
 class SeriesConfigFiles(unittest.TestCase):
     def test_all_series_load_with_required_keys(self):
         sc = _load_module("series_config")

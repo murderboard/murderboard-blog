@@ -66,6 +66,7 @@ the source can carry annotation freely. Recognized sections:
 | Section (title contains) | Becomes |
 | --- | --- |
 | `victim` / `centerpiece` | the fixed **victim polaroid** (1st line = caption, `![[embed]]` = photo, rest = detail) |
+| `summary` | the board **subhead** (the line under the title); overrides `--subhead` / the series default |
 | `timeline` | one **typed** panel (header "Timeline", bullets joined with `<br>`) |
 | `building` / `location` | **yellow** post-its (one per `- ` bullet) |
 | `suspect` | **ID cards** (one per `### Name` sub-heading) |
@@ -92,6 +93,15 @@ the source can carry annotation freely. Recognized sections:
 - `*[bracketed italic aside]*` → moves into that card's **lightbox detail**; a
   question aside (`*[why?]*`) in Suspects/Cornerstone also spawns a **pink
   question sticky** (max 3 per board).
+- **Indented continuation lines** under a Building or Cornerstone bullet become
+  that card's extra **modal detail** — a short card face, a longer note for the
+  enlarged click-to-open view:
+
+  ```
+  - **The manuscript** *(absent)* — Gone.          %%id: manuscript%%
+    Authenticated by two independent scholars; the only known copy. Its absence,
+    not its contents, is what everyone is circling.
+  ```
 - Suspect heading grammar `### Name · Role — STATUS`: `· Role` sets the card's
   role line (no more keyword guessing); `— STILL OPEN`/`— CLEARED`/`— RULED OUT`
   becomes the red **flag** line. Both optional; both stripped from the name.

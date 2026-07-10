@@ -54,6 +54,13 @@ Music professor and jazz scholar at the Rittenhouse Conservatory. Announced he'd
 acquired a lost Della Mercer manuscript. Found dead Friday morning.
 *[The manuscript wasn't with the body.]*
 
+## Summary
+
+%% The whole body here becomes the board's subhead (the line under the title),
+overriding the series default. Keep it to a sentence; put instructions like this
+in a comment. %%
+Two clusters, no thread between them yet. More leads, no closer to an answer.
+
 ## Timeline
 
 One bullet per line. Lead with the day/time in **bold**.
@@ -100,7 +107,8 @@ of the manuscript. *[Did he ever answer it?]*
 The first build picks the longest item as the newspaper clipping (write it as a
 researched paragraph) and remembers it; the rest become cream evidence cards.
 
-- **The Duforte canvas** *(missing)* — A minor work that turns out not to be minor. Provenance records show it changed hands three times in a year, each sale quieter than the last, the final buyer a numbered trust.  %%id: canvas%%
+- **The Duforte canvas** *(missing)* — A minor work that turns out not to be minor.  %%id: canvas%%
+  Provenance records show it changed hands three times in a year, each sale quieter than the last, the final buyer listed only as a numbered trust. The gallery insists it was never officially on loan. *[Who controls the trust?]*
 - **The insurance rider** — Updated eleven days before the piece vanished. ![[InsuranceRider.png]]  %%id: rider%%
 
 ## Connections

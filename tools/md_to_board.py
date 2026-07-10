@@ -167,6 +167,43 @@ def bullets(block: str):
     return out
 
 
+def bullets_with_detail(block: str):
+    """Like bullets(), but also gathers any **indented continuation lines** under
+    each bullet as that card's extra modal detail. Returns [(text, detail)].
+
+    So an author can write a short card face and a longer note for the enlarged
+    (click-to-open) view:
+
+        - **The manuscript** *(absent)* — Gone.          %%id: manuscript%%
+          Authenticated by two independent scholars; the only known copy. Its
+          absence, not its contents, is what everyone is circling.
+
+    A new '- ' at column 0 starts the next card; blank lines are fine."""
+    out, cur, detail = [], None, []
+    for line in block.splitlines():
+        m = re.match(r"^-\s+(.*)$", line)
+        if m:
+            if cur is not None:
+                out.append((cur, " ".join(detail).strip()))
+            cur, detail = m.group(1).strip(), []
+        elif cur is not None and re.match(r"^\s+\S", line):
+            detail.append(line.strip())
+    if cur is not None:
+        out.append((cur, " ".join(detail).strip()))
+    return out
+
+
+def combine_detail(cont, asides):
+    """A card's modal ("Detective's note") detail = continuation prose +
+    bracketed *[asides]*, from either the bullet or its continuation lines,
+    unwrapped and inline-rendered."""
+    cont_asides = re.findall(r"\*\[(.+?)\]\*", cont)
+    cont_body = re.sub(r"\*\[.+?\]\*", "", cont).strip()
+    parts = ([md_inline(cont_body)] if cont_body else []) \
+        + [md_inline(a) for a in list(asides) + cont_asides]
+    return " ".join(p for p in parts if p).strip()
+
+
 def parse_suspects(block: str):
     """Split the Suspects section on H3 (### Name) -> [(name, body)]."""
     out, name, buf = [], None, []
@@ -490,6 +527,13 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
     meta = layout.get("meta", {})
     cards = []
 
+    # A `## Summary` section in the episode is the board's subhead (the line under
+    # the title). Markdown is the source of truth, so it overrides --subhead / the
+    # series default when present.
+    md_summary = section(sections, "summary")
+    if md_summary.strip():
+        subhead = md_inline(re.sub(r"\s+", " ", md_summary.strip()))
+
     def add(card, cat):
         card["_cat"] = cat
         cards.append(card)
@@ -509,14 +553,14 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
 
     # ---- Building / Location notes -> yellow postits -------------------------
     bld_cards = []
-    for b in bullets(section(sections, "building", "location")):
+    for b, cont in bullets_with_detail(section(sections, "building", "location")):
         clean, isnew = strip_new(b)
         clean, cid = pop_id(clean)
         aside = re.findall(r"\*\[(.+?)\]\*", clean)
         body = re.sub(r"\*\[.+?\]\*", "", clean).strip()
         card = add({"id": cid or ("bld-" + slugify(body)), "type": "postit",
                     "color": "y", "w": 195, "text": md_inline(body),
-                    "detail": " ".join(md_inline(a) for a in aside)}, "left")
+                    "detail": combine_detail(cont, aside)}, "left")
         if isnew:
             card["_md_new"] = True
         bld_cards.append(card)
@@ -599,7 +643,7 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
 
     # ---- Cornerstone -> 1 stable clipping + cream evidence postits -----------
     corner_items = []
-    for b in bullets(section(sections, "cornerstone", "central")):
+    for b, cont in bullets_with_detail(section(sections, "cornerstone", "central")):
         clean, isnew = strip_new(b)
         # Strip an ![[photo]] embed and any %%id%% first so neither shows as text
         # nor perturbs the id (which must stay stable across episodes).
@@ -609,8 +653,8 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
         body = re.sub(r"\*\[.+?\]\*", "", clean).strip()
         parts = re.split(r"\s+—\s+", body, maxsplit=1)
         corner_items.append({"cid": cid or ("cs-" + slugify(parts[0])), "parts": parts,
-                             "body": body, "aside": aside, "is_new": isnew,
-                             "image": resolve_asset(embed)})
+                             "body": body, "detail": combine_detail(cont, aside),
+                             "is_new": isnew, "image": resolve_asset(embed)})
     clip_id = meta.get("clipping_id")
     ids_now = [it["cid"] for it in corner_items]
     if corner_items and (not clip_id or clip_id not in ids_now):
@@ -623,7 +667,7 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
             btext = md_inline(it["parts"][1]) if len(it["parts"]) > 1 else md_inline(it["body"])
             clip_card = add({"id": it["cid"], "type": "clipping", "w": 345,
                              "headline": headline, "body": btext,
-                             "detail": " ".join(it["aside"])}, "bottom")
+                             "detail": it["detail"]}, "bottom")
             if it["image"]:
                 clip_card["image"] = it["image"]
             if it["is_new"]:
@@ -632,7 +676,7 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
             postit = add({"id": it["cid"], "type": "postit",
                           "color": "w", "w": 185,
                           "text": md_inline(it["body"]),
-                          "detail": " ".join(it["aside"])}, "bottom")
+                          "detail": it["detail"]}, "bottom")
             if it["image"]:
                 postit["image"] = it["image"]
             if it["is_new"]:
@@ -806,8 +850,8 @@ def extract_board(html: str) -> dict:
 # Keywords section() matches on. Any H2 not containing one of these is ignored
 # by the parser — the lint surfaces those so a mistyped `## Suspcets` is visible.
 KNOWN_SECTION_KEYWORDS = (
-    "victim", "centerpiece", "timeline", "building", "location", "suspect",
-    "document", "cornerstone", "central", "connection", "urgent", "now",
+    "victim", "centerpiece", "summary", "timeline", "building", "location",
+    "suspect", "document", "cornerstone", "central", "connection", "urgent", "now",
 )
 
 
