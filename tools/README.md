@@ -43,7 +43,8 @@ engine never needs to change for a polish — **only the data**.
 | `tools/regen.py` | One-command wrapper: resolves the Obsidian source path and episode tag, runs `md_to_board.py` + `shoot_board.py`, writes both outputs to `public/murderboards/<slug>/`. See `PIPELINE.md`. |
 | `tools/md_to_board.py` | Parser + layout engine. `Murder Board.md` → `BOARD` object → spliced into the template. The heart of the system. |
 | `tools/board_template.html` | The reusable interactive board (styles + render engine + pan/zoom/lightbox). The generator injects a data block into it. **Canonical copy** — keep in sync with the "Claude Design" master template if the look changes. |
-| `tools/layouts/<slug>.json` | Per-series **layout memory**: `{meta, cards:{id:{x,y,rotate}}}`. Auto-created/updated. **Commit it** — the board's growth history lives here. |
+| `tools/layouts/<slug>.json` | Per-series **layout memory**: `{meta, cards:{id:{x,y,rotate,first_seen_episode}}}`. Auto-created/updated. **Commit it** — the board's growth history lives here. |
+| `tools/series/<slug>.json` + `tools/series_config.py` | Per-series settings (`tag_label`, `default_subhead`, `vault_dir`, `annotations`), read by both `md_to_board.py` and `regen.py`. |
 | `tools/Murder Board.example.md` | Annotated input example — every section, `[NEW]`, `*[asides]*`, suspects, cornerstone. Copy to start a series/episode. |
 | `tools/shoot_board.py` | Renders a finished board HTML → wide PNG cropped to the cards (Playwright/Chromium). |
 | `tools/verify_board.py` | Renders a board headless and reports **real** overlapping cards / broken images; non-zero exit gates the pipeline. `regen.py` runs it automatically. |
@@ -195,8 +196,10 @@ Section → card mapping is in §3. Beyond that:
   "Person of Interest". (The old `guess_role` keyword table is gone.)
 - **Annotations** are fixed faint labels: *Timeline*, *The victim*, *Persons of
   interest*, *Physical evidence*.
-- **`SERIES_CONFIG`** (top of the file) holds only the per-series `tag_label` and
-  `default_subhead`; `--series` picks one. The centerpiece now lives in each
+- **Per-series settings** live in `tools/series/<slug>.json` (`tag_label`,
+  `default_subhead`, `vault_dir`, and the `annotations` zone labels), read by both
+  `md_to_board.py` and `regen.py` via `series_config.load_series()`. `--series`
+  picks one; adding a series is one file. The centerpiece now lives in each
   episode's `## Victim` section (see §3), not in code. `rittenhouse-dog-walker`
   is live.
 

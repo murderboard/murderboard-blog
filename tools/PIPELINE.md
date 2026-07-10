@@ -74,9 +74,9 @@ mid-series), `--html-only` / `--shoot-only` to run just one half, `--source`
 to override the auto-resolved vault path, `--tag`/`--subhead` to override the
 auto-derived ones. The Obsidian vault root defaults to
 `~/obsidian/notes/001 Projects`; set `$MURDERBOARD_VAULT` if it's mounted
-elsewhere. New series need a line in `SERIES_VAULT_DIR` at the top of the
-script. Steps 2 and 4 below are what it runs under the hood — reach for them
-directly for a one-off flag `regen.py` doesn't expose yet.
+elsewhere. New series need a `tools/series/<slug>.json` (with a `vault_dir`).
+Steps 2 and 4 below are what it runs under the hood — reach for them directly for
+a one-off flag `regen.py` doesn't expose yet.
 
 ## Files
 
@@ -112,10 +112,11 @@ python -m playwright install chromium     # on macOS this is self-contained
 npm install                               # for the Next.js build/preview
 ```
 
-Per series, add a block to `SERIES_CONFIG` in `md_to_board.py` (the centerpiece
-photo caption + detail and the default subhead). `rittenhouse-dog-walker` is
-live; `porchlight-detectives` and `cassandra-files` are included as worked
-examples — edit their names/details when you start those series.
+Per series, add a `tools/series/<slug>.json` (`tag_label`, `default_subhead`,
+`vault_dir`, and the `annotations` zone labels). `rittenhouse-dog-walker` is live;
+`porchlight-detectives` and `cassandra-files` are included as worked examples —
+fill in their `vault_dir` when you start those series. The centerpiece is no
+longer configured here; it lives in each episode's `## Victim` section.
 
 ## Per-episode routine
 
@@ -139,8 +140,8 @@ examples — edit their names/details when you start those series.
 
    Card types are mapped from the MD sections: Timeline → a typed panel,
    Building notes → yellow stickies, Suspects → ID cards, Cornerstone → one
-   newspaper clipping + cream evidence cards, Urgent → a red flag, victim →
-   the polaroid (from `SERIES_CONFIG`). Layout is balanced into bands; strings
+   newspaper clipping + cream evidence cards, Urgent → a red flag, `## Victim` →
+   the polaroid. Layout is balanced into bands; strings
    are loose and atmospheric (approximate, never traced point-to-point — same
    principle as the Canva Render Prompt).
 

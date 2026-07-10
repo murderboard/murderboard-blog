@@ -26,6 +26,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from series_config import load_series  # noqa: E402
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TOOLS = REPO_ROOT / "tools"
 
@@ -38,17 +41,13 @@ VAULT_ROOT = Path(os.environ.get(
     "MURDERBOARD_VAULT",
     str(Path.home() / "obsidian" / "notes" / "001 Projects"),
 ))
-SERIES_VAULT_DIR = {
-    "rittenhouse-dog-walker": "0011 The Rittenhouse Dog Walker",
-    "cassandra-files": "0012 The Cassandra Files",
-}
 
 
 def resolve_source(series, episode):
-    proj_dir = SERIES_VAULT_DIR.get(series)
+    proj_dir = load_series(series).get("vault_dir")
     if not proj_dir:
-        sys.exit(f"error: no vault folder mapped for series {series!r} "
-                  f"(add it to SERIES_VAULT_DIR in tools/regen.py, or pass --source)")
+        sys.exit(f"error: no vault_dir for series {series!r} "
+                  f"(set it in tools/series/{series}.json, or pass --source)")
     proj = VAULT_ROOT / proj_dir
     pattern = f"volumes/*/episodes/{episode:04d} Episode {episode}/Murder Board.md"
     matches = sorted(proj.glob(pattern))

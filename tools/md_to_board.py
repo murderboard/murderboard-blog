@@ -33,38 +33,11 @@ import re
 import sys
 from pathlib import Path
 
-# ---------------------------------------------------------------------------
-# Per-series static block (set once per volume; not in the episode MD)
-# ---------------------------------------------------------------------------
-#
-# Add one entry per series. The keys:
-#   tag_label       -> the small label in the episode tag chip (top-left).
-#   default_subhead -> used when --subhead isn't passed.
-#
-# The centerpiece (victim / central object) is NOT here — it now lives in each
-# episode's Markdown under a `## Victim` section (see parse_victim).
-#
-SERIES_CONFIG = {
-    "rittenhouse-dog-walker": {
-        "tag_label": "Murder Board",
-        "default_subhead": "Where the board stands at the end of this episode.",
-    },
-
-    # --- EXAMPLES for the other two imprint series (edit names/details) -------
-
-    # Middle-grade, playful/cipher board (no body — the ## Victim section holds
-    # the case's central object instead).
-    "porchlight-detectives": {
-        "tag_label": "Case Board",
-        "default_subhead": "What the Porchlight Detectives have figured out so far.",
-    },
-
-    # Adult thriller, clinical/data-viz board.
-    "cassandra-files": {
-        "tag_label": "The Cassandra Files",
-        "default_subhead": "Current threat model. Weighted by what the data says, not what they want to believe.",
-    },
-}
+# Per-series settings (tag label, default subhead, annotation labels) live in
+# tools/series/<slug>.json and are read via series_config.load_series(). The
+# centerpiece now comes from each episode's `## Victim` section, not from config.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from series_config import load_series  # noqa: E402
 
 WORLD_W = 2400          # board width is fixed so every episode is the "same board"
 MIN_WORLD_H = 1500
@@ -729,11 +702,14 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
     # ---- Annotations (faint zone labels) ------------------------------------
     ev_y = min((c["y"] for c in ([clip_card] if clip_card else []) + corner_cards),
                default=1140) - 34
+    # Zone-label text is per-series (the middle-grade board has no "victim"); the
+    # positions are layout, so they stay here.
+    lbl = (cfg or {}).get("annotations", {})
     annotations = [
-        {"x": 60, "y": 50, "text": "Timeline"},
-        {"x": 1995, "y": 50, "text": "The victim"},
-        {"x": 760, "y": 432, "text": "Persons of interest"},
-        {"x": 80, "y": ev_y, "text": "Physical evidence"},
+        {"x": 60, "y": 50, "text": lbl.get("timeline", "Timeline")},
+        {"x": 1995, "y": 50, "text": lbl.get("victim", "The victim")},
+        {"x": 760, "y": 432, "text": lbl.get("suspects", "Persons of interest")},
+        {"x": 80, "y": ev_y, "text": lbl.get("evidence", "Physical evidence")},
     ]
 
     # ---- Save layout memory + finalise cards --------------------------------
@@ -825,9 +801,7 @@ def main():
                     help="fail if a referenced card image is missing (default: warn)")
     args = ap.parse_args()
 
-    cfg = SERIES_CONFIG.get(args.series)
-    if not cfg:
-        sys.exit(f"Unknown series '{args.series}'. Add it to SERIES_CONFIG.")
+    cfg = load_series(args.series)
 
     md = Path(args.source).read_text(encoding="utf-8")
     template = Path(args.template).read_text(encoding="utf-8")

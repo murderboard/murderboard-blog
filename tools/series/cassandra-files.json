@@ -1,0 +1,11 @@
+{
+  "tag_label": "The Cassandra Files",
+  "default_subhead": "Current threat model. Weighted by what the data says, not what they want to believe.",
+  "vault_dir": "0012 The Cassandra Files",
+  "annotations": {
+    "timeline": "Timeline",
+    "victim": "Subject",
+    "suspects": "Persons of interest",
+    "evidence": "Signals"
+  }
+}

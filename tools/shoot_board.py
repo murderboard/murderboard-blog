@@ -15,18 +15,27 @@ Usage:
 """
 
 import argparse
-import re
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
 FIT = 0.94  # leave a small margin so edge cards aren't clipped
 
-
-def world_dims(html: str):
-    w = int(re.search(r"const WORLD_W\s*=\s*(\d+)", html).group(1))
-    h = int(re.search(r"const WORLD_H\s*=\s*(\d+)", html).group(1))
-    return w, h
+# JS that unions the card boxes with the string-layer bounds, so a deeply sagging
+# bottom string isn't cropped out of the Substack image. Returns {minX..maxY}.
+_BOUNDS_JS = """
+    let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+    for (const el of document.querySelectorAll('#card-layer .card')) {
+        minX=Math.min(minX,el.offsetLeft); minY=Math.min(minY,el.offsetTop);
+        maxX=Math.max(maxX,el.offsetLeft+el.offsetWidth);
+        maxY=Math.max(maxY,el.offsetTop+el.offsetHeight);
+    }
+    const sv=document.getElementById('strings');
+    if (sv) { try { const b=sv.getBBox();
+        minX=Math.min(minX,b.x); minY=Math.min(minY,b.y);
+        maxX=Math.max(maxX,b.x+b.width); maxY=Math.max(maxY,b.y+b.height);
+    } catch(e){} }
+"""
 
 
 def main():
@@ -34,7 +43,8 @@ def main():
     ap.add_argument("html")
     ap.add_argument("--out", required=True)
     ap.add_argument("--width", type=int, default=1600)
-    ap.add_argument("--scale", type=int, default=2)
+    ap.add_argument("--scale", type=float, default=2,
+                    help="device pixel ratio (e.g. 2 = retina; floats allowed)")
     ap.add_argument("--keep-hud", action="store_true",
                     help="keep the title/legend overlay (hidden by default for a clean board)")
     args = ap.parse_args()
@@ -47,7 +57,10 @@ def main():
         page = browser.new_page(viewport={"width": out_w, "height": out_w},
                                 device_scale_factor=args.scale)
         page.goto(html_path.as_uri())
-        page.wait_for_timeout(700)  # fonts + layout settle
+        # Wait for the actual web fonts (not a fixed sleep) so text metrics — and
+        # therefore card heights — are final before we measure.
+        page.evaluate("() => (document.fonts ? document.fonts.ready : Promise.resolve())")
+        page.wait_for_timeout(150)  # brief layout settle
         # Card photos load asynchronously and change card heights, so the
         # bounding box below is only correct once every image has decoded.
         # Wait for network idle, then explicitly for each <img> to finish.
@@ -69,14 +82,7 @@ def main():
         # First pass: measure the card bounding box so we can size the canvas
         # to the content's aspect ratio (no empty letterbox bands).
         bbox = page.evaluate(
-            """() => {
-                const cards = [...document.querySelectorAll('#card-layer .card')];
-                let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
-                for (const el of cards){
-                    minX=Math.min(minX,el.offsetLeft); minY=Math.min(minY,el.offsetTop);
-                    maxX=Math.max(maxX,el.offsetLeft+el.offsetWidth);
-                    maxY=Math.max(maxY,el.offsetTop+el.offsetHeight);
-                }
+            "() => {" + _BOUNDS_JS + """
                 const pad=70;
                 return {w:(maxX-minX)+2*pad, h:(maxY-minY)+2*pad};
             }"""
@@ -88,15 +94,7 @@ def main():
         # Second pass: fit that box to frame, freeze the transform, hide chrome.
         hide_ids = ["controls", "hint"] + ([] if args.keep_hud else ["hud", "legend"])
         page.evaluate(
-            """([fit, hideIds]) => {
-                const cards = [...document.querySelectorAll('#card-layer .card')];
-                let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
-                for (const el of cards) {
-                    const x = el.offsetLeft, y = el.offsetTop;
-                    minX = Math.min(minX, x); minY = Math.min(minY, y);
-                    maxX = Math.max(maxX, x + el.offsetWidth);
-                    maxY = Math.max(maxY, y + el.offsetHeight);
-                }
+            "([fit, hideIds]) => {" + _BOUNDS_JS + """
                 const pad = 70;
                 minX -= pad; minY -= pad; maxX += pad; maxY += pad;
                 const bw = maxX - minX, bh = maxY - minY;
@@ -118,7 +116,7 @@ def main():
         page.wait_for_timeout(400)
         page.screenshot(path=args.out)
         browser.close()
-    print(f"Wrote {args.out}  ({out_w}x{out_h} @ {args.scale}x)")
+    print(f"Wrote {args.out}  ({out_w}x{out_h} @ {args.scale:g}x)")
 
 
 if __name__ == "__main__":

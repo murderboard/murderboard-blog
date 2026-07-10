@@ -144,7 +144,7 @@ Files: new `tools/verify_board.py`; `regen.py` (call it after each build).
 
 ---
 
-## Phase 4 — Config unification & dead-code cleanup (medium)
+## Phase 4 — Config unification & dead-code cleanup (medium) — ✅ DONE
 - With the victim in MD, per-series config shrinks to `tag_label`,
   `default_subhead`, vault dir, and annotation labels. Merge `SERIES_CONFIG`
   (in `md_to_board.py`) and `SERIES_VAULT_DIR` (in `regen.py`) into a single

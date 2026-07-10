@@ -1,0 +1,11 @@
+{
+  "tag_label": "Case Board",
+  "default_subhead": "What the Porchlight Detectives have figured out so far.",
+  "vault_dir": null,
+  "annotations": {
+    "timeline": "Timeline",
+    "victim": "The case",
+    "suspects": "Persons of interest",
+    "evidence": "Clues"
+  }
+}

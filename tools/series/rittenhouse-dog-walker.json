@@ -1,0 +1,11 @@
+{
+  "tag_label": "Murder Board",
+  "default_subhead": "Where the board stands at the end of this episode.",
+  "vault_dir": "0011 The Rittenhouse Dog Walker",
+  "annotations": {
+    "timeline": "Timeline",
+    "victim": "The victim",
+    "suspects": "Persons of interest",
+    "evidence": "Physical evidence"
+  }
+}

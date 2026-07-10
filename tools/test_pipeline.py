@@ -40,7 +40,7 @@ def _load_module(name):
 md2b = _load_generator()
 vb = _load_module("verify_board")   # geometry helpers import lazily (no Playwright)
 TEMPLATE = (HERE / "board_template.html").read_text(encoding="utf-8")
-CFG = md2b.SERIES_CONFIG["rittenhouse-dog-walker"]
+CFG = md2b.load_series("rittenhouse-dog-walker")
 
 # Minimal episode. Stable card ids we assert on: sus-theo-thomas,
 # sus-diane-ashford, and (added in EP2) sus-marcus.
@@ -391,6 +391,20 @@ class VerifyHelpers(unittest.TestCase):
         self.assertFalse(ok2)                                 # broken image
         ok3, _ = vb.report([self.BOXES[0]], [], 500, 500)
         self.assertTrue(ok3)                                  # clean
+
+
+class SeriesConfigFiles(unittest.TestCase):
+    def test_all_series_load_with_required_keys(self):
+        sc = _load_module("series_config")
+        slugs = sc.available()
+        self.assertIn("rittenhouse-dog-walker", slugs)
+        for slug in slugs:
+            cfg = sc.load_series(slug)
+            for key in ("tag_label", "default_subhead", "annotations"):
+                self.assertIn(key, cfg, f"{slug}.json missing {key!r}")
+            for lbl in ("timeline", "victim", "suspects", "evidence"):
+                self.assertIn(lbl, cfg["annotations"],
+                              f"{slug}.json annotations missing {lbl!r}")
 
 
 if __name__ == "__main__":
