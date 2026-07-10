@@ -55,31 +55,51 @@ engine never needs to change for a polish — **only the data**.
 
 ## 3. Input contract — `Murder Board.md`
 
-The generator parses **H2 sections** (`## …`) by keyword. Everything else is
-ignored, so the source can carry prose freely. Recognized sections:
+The episode Markdown is the **complete source of truth** for the board — content
+*and* connections. The generator parses **H2 sections** (`## …`) by keyword;
+everything else (prose under a heading, `<!-- html comments -->`) is ignored, so
+the source can carry annotation freely. Recognized sections:
 
 | Section (title contains) | Becomes |
 | --- | --- |
+| `victim` / `centerpiece` | the fixed **victim polaroid** (1st line = caption, `![[embed]]` = photo, rest = detail) |
 | `timeline` | one **typed** panel (header "Timeline", bullets joined with `<br>`) |
 | `building` / `location` | **yellow** post-its (one per `- ` bullet) |
 | `suspect` | **ID cards** (one per `### Name` sub-heading) |
+| `document` | **typed** document panels (one per `### Title`) |
 | `cornerstone` / `central` | **one newspaper clipping** + **cream** evidence post-its |
+| `connection` | the red **strings** (see below); replaces the auto-heuristic |
 | `urgent` / `now` | one **red** flag post-it |
 
-Plus, from `SERIES_CONFIG` (not the MD): the fixed **victim polaroid**.
+**Authoring markers** (usable in any item unless noted):
 
-**Authoring markers:**
+- `%% … %%` → an **Obsidian comment**: author notes, dropped from every card (and
+  hidden in Obsidian preview). Run globally first, so a heading inside a comment
+  can't spawn a section. (Comments can't contain a literal `%%`.)
+- `%%id: name%%` → **pins a card's stable id** to `name` (lower-case, `[a-z0-9-]`).
+  The card keeps its saved position even if reworded, and `## Connections` refers
+  to it by `name`. Without one, the id is derived from the card's words. Ids must
+  be unique per build (a duplicate is a hard error).
+- `![[file]]` → attaches a **photo** (bare filename, resolved under the board's
+  `assets/` tree). Works on the victim, suspect ID cards, and cornerstone/evidence
+  cards. (Typed cards — timeline, documents — don't show photos.)
+- `[[target|alias]]` / `[[target]]` → a **wikilink**, rendered as its display text.
+- `[NEW]` → forces a **NEW** tab this episode (first-appearance cards are tagged
+  automatically, so this is optional emphasis). Stripped from text and id.
+- `*[bracketed italic aside]*` → moves into that card's **lightbox detail**; a
+  question aside (`*[why?]*`) in Suspects/Cornerstone also spawns a **pink
+  question sticky** (max 3 per board).
+- Suspect heading grammar `### Name · Role — STATUS`: `· Role` sets the card's
+  role line (no more keyword guessing); `— STILL OPEN`/`— CLEARED`/`— RULED OUT`
+  becomes the red **flag** line. Both optional; both stripped from the name.
 
-- `[NEW]` anywhere in an item → that card gets a **NEW** tab this episode
-  (cleared automatically next episode). Stripped from the rendered text and from
-  the id, so adding/removing `[NEW]` never moves a card.
-- `*[bracketed italic aside]*` inside an item → moves into that card's **lightbox
-  detail** (not shown on the card face).
-- An aside that is a **question** (`*[why was she there?]*`) in the Suspects or
-  Cornerstone sections → also spawns a **pink question sticky** (max 3 per board).
-- Suspect status suffixes on the heading (`### Marcus — STILL OPEN`,
-  `— CLEARED`, `— RULED OUT`) → become the card's red **flag** line; stripped
-  from the name so the id stays stable.
+### `## Connections`
+One string per bullet: `- <from-id> -> <to-id>: <kind>`, where `kind` is
+`confirmed`, `suspected`, `evidence`, or `unverified`. Endpoints are resolved by
+**explicit id only** (`victim`, `timeline`, `urgent`, or a pinned `%%id%%`); an
+unknown id or kind is a **hard error**, so a typo can't silently drop a string. If
+a board has **no** `## Connections` section, the generator falls back to the legacy
+heuristic (victim→suspects, etc.) so un-migrated episodes still build.
 
 See `tools/Murder Board.example.md` for the fully worked format.
 
@@ -162,18 +182,21 @@ Section → card mapping is in §3. Beyond that:
 - **The cornerstone clipping is chosen once.** On first build, the longest
   cornerstone item becomes the newspaper clipping and its id is saved in
   `meta.clipping_id`; every later cornerstone item is a cream evidence post-it.
-- **Strings are generated deterministically** from the cast: victim → each
-  suspect (the newest/first suspect is the `confirmed` "central" one, the rest
-  `suspected`), central → urgent and central → clipping (`suspected`), timeline →
-  clipping (`evidence`), timeline → first building note (`unverified`). `sag` is a
-  function of endpoint distance, so a link between two fixed cards looks identical
-  every episode.
+- **Strings come from `## Connections`** when present (authored, resolved by
+  explicit id — see §3). With no `## Connections` section the generator falls back
+  to a deterministic heuristic: victim → each suspect (the newest/first suspect is
+  the `confirmed` "central" one, the rest `suspected`), central → urgent and
+  central → clipping (`suspected`), timeline → clipping (`evidence`), timeline →
+  first building note (`unverified`). `sag` is a function of endpoint distance, so
+  a link between two fixed cards looks identical every episode.
+- **Roles** come from the suspect heading (`### Name · Role`); default is
+  "Person of Interest". (The old `guess_role` keyword table is gone.)
 - **Annotations** are fixed faint labels: *Timeline*, *The victim*, *Persons of
   interest*, *Physical evidence*.
-- **`SERIES_CONFIG`** (top of the file) holds the per-series static block: the
-  `victim` polaroid `caption`/`detail` *(and, per §9, an optional `image`)*, the
-  `tag_label`, and the `default_subhead`. One entry per series; `--series` picks
-  it. `rittenhouse-dog-walker` is live.
+- **`SERIES_CONFIG`** (top of the file) holds only the per-series `tag_label` and
+  `default_subhead`; `--series` picks one. The centerpiece now lives in each
+  episode's `## Victim` section (see §3), not in code. `rittenhouse-dog-walker`
+  is live.
 
 ### CLI
 ```
@@ -303,8 +326,8 @@ the photo for free.
   basename, so the author never types the sub-folder). Deterministic on duplicate
   basenames (lexicographically-first path wins). Missing files warn to stderr, or
   hard-fail under **`--check-assets`**.
-- **Victim:** optional `"image": "JamesHalloway.jpg"` in the series'
-  `SERIES_CONFIG` victim block → `card["image"]`.
+- **Victim:** an `![[JamesHalloway.jpg]]` embed in the episode's `## Victim`
+  section → `card["image"]`.
 - **Suspects & cornerstone:** an Obsidian embed `![[TheoThomas.jpg]]` in the block
   is parsed by `pop_embed()`, **stripped from the card text before the id is
   derived** (so a photo never moves a card), and resolved to `card["image"]`.
@@ -347,15 +370,19 @@ bounding-box math must run after they paint.
 - The deployed `episode-1…6.html` in `public/murderboards/rittenhouse-dog-walker/`
   were produced by a **one-off Cowork script**, not this pipeline, so they are
   **not guaranteed to match** `md_to_board.py`'s output or the saved
-  `layouts/rittenhouse-dog-walker.json`. **First task: regenerate all six through
-  the pipeline, in order 1→6**, so the boards, the template, and the layout memory
-  agree; then screenshot and commit. (Use existing memory to preserve positions,
-  or `--reflow` on Ep 1 then run 2–6 for a clean rebuild.)
-- **Fix-first content bug:** `SERIES_CONFIG["rittenhouse-dog-walker"]["victim"]`
-  calls Halloway a **"Philosophy professor."** He is a **music/piano professor and
-  jazz scholar** at the Rittenhouse Conservatory who acquired a lost **Della Mercer
-  jazz manuscript**. Correct the `detail` (and align the `caption` with the board's
-  "PROF. JAMES HALLOWAY" if you like).
+  `layouts/rittenhouse-dog-walker.json`. **Remaining task: regenerate all six
+  through the pipeline, in order 1→6**, so the boards, the template, and the layout
+  memory agree; then screenshot and commit. (Memory now merges safely, so run
+  order won't clobber later episodes.)
+- **Migration to the new grammar:** the vault `Murder Board.md` files need a
+  `## Victim` section, `%%id%%` markers on suspects/evidence, and `## Connections`
+  (see §3). Until an episode is migrated, it still builds via the fallback
+  heuristic. The victim's "music/piano professor and jazz scholar" copy now lives
+  in that `## Victim` section, not in code — write it correctly there.
+- **Progress:** Phase 0 (memory-merge safety, provenance, hardened splice) and
+  Phase 1 (the Markdown grammar above) are implemented and covered by
+  `tools/test_pipeline.py`. See `tools/PLAN-md-source-of-truth.md` for the roadmap
+  (collision verifier, config unification, migration still pending).
 
 ---
 

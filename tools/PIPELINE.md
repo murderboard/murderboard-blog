@@ -37,14 +37,19 @@ file at `tools/layouts/<slug>.json` mapping each card to a locked `x/y/rotate`.
 
 ### Keeping card identity stable
 
-A card's id comes from its **content**, so identity (and therefore position) is
-preserved only if the wording stays stable:
+A card's id comes from its **content** unless you pin one, so identity (and
+therefore position) is preserved if either the wording stays stable or you pin an
+id:
 
-- A **suspect** is keyed by name — keep the `### Name` heading the same episode
-  to episode (status suffixes like `— STILL OPEN` and `[NEW]` are ignored, so
-  those are safe to change).
-- A **note / evidence item** is keyed by its text. Light edits keep its id;
-  substantially rewording it reads as a brand-new card in a new spot.
+- **Pin an `%%id: name%%`** on anything you expect to reword or rename — the card
+  then keeps its id (and saved position) no matter how the text changes. Strongly
+  recommended for suspects and cornerstone items. `## Connections` also refers to
+  cards by this id.
+- A **suspect** without a pinned id is keyed by name — keep the `### Name` heading
+  stable (role `· …` and status `— STILL OPEN` / `[NEW]` are ignored, so those are
+  safe to change).
+- A **note / evidence item** without a pinned id is keyed by its text. Light edits
+  keep its id; substantially rewording it reads as a brand-new card in a new spot.
 - The **timeline**, **victim**, and **urgent** slots are singletons — their text
   can change freely; they stay put.
 - The **cornerstone clipping** (the one newspaper-style card) is chosen on the

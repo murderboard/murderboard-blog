@@ -38,54 +38,29 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 #
 # Add one entry per series. The keys:
-#   victim          -> the board's fixed centerpiece polaroid (set once per
-#                      volume; doesn't come from the episode MD). For a body it's
-#                      the victim; for a series with no body it's the central
-#                      figure or case object. caption is printed on the photo;
-#                      detail shows in the lightbox.
 #   tag_label       -> the small label in the episode tag chip (top-left).
 #   default_subhead -> used when --subhead isn't passed.
 #
+# The centerpiece (victim / central object) is NOT here — it now lives in each
+# episode's Markdown under a `## Victim` section (see parse_victim).
+#
 SERIES_CONFIG = {
     "rittenhouse-dog-walker": {
-        "victim": {
-            "caption": "JAMES HALLOWAY — DECEASED",
-            "detail": ("Music/piano professor and jazz scholar at the Rittenhouse "
-                       "Conservatory. Recently announced he'd acquired a lost Della "
-                       "Mercer jazz manuscript and was publishing a book about it. "
-                       "Found dead Friday morning."),
-            # Centerpiece photo. Bare filename; resolved against the board's
-            # sibling assets/ tree (assets/people/JamesHalloway.jpg here). Omit
-            # or set to None/"" to fall back to the "case photo" placeholder.
-            "image": "JamesHalloway.jpg",
-        },
         "tag_label": "Murder Board",
         "default_subhead": "Where the board stands at the end of this episode.",
     },
 
     # --- EXAMPLES for the other two imprint series (edit names/details) -------
 
-    # Middle-grade, playful/cipher board. No body — the centerpiece is the case
-    # itself, so the "victim" card holds the mystery's central object.
+    # Middle-grade, playful/cipher board (no body — the ## Victim section holds
+    # the case's central object instead).
     "porchlight-detectives": {
-        "victim": {
-            "caption": "THE CASE: THE PORCHLIGHT THAT WENT OUT",
-            "detail": ("Old Mr. Alvarez's porchlight has been on every night for "
-                       "thirty years. Last Tuesday it went dark — and so did he. "
-                       "The Porchlight Detectives are on it."),
-        },
         "tag_label": "Case Board",
         "default_subhead": "What the Porchlight Detectives have figured out so far.",
     },
 
-    # Adult thriller, clinical/data-viz board. Centerpiece is the victim.
+    # Adult thriller, clinical/data-viz board.
     "cassandra-files": {
-        "victim": {
-            "caption": "SUBJECT 01 — DECEASED",
-            "detail": ("Found at the scene. Casey Reilly's models flagged the "
-                       "pattern weeks before anyone else saw it. Probability the "
-                       "death is unrelated: low."),
-        },
         "tag_label": "The Cassandra Files",
         "default_subhead": "Current threat model. Weighted by what the data says, not what they want to believe.",
     },
@@ -116,10 +91,46 @@ def pop_embed(text: str):
     return cleaned, filename
 
 
+# Obsidian comment: %% hidden note %%. Author meta — dropped from every card (and
+# already hidden in Obsidian's preview). The one exception is `%%id: name%%`,
+# which pins a stable card id and is preserved here so pop_id() can consume it.
+ID_RE = re.compile(r"%%\s*id:\s*([a-z0-9][a-z0-9-]*)\s*%%", re.I)
+COMMENT_RE = re.compile(r"%%(.*?)%%", re.S)
+
+
+def strip_comments(md: str) -> str:
+    """Remove `%%comments%%` (author notes) anywhere in the source, but KEEP
+    `%%id: name%%` markers for pop_id() to extract per-card. Run once on the whole
+    document before parsing, so a stray heading inside a comment can't spawn a
+    section."""
+    def repl(m):
+        if re.fullmatch(r"\s*id:\s*[a-z0-9][a-z0-9-]*\s*", m.group(1), re.I):
+            return m.group(0)
+        return " "
+    return COMMENT_RE.sub(repl, md)
+
+
+def pop_id(text: str):
+    """Return (text_without_id_marker, explicit_id_or_None).
+
+    An `%%id: name%%` marker pins a card's identity so it keeps its saved
+    position even when its words change — the fix for reworded cards drifting to
+    a new spot. Ids are lower-cased and must be [a-z0-9-]."""
+    m = ID_RE.search(text)
+    cid = m.group(1).lower() if m else None
+    cleaned = ID_RE.sub(" ", text)
+    cleaned = re.sub(r"[ \t]{2,}", " ", cleaned).strip()
+    return cleaned, cid
+
+
 def md_inline(text: str) -> str:
     """Convert a snippet of markdown to the small subset of inline HTML the
     cards render (bold, italic). Leaves the rest as plain text."""
     text = text.strip()
+    # Obsidian wikilinks render as their display text: [[target|alias]] -> alias,
+    # [[target]] -> target. (Image embeds ![[file]] are popped earlier.)
+    text = re.sub(r"\[\[[^\]|]*\|([^\]]+)\]\]", r"\1", text)
+    text = re.sub(r"\[\[([^\]]+)\]\]", r"\1", text)
     text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
     text = re.sub(r"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)", r"<em>\1</em>", text)
     return text.strip()
@@ -209,22 +220,26 @@ def first_sentence(text: str, limit: int = 90) -> str:
     return s
 
 
-def guess_role(name: str, body: str) -> str:
-    blob = (name + " " + body).lower()
-    table = [
-        ("realt", "Witness / Suspect — Realtor"),
-        ("student", "Suspect — Student"),
-        ("conservatory", "Suspect — Student"),
-        ("doorman", "Witness — Doorman"),
-        ("doctor", "Person of Interest — Doctor"),
-        ("lawyer", "Person of Interest — Lawyer"),
-        ("police", "Witness — Police"),
-        ("officer", "Witness — Police"),
-    ]
-    for needle, role in table:
-        if needle in blob:
-            return role
-    return "Person of Interest"
+def parse_victim(block: str) -> dict:
+    """Parse the `## Victim` section into the centerpiece polaroid's fields.
+
+    First non-empty line -> caption (upper-cased); an `![[embed]]` -> photo; the
+    remaining prose -> lightbox detail, with any `*[asides]*` folded in. The
+    victim now lives in the episode's Markdown, not in code."""
+    body, embed = pop_embed(block)
+    body, _ = pop_id(body)
+    asides = re.findall(r"\*\[(.+?)\]\*", body)
+    body = re.sub(r"\*\[.+?\]\*", "", body)
+    lines = [ln.strip() for ln in body.splitlines() if ln.strip()]
+    caption = clean_plain(lines[0]).upper() if lines else "UNKNOWN"
+    detail = " ".join(md_inline(ln) for ln in lines[1:])
+    if asides:
+        detail = (detail + " " + " ".join(md_inline(a) for a in asides)).strip()
+    return {"caption": caption, "detail": detail, "image": embed}
+
+
+# Valid `## Connections` kinds; must match STRING_STYLE in board_template.html.
+STRING_KINDS = ("confirmed", "suspected", "evidence", "unverified")
 
 
 # ---------------------------------------------------------------------------
@@ -400,6 +415,63 @@ def layout_diff(saved: dict, current: dict, prune: bool = False) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Strings — authored `## Connections`, else the legacy heuristic
+# ---------------------------------------------------------------------------
+def build_strings(sections, cards, anchor, victim, suspect_cards,
+                  urgent_card, clip_card, timeline, bld_cards):
+    """Return the board's connection strings.
+
+    If the episode declares a `## Connections` section, that is the source of
+    truth: each `from-id -> to-id: kind` line is resolved by **explicit id**, and
+    an unknown id or kind is a hard error (a typo can never silently drop a
+    string). With no `## Connections`, fall back to the legacy deterministic
+    heuristic so un-migrated episodes still build."""
+    strings = []
+    conn_block = section(sections, "connection")
+    if conn_block.strip():
+        index = {c["id"]: c for c in cards}
+        for line in bullets(conn_block):
+            m = re.match(r"^(.+?)\s*->\s*(.+?)\s*:\s*([A-Za-z]+)\s*$", line)
+            if not m:
+                sys.exit(f"[md_to_board] bad connection line {line!r}; "
+                         f"expected 'from-id -> to-id: kind'.")
+            a_id, b_id, kind = m.group(1).strip(), m.group(2).strip(), m.group(3).lower()
+            if kind not in STRING_KINDS:
+                sys.exit(f"[md_to_board] unknown connection kind {kind!r} in {line!r}; "
+                         f"valid kinds: {', '.join(STRING_KINDS)}.")
+            for eid in (a_id, b_id):
+                if eid not in index:
+                    sys.exit(f"[md_to_board] connection references unknown id {eid!r} "
+                             f"in {line!r}. Pin it with %%id: {eid}%% or fix the "
+                             f"reference. Known ids: {', '.join(sorted(index))}.")
+            a, b = anchor(index[a_id]), anchor(index[b_id])
+            strings.append({"from": a, "to": b, "sag": sag_for(a, b), "kind": kind})
+        return strings
+
+    # ---- Fallback: loose, atmospheric, deterministic (never traced) ---------
+    vic_a = anchor(victim)
+    if suspect_cards:
+        central = next((c for c in suspect_cards if c.get("isNew")), suspect_cards[0])
+        for c in suspect_cards:
+            kind = "confirmed" if c is central else "suspected"
+            strings.append({"from": vic_a, "to": anchor(c),
+                            "sag": sag_for(vic_a, anchor(c)), "kind": kind})
+        if urgent_card:
+            a, b = anchor(central), anchor(urgent_card)
+            strings.append({"from": a, "to": b, "sag": sag_for(a, b), "kind": "suspected"})
+        if clip_card:
+            a, b = anchor(central), anchor(clip_card)
+            strings.append({"from": a, "to": b, "sag": sag_for(a, b), "kind": "suspected"})
+    if clip_card and timeline:
+        a, b = anchor(timeline), anchor(clip_card)
+        strings.append({"from": a, "to": b, "sag": sag_for(a, b), "kind": "evidence"})
+    if bld_cards and timeline:
+        a, b = anchor(timeline), anchor(bld_cards[0])
+        strings.append({"from": a, "to": b, "sag": sag_for(a, b), "kind": "unverified"})
+    return strings
+
+
+# ---------------------------------------------------------------------------
 # Build the BOARD object
 # ---------------------------------------------------------------------------
 def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
@@ -413,6 +485,7 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
     rng = random.Random(seed)
     if resolve_asset is None:
         resolve_asset = lambda _f: None
+    md = strip_comments(md)          # drop %%author notes%%, keep %%id%% markers
     sections = parse_sections(md)
     saved = layout.get("cards", {})
     meta = layout.get("meta", {})
@@ -427,23 +500,34 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
     tl = bullets(section(sections, "timeline"))
     timeline = None
     if tl:
-        lines = [md_inline(strip_new(b)[0]) for b in tl]
+        parsed = [strip_new(b) for b in tl]
+        lines = [md_inline(t) for t, _ in parsed]
         timeline = add({"id": "timeline", "type": "typed", "w": 330,
                         "header": "Timeline", "text": "<br>".join(lines),
                         "detail": ""}, "left")
+        if any(n for _, n in parsed):
+            timeline["_md_new"] = True
 
     # ---- Building / Location notes -> yellow postits -------------------------
     bld_cards = []
     for b in bullets(section(sections, "building", "location")):
-        clean, _ = strip_new(b)
+        clean, isnew = strip_new(b)
+        clean, cid = pop_id(clean)
         aside = re.findall(r"\*\[(.+?)\]\*", clean)
         body = re.sub(r"\*\[.+?\]\*", "", clean).strip()
-        bld_cards.append(add({"id": "bld-" + slugify(body), "type": "postit",
-                              "color": "y", "w": 195, "text": md_inline(body),
-                              "detail": " ".join(aside)}, "left"))
+        card = add({"id": cid or ("bld-" + slugify(body)), "type": "postit",
+                    "color": "y", "w": 195, "text": md_inline(body),
+                    "detail": " ".join(md_inline(a) for a in aside)}, "left")
+        if isnew:
+            card["_md_new"] = True
+        bld_cards.append(card)
 
-    # ---- Victim polaroid + Urgent -------------------------------------------
-    v = cfg["victim"]
+    # ---- Victim polaroid (from the ## Victim section) + Urgent --------------
+    vic_block = section(sections, "victim", "centerpiece")
+    if not vic_block.strip():
+        print("WARNING [md_to_board]: no ## Victim section — the centerpiece will "
+              "use a placeholder. Add a ## Victim block to the episode.", file=sys.stderr)
+    v = parse_victim(vic_block)
     victim = add({"id": "victim", "type": "polaroid", "w": 185,
                   "caption": v["caption"], "detail": v["detail"]}, "tr")
     vimg = resolve_asset(v.get("image"))
@@ -453,48 +537,80 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
     urgent_card = None
     urgent_items = bullets(section(sections, "urgent", "now"))
     if urgent_items:
-        clean, _ = strip_new(urgent_items[0])
+        clean, isnew = strip_new(urgent_items[0])
+        clean, _ = pop_id(clean)
         urgent_card = add({"id": "urgent", "type": "postit", "color": "r",
                            "w": 180,
                            "text": md_inline(clean).upper() if len(clean) < 40 else md_inline(clean),
-                           "detail": " ".join(md_inline(strip_new(u)[0]) for u in urgent_items[1:])},
+                           "detail": " ".join(md_inline(strip_new(pop_id(u)[0])[0]) for u in urgent_items[1:])},
                           "tr")
+        if isnew:
+            urgent_card["_md_new"] = True
 
-    # ---- Suspects -> id cards (stable id = slug of the name) -----------------
+    # ---- Suspects -> id cards -----------------------------------------------
+    # Heading grammar: `### Name · Role — STATUS`. `%%id: x%%` pins the id.
     suspect_cards = []
     for raw_name, raw_body in parse_suspects(section(sections, "suspect")):
-        name, _ = strip_new(raw_name)
+        name, isnew = strip_new(raw_name)
+        name, cid = pop_id(name)
         # Pull an optional ![[photo]] embed out of the body so it renders as a
         # mugshot rather than literal text, and doesn't disturb the id.
         body, embed = pop_embed(raw_body)
+        body, body_id = pop_id(body)
+        cid = cid or body_id
         status_flag = ""
         m = re.search(r"—\s*(STILL OPEN|OPEN|CLEARED|RULED OUT)", name, re.I)
         if m:
             status_flag = m.group(1).upper()
             name = name[: m.start()].strip(" —")
-        card = add({"id": "sus-" + slugify(name), "type": "id",
-                    "w": 215, "role": guess_role(name, body),
+        role = "Person of Interest"
+        if "·" in name:                       # explicit role after a middle dot
+            name, _, role = name.partition("·")
+            name, role = name.strip(), role.strip()
+        card = add({"id": cid or ("sus-" + slugify(name)), "type": "id",
+                    "w": 215, "role": role or "Person of Interest",
                     "name": name, "detailLine": first_sentence(body),
                     "flag": status_flag,
                     "detail": md_inline(re.sub(r"\s+", " ", body))},
                    "suspect")
+        if isnew:
+            card["_md_new"] = True
         img = resolve_asset(embed)
         if img:
             card["image"] = img
         suspect_cards.append(card)
 
+    # ---- Documents -> typed panels (### Title + body) -----------------------
+    doc_cards = []
+    for raw_title, raw_body in parse_suspects(section(sections, "document")):
+        title, isnew = strip_new(raw_title)
+        title, cid = pop_id(title)
+        body, _embed = pop_embed(raw_body)     # typed panels don't show photos
+        body, body_id = pop_id(body)
+        cid = cid or body_id
+        aside = re.findall(r"\*\[(.+?)\]\*", body)
+        body = re.sub(r"\*\[.+?\]\*", "", body)
+        card = add({"id": cid or ("doc-" + slugify(title)), "type": "typed",
+                    "w": 300, "header": clean_plain(title).upper(),
+                    "text": md_inline(re.sub(r"\s+", " ", body)),
+                    "detail": " ".join(md_inline(a) for a in aside)}, "left")
+        if isnew:
+            card["_md_new"] = True
+        doc_cards.append(card)
+
     # ---- Cornerstone -> 1 stable clipping + cream evidence postits -----------
     corner_items = []
     for b in bullets(section(sections, "cornerstone", "central")):
-        clean, _ = strip_new(b)
-        # Strip an ![[photo]] embed first so it neither shows as text nor perturbs
-        # the content-derived id (which must stay stable across episodes).
+        clean, isnew = strip_new(b)
+        # Strip an ![[photo]] embed and any %%id%% first so neither shows as text
+        # nor perturbs the id (which must stay stable across episodes).
         clean, embed = pop_embed(clean)
+        clean, cid = pop_id(clean)
         aside = re.findall(r"\*\[(.+?)\]\*", clean)
         body = re.sub(r"\*\[.+?\]\*", "", clean).strip()
         parts = re.split(r"\s+—\s+", body, maxsplit=1)
-        corner_items.append({"cid": "cs-" + slugify(parts[0]), "parts": parts,
-                             "body": body, "aside": aside,
+        corner_items.append({"cid": cid or ("cs-" + slugify(parts[0])), "parts": parts,
+                             "body": body, "aside": aside, "is_new": isnew,
                              "image": resolve_asset(embed)})
     clip_id = meta.get("clipping_id")
     ids_now = [it["cid"] for it in corner_items]
@@ -511,6 +627,8 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
                              "detail": " ".join(it["aside"])}, "bottom")
             if it["image"]:
                 clip_card["image"] = it["image"]
+            if it["is_new"]:
+                clip_card["_md_new"] = True
         else:
             postit = add({"id": it["cid"], "type": "postit",
                           "color": "w", "w": 185,
@@ -518,6 +636,8 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
                           "detail": " ".join(it["aside"])}, "bottom")
             if it["image"]:
                 postit["image"] = it["image"]
+            if it["is_new"]:
+                postit["_md_new"] = True
             corner_cards.append(postit)
 
     # ---- Open-question asides -> pink stickies -------------------------------
@@ -530,10 +650,18 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
                             "color": "pink", "w": 200, "text": md_inline(q),
                             "detail": ""}, "question"))
 
+    # ---- Guard: ids must be unique -------------------------------------------
+    seen = set()
+    for c in cards:
+        if c["id"] in seen:
+            sys.exit(f"[md_to_board] duplicate card id {c['id']!r}. Two cards "
+                     f"resolved to the same id — pin distinct %%id: name%% markers.")
+        seen.add(c["id"])
+
     # ---- Placement: lock existing, drop in new ------------------------------
     if first_build:
-        # Initial board: lay out balanced bands once; nothing is "new".
-        left_col = ([timeline] if timeline else []) + bld_cards
+        # Initial board: lay out balanced bands once.
+        left_col = ([timeline] if timeline else []) + bld_cards + doc_cards
         left_b = flow(left_col, 80, 90, x_max=290, rng=rng, gap=42)
         tr_b = flow([victim] + ([urgent_card] if urgent_card else []),
                     1995, 80, x_max=2200, rng=rng, gap=52)
@@ -565,40 +693,24 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
         prev = saved.get(c["id"])
         if prev is None:
             c["_first_seen"] = episode
-            c["isNew"] = True
+            prov_new = True
         else:
             fs = prev.get("first_seen_episode")
             # Legacy memory (pre-provenance): adopt the current episode as the
             # stamp but don't retroactively flag a long-standing card as new.
             c["_first_seen"] = episode if fs is None else fs
-            if fs == episode:
-                c["isNew"] = True
+            prov_new = (fs == episode)
+        # NEW tab: first-seen this episode, OR an explicit [NEW] marker.
+        if prov_new or c.get("_md_new"):
+            c["isNew"] = True
 
-    # ---- Loose, atmospheric strings (deterministic, never traced) -----------
+    # ---- Strings -------------------------------------------------------------
     def anchor(card):
         cx, cy = center_of(card)
         return [int(cx), int(cy)]
 
-    strings = []
-    vic_a = anchor(victim)
-    if suspect_cards:
-        central = next((c for c in suspect_cards if c.get("isNew")), suspect_cards[0])
-        for c in suspect_cards:
-            kind = "confirmed" if c is central else "suspected"
-            strings.append({"from": vic_a, "to": anchor(c),
-                            "sag": sag_for(vic_a, anchor(c)), "kind": kind})
-        if urgent_card:
-            a, b = anchor(central), anchor(urgent_card)
-            strings.append({"from": a, "to": b, "sag": sag_for(a, b), "kind": "suspected"})
-        if clip_card:
-            a, b = anchor(central), anchor(clip_card)
-            strings.append({"from": a, "to": b, "sag": sag_for(a, b), "kind": "suspected"})
-    if clip_card and timeline:
-        a, b = anchor(timeline), anchor(clip_card)
-        strings.append({"from": a, "to": b, "sag": sag_for(a, b), "kind": "evidence"})
-    if bld_cards and timeline:
-        a, b = anchor(timeline), anchor(bld_cards[0])
-        strings.append({"from": a, "to": b, "sag": sag_for(a, b), "kind": "unverified"})
+    strings = build_strings(sections, cards, anchor, victim, suspect_cards,
+                            urgent_card, clip_card, timeline, bld_cards)
 
     # ---- Annotations (faint zone labels) ------------------------------------
     ev_y = min((c["y"] for c in ([clip_card] if clip_card else []) + corner_cards),
@@ -623,6 +735,7 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
     for c in cards:
         c.pop("_cat", None)
         c.pop("_first_seen", None)
+        c.pop("_md_new", None)
 
     bottom = max((c["y"] + est_height(c)) for c in cards) if cards else MIN_WORLD_H
     world_h = max(MIN_WORLD_H, int(bottom + MARGIN_BOTTOM))

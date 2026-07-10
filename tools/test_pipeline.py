@@ -36,8 +36,15 @@ CFG = md2b.SERIES_CONFIG["rittenhouse-dog-walker"]
 
 # Minimal episode. Stable card ids we assert on: sus-theo-thomas,
 # sus-diane-ashford, and (added in EP2) sus-marcus.
-EP1 = """
-## Timeline
+VICTIM = """## Victim
+
+James Halloway — deceased
+![[JamesHalloway.jpg]]
+Music professor and jazz scholar. Found dead Friday morning.
+
+"""
+
+EP1 = VICTIM + """## Timeline
 - **Fri** — Body found in 2D.
 
 ## Suspects
@@ -218,6 +225,121 @@ class LayoutDiff(unittest.TestCase):
         self.assertEqual(keep["not_in_input"], ["old"])
         self.assertEqual(keep["removed"], [])
         self.assertEqual(drop["removed"], ["old"])
+
+
+class ExplicitIds(unittest.TestCase):
+    def _card(self, board, cid):
+        return next((c for c in board["cards"] if c["id"] == cid), None)
+
+    def test_pinned_id_survives_rename(self):
+        md1 = VICTIM + (
+            "## Suspects\n\n"
+            "### Diane Ashford · Realtor  %%id: diane%%\n"
+            "Kept showing the unit.\n")
+        b1, _, _, layout1, _ = _build(md1, episode=1)
+        self.assertIsNotNone(self._card(b1, "diane"))
+        self.assertEqual(layout1["cards"]["diane"]["first_seen_episode"], 1)
+
+        # Rename the heading text but keep the pinned id.
+        md2 = VICTIM + (
+            "## Suspects\n\n"
+            "### Diane Ashford Realty / Kelsey · Realtor  %%id: diane%%\n"
+            "Kept showing the unit.\n")
+        b2, _, _, layout2, _ = _build(md2, layout1, first_build=False, episode=2)
+        self.assertIsNotNone(self._card(b2, "diane"))          # same card
+        self.assertEqual(layout1["cards"]["diane"], layout2["cards"]["diane"])  # not moved
+
+    def test_duplicate_id_is_a_hard_error(self):
+        md = VICTIM + (
+            "## Suspects\n\n"
+            "### Alice  %%id: dup%%\nx\n\n"
+            "### Bob  %%id: dup%%\ny\n")
+        with self.assertRaises(SystemExit):
+            _build(md, episode=1)
+
+
+class Roles(unittest.TestCase):
+    def _role(self, board, cid):
+        return next(c["role"] for c in board["cards"] if c["id"] == cid)
+
+    def test_role_from_heading_and_default(self):
+        md = VICTIM + (
+            "## Suspects\n\n"
+            "### Theo Thomas · Conservatory student\nKnew the victim.\n\n"
+            "### Marcus\nDoorman.\n")
+        board, *_ = _build(md, episode=1)
+        self.assertEqual(self._role(board, "sus-theo-thomas"), "Conservatory student")
+        self.assertEqual(self._role(board, "sus-marcus"), "Person of Interest")
+
+
+class Documents(unittest.TestCase):
+    def test_documents_become_typed_panels(self):
+        md = VICTIM + (
+            "## Documents\n\n"
+            "### The lawyer's letter\nA demand from the estate.\n")
+        board, *_ = _build(md, episode=1)
+        doc = next((c for c in board["cards"] if c["id"].startswith("doc-")), None)
+        self.assertIsNotNone(doc)
+        self.assertEqual(doc["type"], "typed")
+        self.assertIn("LAWYER", doc["header"])
+
+
+class Connections(unittest.TestCase):
+    BASE = VICTIM + (
+        "## Suspects\n\n"
+        "### Theo Thomas  %%id: theo%%\nKnew the victim.\n\n")
+
+    def test_authored_connection_is_used(self):
+        md = self.BASE + "## Connections\n- victim -> theo: confirmed\n"
+        board, *_ = _build(md, episode=1)
+        kinds = [s["kind"] for s in board["strings"]]
+        self.assertEqual(board["strings"] and kinds, ["confirmed"])
+
+    def test_unknown_id_is_a_hard_error(self):
+        md = self.BASE + "## Connections\n- victim -> ghost: confirmed\n"
+        with self.assertRaises(SystemExit):
+            _build(md, episode=1)
+
+    def test_unknown_kind_is_a_hard_error(self):
+        md = self.BASE + "## Connections\n- victim -> theo: maybe\n"
+        with self.assertRaises(SystemExit):
+            _build(md, episode=1)
+
+
+class CommentsAndLinks(unittest.TestCase):
+    def _detail(self, board, cid):
+        return next(c["detail"] for c in board["cards"] if c["id"] == cid)
+
+    def test_comments_are_dropped_and_dont_spawn_sections(self):
+        md = VICTIM + (
+            "## Suspects\n\n"
+            "### Theo Thomas  %%id: theo%%\n"
+            "Knew the victim. %% secret: do not show this on the card %%\n"
+            "%%\n## Fake Section\n- a bogus bullet\n%%\n")
+        board, *_ = _build(md, episode=1)
+        self.assertNotIn("secret", self._detail(board, "theo"))
+        self.assertFalse(any("bogus" in c.get("text", "") for c in board["cards"]))
+
+    def test_wikilinks_render_as_alias(self):
+        md = VICTIM + (
+            "## Suspects\n\n"
+            "### Theo Thomas  %%id: theo%%\n"
+            "Corroborated by [[K-02 — Kelsey's account|Kelsey]].\n")
+        board, *_ = _build(md, episode=1)
+        detail = self._detail(board, "theo")
+        self.assertIn("Kelsey", detail)
+        self.assertNotIn("[[", detail)
+
+
+class NewMarker(unittest.TestCase):
+    def test_explicit_new_marker_flags_card(self):
+        # A card already in memory (not new by provenance) but marked [NEW]
+        # should still get the NEW tab.
+        _, _, _, layout1, _ = _build(EP1, episode=1)
+        md2 = EP1.replace("### Theo Thomas", "### Theo Thomas [NEW]")
+        board2, *_ = _build(md2, layout1, first_build=False, episode=2)
+        theo = next(c for c in board2["cards"] if c["id"] == "sus-theo-thomas")
+        self.assertTrue(theo.get("isNew"))
 
 
 if __name__ == "__main__":

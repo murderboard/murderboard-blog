@@ -54,9 +54,11 @@ Files: `md_to_board.py` (`build_board`, `main`, `inject`), `board_template.html`
 
 ---
 
-## Phase 1 — Parser rework (core of the plan; medium)
-All new grammar lands in `md_to_board.py`. Cards without new markers keep working
-(slug ids, auto-strings) so migration can be incremental.
+## Phase 1 — Parser rework (core of the plan; medium) — ✅ DONE
+Landed in `md_to_board.py`; `## Victim` moved out of `SERIES_CONFIG`; example MD
+rewritten; README §3/§5/§9/§11 + PIPELINE synced; 10 new tests (23 total). All new
+grammar is in `md_to_board.py`. Cards without new markers keep working (slug ids,
+auto-strings) so migration can be incremental.
 
 ### 1a. Author notes & meta — `%% … %%`
 - Strip Obsidian comments **globally, first**, both block (`%%\n…\n%%`) and inline
