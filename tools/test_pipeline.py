@@ -30,7 +30,15 @@ def _load_generator():
     return mod
 
 
+def _load_module(name):
+    spec = importlib.util.spec_from_file_location(name, HERE / f"{name}.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
 md2b = _load_generator()
+vb = _load_module("verify_board")   # geometry helpers import lazily (no Playwright)
 TEMPLATE = (HERE / "board_template.html").read_text(encoding="utf-8")
 CFG = md2b.SERIES_CONFIG["rittenhouse-dog-walker"]
 
@@ -340,6 +348,49 @@ class NewMarker(unittest.TestCase):
         board2, *_ = _build(md2, layout1, first_build=False, episode=2)
         theo = next(c for c in board2["cards"] if c["id"] == "sus-theo-thomas")
         self.assertTrue(theo.get("isNew"))
+
+
+class Placement(unittest.TestCase):
+    def test_free_slot_never_stacks_and_overflows_below(self):
+        # A deliberately tiny band forces overflow; cards must still not overlap.
+        band = (0, 0, 220, 200)
+        placed, boxes, overflowed_any = [], [], False
+        for i in range(30):
+            card = {"id": f"c{i}", "type": "postit", "w": 100, "text": "x"}
+            x, y, of = md2b.free_slot(card, band, placed)
+            card["x"], card["y"] = x, y
+            placed.append(md2b.box_of(card))
+            boxes.append({"id": card["id"], "x": x, "y": y,
+                          "w": 100, "h": md2b.est_height(card)})
+            overflowed_any = overflowed_any or of
+        self.assertEqual(vb.find_overlaps(boxes), [],
+                         "free_slot produced overlapping cards")
+        self.assertTrue(overflowed_any, "expected the tiny band to overflow")
+
+
+class VerifyHelpers(unittest.TestCase):
+    BOXES = [
+        {"id": "a", "x": 0, "y": 0, "w": 100, "h": 100},
+        {"id": "b", "x": 50, "y": 50, "w": 100, "h": 100},   # overlaps a
+        {"id": "c", "x": 300, "y": 0, "w": 100, "h": 100},   # clear
+    ]
+
+    def test_find_overlaps(self):
+        self.assertEqual(vb.find_overlaps(self.BOXES), [("a", "b", 2500)])
+        self.assertEqual(vb.find_overlaps(self.BOXES, pad=60), [])   # under pad
+        self.assertEqual(vb.find_overlaps([self.BOXES[0], self.BOXES[2]]), [])
+
+    def test_out_of_bounds(self):
+        self.assertEqual(vb.out_of_bounds(self.BOXES, 500, 500), [])
+        self.assertEqual(vb.out_of_bounds(self.BOXES, 350, 500), ["c"])
+
+    def test_report_fails_on_overlap_or_broken_image(self):
+        ok, _ = vb.report(self.BOXES[:2], [], 500, 500)
+        self.assertFalse(ok)                                  # overlap
+        ok2, _ = vb.report([self.BOXES[0]], ["assets/x.jpg"], 500, 500)
+        self.assertFalse(ok2)                                 # broken image
+        ok3, _ = vb.report([self.BOXES[0]], [], 500, 500)
+        self.assertTrue(ok3)                                  # clean
 
 
 if __name__ == "__main__":

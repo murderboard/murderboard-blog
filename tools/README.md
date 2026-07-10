@@ -46,6 +46,8 @@ engine never needs to change for a polish — **only the data**.
 | `tools/layouts/<slug>.json` | Per-series **layout memory**: `{meta, cards:{id:{x,y,rotate}}}`. Auto-created/updated. **Commit it** — the board's growth history lives here. |
 | `tools/Murder Board.example.md` | Annotated input example — every section, `[NEW]`, `*[asides]*`, suspects, cornerstone. Copy to start a series/episode. |
 | `tools/shoot_board.py` | Renders a finished board HTML → wide PNG cropped to the cards (Playwright/Chromium). |
+| `tools/verify_board.py` | Renders a board headless and reports **real** overlapping cards / broken images; non-zero exit gates the pipeline. `regen.py` runs it automatically. |
+| `tools/test_pipeline.py` | Fast, dependency-free regression tests (`python3 tools/test_pipeline.py`). |
 | `tools/PIPELINE.md` | Operator routine (the per-episode command sequence + publish). |
 | `content/entries/<slug>.md` | Series file; its `episodes:` list points each episode at its board via `murderboardUrl`. |
 | `public/murderboards/<slug>/episode-N.html` | The committed, served boards. |
@@ -388,16 +390,20 @@ bounding-box math must run after they paint.
 
 ## 12. How to verify a change
 
-- **Parse check:** every emitted board must contain a valid `const BOARD = {…};`
-  and load without a console error. Quick check: extract the block and `JSON.parse`
-  the object literal.
-- **No overlaps:** on a fresh build, cards shouldn't collide (the engine pads
-  them). After a manual nudge, eyeball it or diff card boxes.
+- **Tests:** `python3 tools/test_pipeline.py` — determinism, memory merge,
+  provenance, the splice, ids, images, connections, and collision math. Run it
+  before committing any generator change.
+- **No overlaps (real render):** `python3 tools/verify_board.py <board>.html`
+  measures the actual rendered card boxes and fails on a true overlap or broken
+  image — the ground truth, not the `est_height` estimate. `regen.py` runs it.
+- **Parse check:** every emitted board contains a valid `const BOARD = {…};`
+  between the `BOARD-DATA` sentinels; the build self-checks this via
+  `extract_board()`.
 - **Screenshot:** run `shoot_board.py`; the PNG should be cropped to the cards
   with all photos loaded.
 - **Determinism:** run the same episode twice — the output should be identical.
-- **Memory:** confirm `layouts/<slug>.json` updated and that previously-placed
-  cards kept their coordinates.
+- **Memory:** confirm `layouts/<slug>.json` merged (not truncated) and that
+  previously-placed cards kept their coordinates.
 
 ---
 

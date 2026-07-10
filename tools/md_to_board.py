@@ -255,9 +255,10 @@ def est_height(card: dict) -> int:
     if t == "typed":
         lines = card.get("text", "").count("<br>") + 1
         return 70 + lines * 24
-    # An embedded photo fills the card width; reserve ~its height (assume a
-    # broadly landscape image ~1.6:1) so reflow/new-slot placement won't collide.
-    img_h = int(card["w"] / 1.6) + 12 if card.get("image") else 0
+    # An embedded photo fills the card width; reserve a portrait-ish height
+    # (evidence shots run ~4:5, taller than wide) so placement leaves room. This
+    # is only a floor — the Phase 3 verifier checks the real rendered box.
+    img_h = int(card["w"] * 1.1) + 12 if card.get("image") else 0
     if t == "clipping":
         body = re.sub(r"<.*?>", "", card.get("body", ""))
         chars_per_line = max(20, int(card["w"] / 7.0))
@@ -313,21 +314,27 @@ def _overlap(a, b, pad):
                 a[3] < b[1] - pad or a[1] > b[3] + pad)
 
 
-def free_slot(card, band, placed, step=24, pad=16):
-    """Scan a band row-major for the first spot where `card` doesn't collide
-    with anything already placed. Extends below the band if it's full."""
+def free_slot(card, band, placed, step=24, pad=16, max_y=20000):
+    """Scan a band row-major for the first spot where `card` doesn't collide with
+    anything already placed.
+
+    If the band fills up, keep scanning **downward past its bottom** (the world
+    grows to fit) instead of dumping every extra card onto one fixed point — the
+    old behavior silently stacked cards late in a long series. Returns
+    ``(x, y, overflowed)`` where `overflowed` means the slot fell below the band.
+    """
     x0, y0, x1, y1 = band
     w, h = card["w"], est_height(card)
     y = y0
-    while y + h <= y1 + 600:
+    while y + h <= max_y:
         x = x0
         while x + w <= x1:
             box = (x, y, x + w, y + h)
             if not any(_overlap(box, b, pad) for b in placed):
-                return x, y
+                return x, y, (y + h > y1)
             x += step
         y += step
-    return x0, y1
+    return x0, y1, True   # defensive: unreachable in practice
 
 
 def sag_for(a, b):
@@ -677,12 +684,19 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
                 p = saved[c["id"]]
                 c["x"], c["y"], c["rotate"] = p["x"], p["y"], p.get("rotate", 0)
                 placed.append(box_of(c))
+        overflow_bands = set()
         for c in cards:                       # new cards find an open slot
             if c["id"] not in saved:
-                x, y = free_slot(c, BANDS[c["_cat"]], placed)
+                x, y, overflowed = free_slot(c, BANDS[c["_cat"]], placed)
                 c["x"], c["y"] = x, y
                 c["rotate"] = round(rng.uniform(-3.0, 3.0), 1)
                 placed.append(box_of(c))
+                if overflowed:
+                    overflow_bands.add(c["_cat"])
+        for b in sorted(overflow_bands):
+            print(f"NOTE [md_to_board]: band {b!r} was full — new card(s) placed "
+                  f"below it (world grew to fit). Consider a polish pass or "
+                  f"--reflow.", file=sys.stderr)
 
     # ---- Provenance & NEW tags (stable across reruns) -----------------------
     # A card is "new" iff this is the episode it first appeared in. Reading that

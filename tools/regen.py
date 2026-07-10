@@ -86,6 +86,10 @@ def main():
     ap.add_argument("--html-only", action="store_true", help="skip the screenshot step")
     ap.add_argument("--shoot-only", action="store_true",
                      help="skip HTML generation, just re-shoot the existing board")
+    ap.add_argument("--no-verify", action="store_true",
+                     help="skip the render-overlap check")
+    ap.add_argument("--strict", action="store_true",
+                     help="fail the regen if the verifier finds overlaps/broken images")
     ap.add_argument("--width", type=int, default=1600)
     ap.add_argument("--scale", type=int, default=2)
     ap.add_argument("--keep-hud", action="store_true")
@@ -113,6 +117,17 @@ def main():
         if args.reflow:
             cmd.append("--reflow")
         subprocess.run(cmd, check=True)
+
+        # Verify the real render: fail (or warn) on actual card overlaps.
+        if not args.no_verify:
+            v = subprocess.run(
+                [sys.executable, str(TOOLS / "verify_board.py"), str(html_out)])
+            if v.returncode != 0:
+                if args.strict:
+                    sys.exit("regen: verifier found problems (see above); "
+                             "aborting because --strict.")
+                print("regen: WARNING — verifier found problems (see above). "
+                      "Fix with a polish pass, or re-run with --strict to gate.")
 
     if not args.html_only:
         cmd = [

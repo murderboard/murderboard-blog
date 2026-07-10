@@ -117,7 +117,7 @@ Files: `md_to_board.py` (new parse helpers, `build_board`, `SERIES_CONFIG`,
 
 ---
 
-## Phase 2 — Collision prevention upgrade (small)
+## Phase 2 — Collision prevention upgrade (small) — ✅ DONE
 - **`free_slot()` never stacks.** Today, when a band fills, it returns a fixed
   point `(x0, y1)` and every further new card lands there, silently overlapped.
   Change: extend the search downward indefinitely (drop the `y1 + 600` cap), grow
@@ -131,7 +131,7 @@ Files: `md_to_board.py` (`free_slot`, `est_height`, world-height calc, `BANDS`).
 
 ---
 
-## Phase 3 — Real-render verifier (medium)
+## Phase 3 — Real-render verifier (medium) — ✅ DONE
 - New `tools/verify_board.py`: load the emitted HTML headless (Playwright is
   already a dependency), measure **actual** card bounding boxes, and report:
   overlapping pairs (with overlap area), cards outside the world bounds, and any

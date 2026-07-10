@@ -94,9 +94,12 @@ directly for a one-off flag `regen.py` doesn't expose yet.
   cornerstone). Copy it to start a new episode or series.
 - `tools/shoot_board.py` — renders a finished board HTML to a wide PNG, cropped
   to the cards (no empty cork).
+- `tools/verify_board.py` — renders a finished board headless and fails on real
+  overlapping cards or broken images. `regen.py` runs it automatically after
+  generating the HTML (`--no-verify` to skip, `--strict` to abort on problems).
 - `tools/test_pipeline.py` — fast, dependency-free regression tests (determinism,
-  memory merge, provenance, the splice). Run `python3 tools/test_pipeline.py`
-  before committing generator changes.
+  memory merge, provenance, the splice, collision math). Run
+  `python3 tools/test_pipeline.py` before committing generator changes.
 - `content/entries/<slug>.md` — the series file; its `episodes:` list points each
   episode at its board via `murderboardUrl`.
 
