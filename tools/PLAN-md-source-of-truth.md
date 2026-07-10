@@ -180,7 +180,7 @@ Files: new `tools/test_pipeline.py`; `md_to_board.py` (`--lint`); `README.md`,
 
 ---
 
-## Phase 6 — Migration of Episodes 1–6 (medium; editorial)
+## Phase 6 — Migration of Episodes 1–7 (medium; editorial) — ✅ DONE (see notes)
 1. Diff each deployed `episode-N.html` BOARD against a fresh pipeline build to
    enumerate anything the hand-built boards contain that the new MD grammar still
    can't express. That list is the final gate on the syntax.
