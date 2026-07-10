@@ -24,6 +24,15 @@ Conventions that matter:
   • *[aside]* -> an italic bracketed aside becomes the card's lightbox "detective's
                  note". If it ends in "?", it may also surface as a pink question.
   • **bold**  -> rendered on the card.
+  • ![[file]] -> an Obsidian image embed attaches a PHOTO to a card. Drop it in a
+                 Suspect block (mugshot on the ID card) or a Cornerstone item
+                 (photo on the evidence/clipping card). Write just the bare
+                 filename — ![[TheoThomas.jpg]] — and the converter finds it under
+                 the board's assets/ tree (people/, discoverables/, locations/).
+                 The embed is stripped from the card text and never changes the
+                 card's id, so adding/removing a photo never moves the card.
+                 (The victim/centerpiece photo is NOT an embed — it's set once per
+                 series via the victim "image" key in md_to_board.py SERIES_CONFIG.)
   • Stable wording = stable identity. A card keeps its saved position only if its
     text (or, for a suspect, its `### Name`) stays the same. Status suffixes like
     `— STILL OPEN` and `[NEW]` are stripped, so those are safe to change.
@@ -51,10 +60,12 @@ Short, observational. One bullet = one yellow sticky.
 ## Suspects
 
 One `### Name` per person. The text under it is the card's detail; keep the name
-steady episode to episode so the card stays put.
+steady episode to episode so the card stays put. An `![[file]]` embed anywhere in
+the block puts a mugshot on the ID card (bare filename; lives in assets/people/).
 
 ### Dr. Lillian Voss [NEW]
 
+![[LillianVoss.jpg]]
 Gallery curator. Catalogued the missing piece the week before it vanished. Calm,
 precise, a little too rehearsed. *[How well did she know the victim?]* — first
 real person of interest.
@@ -70,7 +81,7 @@ The first bullet becomes the newspaper clipping (write it as a researched
 paragraph); the rest become cream evidence cards.
 
 - **The Duforte canvas** *(missing)* — A minor work that turns out not to be minor. Provenance records show it changed hands three times in a year, each sale quieter than the last, the final buyer listed only as a numbered trust. The gallery insists it was never officially on loan.
-- **The insurance rider** — Updated eleven days before the piece vanished.
+- **The insurance rider** — Updated eleven days before the piece vanished. ![[InsuranceRider.png]]
 - **The numbered trust [NEW]** — Registered out of state. *[Who controls it?]*
 
 ## Urgent / Now

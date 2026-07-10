@@ -49,8 +49,30 @@ preserved only if the wording stays stable:
 Commit `tools/layouts/<slug>.json` along with the boards so the memory travels
 with the repo.
 
+## Quick regen (recommended)
+
+For a normal regen — HTML and the Substack PNG, no polish needed — use
+`tools/regen.py` instead of steps 2 and 4 below. It resolves the Obsidian
+source path and the real episode tag for you and writes both outputs straight
+to `public/murderboards/<slug>/`:
+
+```bash
+python3 tools/regen.py rittenhouse-dog-walker 3
+```
+
+Useful flags: `--reflow` (see the warning in step 2 below — don't use it
+mid-series), `--html-only` / `--shoot-only` to run just one half, `--source`
+to override the auto-resolved vault path, `--tag`/`--subhead` to override the
+auto-derived ones. The Obsidian vault root defaults to
+`~/obsidian/notes/001 Projects`; set `$MURDERBOARD_VAULT` if it's mounted
+elsewhere. New series need a line in `SERIES_VAULT_DIR` at the top of the
+script. Steps 2 and 4 below are what it runs under the hood — reach for them
+directly for a one-off flag `regen.py` doesn't expose yet.
+
 ## Files
 
+- `tools/regen.py` — one-command wrapper around `md_to_board.py` +
+  `shoot_board.py` (see "Quick regen" above).
 - `tools/md_to_board.py` — parser + layout engine. Reads a `Murder Board.md`,
   builds the `BOARD` data object, splices it into the template.
 - `tools/layouts/<slug>.json` — per-series layout memory (card positions). Auto

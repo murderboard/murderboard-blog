@@ -29,20 +29,21 @@ memory in `tools/layouts/<slug>.json`) → `episode-N.html` → `tools/shoot_boa
 3. **Keep the generator and template in sync** — the `inject()` markers
    `const WORLD_W` … `const STRING_STYLE` must exist verbatim in
    `board_template.html`.
-4. **Card images use RELATIVE paths** (`../../assets/murderboards/<slug>/…`),
+4. **Card images use RELATIVE paths** (`assets/<kind>/<file>`, beside the board),
    never root-absolute `/assets/…` — `shoot_board.py` loads boards over `file://`,
    where root-absolute paths silently 404 and ship a broken screenshot. (Image
-   support spec: `tools/README.md` §9.)
+   support: `tools/README.md` §9.)
 5. Commit `tools/layouts/<slug>.json` with the boards — it's the board's memory.
 
 ### Notes
 - **Board content lives outside this repo**, in the author's Obsidian vault
   (`.../Murder Board.md` per episode). The generator reads it by path; those
   files are provided/mounted per session.
-- Known first tasks (fix the `SERIES_CONFIG` "Philosophy professor" bug, build
-  image support, and regenerate Episodes 1–6 through the pipeline so the deployed
-  boards match the generator + layout memory) are written up in
-  `tools/README.md` §9 and §11.
+- Image support is **built** (`tools/README.md` §9): victim via `SERIES_CONFIG`,
+  suspects/evidence via `![[embed]]`, resolved to `assets/<kind>/<file>`.
+- Remaining known tasks (fix the `SERIES_CONFIG` "Philosophy professor" bug, and
+  regenerate Episodes 1–6 through the pipeline so the deployed boards match the
+  generator + layout memory) are written up in `tools/README.md` §11.
 
 ## Don't touch
 - `.claude/settings.local.json`, `.next/`, `out/`, `node_modules/` — generated or

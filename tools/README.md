@@ -40,6 +40,7 @@ engine never needs to change for a polish — **only the data**.
 
 | File | Role |
 | --- | --- |
+| `tools/regen.py` | One-command wrapper: resolves the Obsidian source path and episode tag, runs `md_to_board.py` + `shoot_board.py`, writes both outputs to `public/murderboards/<slug>/`. See `PIPELINE.md`. |
 | `tools/md_to_board.py` | Parser + layout engine. `Murder Board.md` → `BOARD` object → spliced into the template. The heart of the system. |
 | `tools/board_template.html` | The reusable interactive board (styles + render engine + pan/zoom/lightbox). The generator injects a data block into it. **Canonical copy** — keep in sync with the "Claude Design" master template if the look changes. |
 | `tools/layouts/<slug>.json` | Per-series **layout memory**: `{meta, cards:{id:{x,y,rotate}}}`. Auto-created/updated. **Commit it** — the board's growth history lives here. |
@@ -48,7 +49,7 @@ engine never needs to change for a polish — **only the data**.
 | `tools/PIPELINE.md` | Operator routine (the per-episode command sequence + publish). |
 | `content/entries/<slug>.md` | Series file; its `episodes:` list points each episode at its board via `murderboardUrl`. |
 | `public/murderboards/<slug>/episode-N.html` | The committed, served boards. |
-| `public/assets/murderboards/<slug>/…` | **Card images** live here (see §9). |
+| `public/murderboards/<slug>/assets/{people,discoverables,locations}/…` | **Card images** live here, beside the board (see §9). |
 
 ---
 
@@ -235,67 +236,73 @@ must be file-resolvable** (see §9).
 
 ---
 
-## 9. Images (the extension to build)
+## 9. Images (built)
 
-Today the polaroid renders a `case photo` placeholder. Add real photos for the
-victim and suspects.
+Cards can carry real photos: the victim polaroid, suspect ID cards (a mugshot),
+and cornerstone evidence/clipping cards. A card with no image falls back to the
+`case photo` placeholder, so images are entirely optional and additive.
 
 ### 9.1 Where images live
-`public/assets/murderboards/<slug>/` — e.g.
-`public/assets/murderboards/rittenhouse-dog-walker/theo-thomas.jpg`.
-Keep them reasonably small (long edge ~800px); the polaroid box is 4:5.
+**Beside the board**, under the board's own `assets/` tree, organised by kind:
+
+```
+public/murderboards/<slug>/assets/people/<file>          # victim + suspects
+public/murderboards/<slug>/assets/discoverables/<file>   # evidence / clipping photos
+public/murderboards/<slug>/assets/locations/<file>       # maps/floorplans (not yet on a card)
+```
+
+e.g. `public/murderboards/rittenhouse-dog-walker/assets/people/TheoThomas.jpg`.
+Keep them reasonably small (long edge ~800px); the polaroid box is 4:5, mugshots
+crop to ~4:5, evidence photos render full card-width.
+
+> **Note:** this colocated layout supersedes the earlier draft spec, which put
+> images in a shared `public/assets/murderboards/<slug>/` referenced via
+> `../../assets/…`. Because the assets now sit next to the board HTML, the
+> reference is the shorter `assets/<kind>/<file>` — but the relative-path rule
+> below is unchanged and just as load-bearing.
 
 ### 9.2 The hard constraint: **relative paths, not root-absolute**
 A board references an image with a path **relative to the board HTML file**:
 
 ```
-../../assets/murderboards/<slug>/<file>
+assets/<kind>/<file>
 ```
 
-From `public/murderboards/<slug>/episode-N.html`, `../../assets/…` resolves to
-`public/assets/…` **both** when served by Next (→ `/assets/…`) **and** under
-`file://` (which is how `shoot_board.py` loads it). **Do not use `/assets/…`** —
-root-absolute paths resolve when served but **silently 404 under `file://`, so the
-Substack screenshot would ship with broken/empty photos.** This is the single
-easiest way to break the pipeline; enforce relative paths.
+From `public/murderboards/<slug>/episode-N.html`, `assets/…` resolves to the
+sibling `assets/` folder **both** when served by Next (→ `/murderboards/<slug>/assets/…`)
+**and** under `file://` (which is how `shoot_board.py` loads it). **Never use a
+root-absolute `/assets/…` or `/murderboards/…` path** — it resolves when served
+but **silently 404s under `file://`, so the Substack screenshot would ship with
+broken/empty photos.** This is the single easiest way to break the pipeline;
+the generator only ever emits the relative form (see §9.4), so keep it that way.
 
-### 9.3 Template change (`board_template.html`)
-In `cardInnerHTML`, the `polaroid` branch:
+### 9.3 Template (`board_template.html`) — implemented
+`cardInnerHTML` renders `card.image` on four card types (`polaroid`, `id`,
+`postit`, `clipping`); each falls back cleanly when `image` is absent. The
+polaroid fills the existing 4:5 `.img` box (`.img.has-photo`); the ID card lays
+out as a flex row with a `.mug` thumbnail (`.card-id.has-photo`); evidence
+post-its and clippings render a full-width `.evidence-photo` / `.clip-photo`
+above the text. The lightbox reuses `cardInnerHTML`, so the enlarged view gets
+the photo for free.
 
-```js
-if (card.type === 'polaroid') {
-  const inner = card.image
-    ? `<img class="photo" src="${card.image}" alt="${card.caption}">`
-    : 'case photo';
-  return `<div class="card-polaroid"><div class="img">${inner}</div>` +
-         `<div class="cap">${card.caption}</div></div>`;
-}
-```
-Add CSS so the photo fills the existing 4:5 `.img` box:
-```css
-.card-polaroid .img { padding: 0; overflow: hidden; }      /* when an image is present */
-.card-polaroid .img img.photo { width: 100%; height: 100%; object-fit: cover; display: block; }
-```
-The lightbox reuses `cardInnerHTML`, so the enlarged view gets the photo for
-free — just verify it looks right at 1.6× (`#lightbox-card`).
-*(Optional, later: an `image` on `clipping` cards for a small newspaper photo —
-same relative-path rule.)*
+### 9.4 Generator (`md_to_board.py`) — implemented
+- **`build_asset_resolver(out_path, check=False)`** indexes the `assets/` tree
+  beside `--out` and maps a **bare filename → `assets/<kind>/<file>`** (matched on
+  basename, so the author never types the sub-folder). Deterministic on duplicate
+  basenames (lexicographically-first path wins). Missing files warn to stderr, or
+  hard-fail under **`--check-assets`**.
+- **Victim:** optional `"image": "JamesHalloway.jpg"` in the series'
+  `SERIES_CONFIG` victim block → `card["image"]`.
+- **Suspects & cornerstone:** an Obsidian embed `![[TheoThomas.jpg]]` in the block
+  is parsed by `pop_embed()`, **stripped from the card text before the id is
+  derived** (so a photo never moves a card), and resolved to `card["image"]`.
+- The generator **does not copy image bytes** — the file must already exist under
+  `public/murderboards/<slug>/assets/`.
 
-### 9.4 Generator change (`md_to_board.py`)
-- Add a helper `assets_rel(series, filename) -> f"../../assets/murderboards/{series}/{filename}"`.
-- **Victim:** support an optional `"image": "halloway.jpg"` in the series'
-  `SERIES_CONFIG` victim block; set `card["image"] = assets_rel(series, …)` when present.
-- **Suspects:** let the author drop an Obsidian embed in the suspect block,
-  `![[theo-thomas.jpg]]`; parse the filename out, strip it from the card text,
-  and set `card["image"] = assets_rel(series, "theo-thomas.jpg")`.
-- The generator **does not copy image bytes** — the file must already exist at
-  `public/assets/murderboards/<slug>/`. Add a warning if a referenced image is
-  missing (nice-to-have: a `--check-assets` flag).
-
-### 9.5 Screenshot change (`shoot_board.py`)
-Images load asynchronously, so before measuring/capturing, wait for them:
-`page.wait_for_load_state("networkidle")`, or explicitly await every
-`img.complete`. Otherwise the PNG can fire before photos paint.
+### 9.5 Screenshot (`shoot_board.py`) — implemented
+Before measuring/capturing, it waits for `networkidle` and then explicitly awaits
+every `<img>` (`load`/`error`), because photos change card heights and the
+bounding-box math must run after they paint.
 
 ---
 
@@ -309,7 +316,8 @@ Images load asynchronously, so before measuring/capturing, wait for them:
 3. **Keep template ↔ generator in sync.** The `inject()` markers
    (`const WORLD_W` … `const STRING_STYLE`) and the card-field names must match
    between `md_to_board.py` and `board_template.html`.
-4. **Relative image paths only** (§9.2). Root-absolute breaks the screenshot.
+4. **Relative image paths only** — `assets/<kind>/<file>` (§9.2). Root-absolute
+   (`/assets/…`, `/murderboards/…`) breaks the `file://` screenshot.
 5. **The `BOARD` object is emitted as JSON** (`json.dumps`). Anything you add to a
    card must be JSON-serializable and consumed by `cardInnerHTML`/`openLightbox`.
 6. **Ids are content-derived and load-bearing.** Renaming a suspect or heavily

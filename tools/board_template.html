@@ -85,6 +85,8 @@
     background: #1c1515; aspect-ratio: 4/5; display: flex; align-items: center; justify-content: center;
     font-family: monospace; font-size: 10px; color: #4a3838; text-align: center; padding: 6px; line-height: 1.5;
   }
+  .card-polaroid .img.has-photo { padding: 0; overflow: hidden; }
+  .card-polaroid .img img.photo { width: 100%; height: 100%; object-fit: cover; display: block; }
   .card-polaroid .cap {
     text-align: center; font-family: 'Special Elite', monospace; font-size: 10px; color: #2a2020;
     padding-top: 8px; letter-spacing: 0.06em; text-transform: uppercase;
@@ -103,11 +105,16 @@
     margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid rgba(192,0,26,0.25);
   }
   .card-id { background: var(--cream); color: #111; padding: 12px 14px; box-shadow: 3px 5px 16px rgba(0,0,0,0.6); font-family: 'Special Elite', monospace; border-left: 4px solid var(--red); }
+  .card-id.has-photo { display: flex; gap: 11px; align-items: flex-start; }
+  .card-id .mug { width: 60px; height: 75px; object-fit: cover; flex: none; border: 2px solid #fff; box-shadow: 0 1px 5px rgba(0,0,0,0.45); }
+  .card-id .id-body { min-width: 0; }
   .card-id .role { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--red); margin-bottom: 4px; }
   .card-id .name { font-size: 15px; font-weight: bold; color: var(--black); margin-bottom: 3px; }
   .card-id .detail { font-size: 11px; color: #555; line-height: 1.55; }
+  .card-postit .evidence-photo { width: 100%; display: block; margin-bottom: 9px; border: 1px solid rgba(0,0,0,0.28); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
   .card-clipping { background: #e8e0cc; padding: 13px 15px; font-family: 'Special Elite', monospace; box-shadow: 3px 5px 16px rgba(0,0,0,0.6); }
   .card-clipping .headline { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: #111; line-height: 1.25; margin-bottom: 6px; border-bottom: 2px solid #111; padding-bottom: 5px; }
+  .card-clipping .clip-photo { width: 100%; display: block; margin: 0 0 8px; border: 1px solid rgba(0,0,0,0.3); }
   .card-clipping .body { font-size: 10.5px; color: #333; line-height: 1.6; }
   #hud { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 24px; pointer-events: none; z-index: 200; }
   #title-block { max-width: 420px; background: rgba(13,11,11,0.82); border: 1px solid rgba(192,0,26,0.28); padding: 16px 18px 14px; border-radius: 3px; box-shadow: 0 6px 24px rgba(0,0,0,0.55); }
@@ -294,23 +301,32 @@ function pinHTML(variant) {
 
 function cardInnerHTML(card) {
   if (card.type === 'polaroid') {
-    return `<div class="card-polaroid"><div class="img">case photo</div><div class="cap">${card.caption}</div></div>`;
+    const inner = card.image
+      ? `<img class="photo" src="${card.image}" alt="${card.caption}">`
+      : 'case photo';
+    return `<div class="card-polaroid"><div class="img${card.image ? ' has-photo' : ''}">${inner}</div><div class="cap">${card.caption}</div></div>`;
   }
   if (card.type === 'postit') {
-    return `<div class="card-postit ${card.color}">${card.text}</div>`;
+    const photo = card.image ? `<img class="evidence-photo" src="${card.image}" alt="">` : '';
+    return `<div class="card-postit ${card.color}">${photo}${card.text}</div>`;
   }
   if (card.type === 'typed') {
     return `<div class="card-typed"><div class="hdr">${card.header}</div>${card.text}</div>`;
   }
   if (card.type === 'id') {
-    return `<div class="card-id">
-      <div class="role">${card.role}</div>
-      <div class="name">${card.name}</div>
-      <div class="detail">${card.detailLine}${card.flag ? '<br><span style="color:var(--red);">' + card.flag + '</span>' : ''}</div>
+    const mug = card.image ? `<img class="mug" src="${card.image}" alt="${card.name}">` : '';
+    return `<div class="card-id${card.image ? ' has-photo' : ''}">
+      ${mug}
+      <div class="id-body">
+        <div class="role">${card.role}</div>
+        <div class="name">${card.name}</div>
+        <div class="detail">${card.detailLine}${card.flag ? '<br><span style="color:var(--red);">' + card.flag + '</span>' : ''}</div>
+      </div>
     </div>`;
   }
   if (card.type === 'clipping') {
-    return `<div class="card-clipping"><div class="headline">${card.headline}</div><div class="body">${card.body}</div></div>`;
+    const photo = card.image ? `<img class="clip-photo" src="${card.image}" alt="">` : '';
+    return `<div class="card-clipping"><div class="headline">${card.headline}</div>${photo}<div class="body">${card.body}</div></div>`;
   }
   return '';
 }

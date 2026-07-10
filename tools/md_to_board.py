@@ -50,9 +50,14 @@ SERIES_CONFIG = {
     "rittenhouse-dog-walker": {
         "victim": {
             "caption": "JAMES HALLOWAY — DECEASED",
-            "detail": ("Philosophy professor. Recently announced he'd acquired a "
-                       "previously unknown jazz manuscript and was publishing a book "
-                       "about it. Found dead Friday morning."),
+            "detail": ("Music/piano professor and jazz scholar at the Rittenhouse "
+                       "Conservatory. Recently announced he'd acquired a lost Della "
+                       "Mercer jazz manuscript and was publishing a book about it. "
+                       "Found dead Friday morning."),
+            # Centerpiece photo. Bare filename; resolved against the board's
+            # sibling assets/ tree (assets/people/JamesHalloway.jpg here). Omit
+            # or set to None/"" to fall back to the "case photo" placeholder.
+            "image": "JamesHalloway.jpg",
         },
         "tag_label": "Murder Board",
         "default_subhead": "Where the board stands at the end of this episode.",
@@ -94,6 +99,21 @@ MARGIN_BOTTOM = 180
 # Markdown -> inline HTML helpers
 # ---------------------------------------------------------------------------
 NEW_RE = re.compile(r"\s*\[NEW\]\s*", re.I)
+# Obsidian embed, e.g. ![[TheoThomas.jpg]] or ![[TheoThomas.jpg|alt text]].
+EMBED_RE = re.compile(r"!\[\[\s*([^\]|]+?)\s*(?:\|[^\]]*)?\]\]")
+
+
+def pop_embed(text: str):
+    """Return (text_without_embeds, first_embed_filename_or_None).
+
+    Pulls an Obsidian image embed (``![[file.jpg]]``) out of a snippet so it
+    never renders as literal text, and hands back the bare filename to resolve
+    into a card image. If several embeds appear, the first wins."""
+    m = EMBED_RE.search(text)
+    filename = m.group(1).strip() if m else None
+    cleaned = EMBED_RE.sub(" ", text)
+    cleaned = re.sub(r"[ \t]{2,}", " ", cleaned).strip()
+    return cleaned, filename
 
 
 def md_inline(text: str) -> str:
@@ -220,16 +240,19 @@ def est_height(card: dict) -> int:
     if t == "typed":
         lines = card.get("text", "").count("<br>") + 1
         return 70 + lines * 24
+    # An embedded photo fills the card width; reserve ~its height (assume a
+    # broadly landscape image ~1.6:1) so reflow/new-slot placement won't collide.
+    img_h = int(card["w"] / 1.6) + 12 if card.get("image") else 0
     if t == "clipping":
         body = re.sub(r"<.*?>", "", card.get("body", ""))
         chars_per_line = max(20, int(card["w"] / 7.0))
         lines = max(2, (len(body) // chars_per_line) + 1)
-        return 78 + lines * 17
+        return 78 + lines * 17 + img_h
     # postit
     txt = re.sub(r"<.*?>", "", card.get("text", ""))
     chars_per_line = max(12, int(card["w"] / 8.5))
     lines = max(1, (len(txt) // chars_per_line) + 1)
-    return 30 + lines * 22
+    return 30 + lines * 22 + img_h
 
 
 def flow(cards, x0, y0, x_max, rng, gap=58):
@@ -301,9 +324,57 @@ def sag_for(a, b):
 
 
 # ---------------------------------------------------------------------------
+# Card images — resolve a bare filename to a board-relative path
+# ---------------------------------------------------------------------------
+#
+# Images live *beside the board HTML*, under the board's own `assets/` tree,
+# organised by kind:
+#     public/murderboards/<slug>/assets/people/JamesHalloway.jpg
+#     public/murderboards/<slug>/assets/discoverables/DianeAshfordBusinessCard.png
+#     public/murderboards/<slug>/assets/locations/HallowayApartment2D.png
+# so from `public/murderboards/<slug>/episode-N.html` the reference is simply
+# `assets/<kind>/<file>` — a RELATIVE path, which is the hard requirement:
+# shoot_board.py loads boards over file://, where root-absolute `/assets/…`
+# silently 404s (see README §9.2). The author only writes a bare filename
+# (in SERIES_CONFIG for the victim, or an `![[file]]` embed for suspects /
+# evidence); the resolver finds it in the tree and returns the relative path,
+# so the folder layout is a config detail, not something the author types.
+def build_asset_resolver(out_path, check=False):
+    """Return ``resolve(filename) -> "assets/<kind>/<file>"`` (or None).
+
+    Indexes the ``assets/`` folder that sits next to the output board, matching
+    on basename so the author never has to spell out the sub-folder. Missing
+    files warn to stderr, or hard-fail when ``check`` is set (``--check-assets``).
+    Deterministic: on a duplicate basename the lexicographically-first path wins.
+    """
+    board_dir = Path(out_path).resolve().parent
+    assets_dir = board_dir / "assets"
+    index = {}
+    if assets_dir.is_dir():
+        for p in sorted(assets_dir.rglob("*")):
+            if p.is_file():
+                index.setdefault(p.name.lower(), p)
+
+    def resolve(filename):
+        if not filename:
+            return None
+        p = index.get(Path(filename).name.lower())
+        if p is None:
+            msg = f"image not found under {assets_dir}: {filename!r}"
+            if check:
+                sys.exit(f"[md_to_board] {msg}")
+            print(f"WARNING [md_to_board]: {msg}", file=sys.stderr)
+            return None
+        return p.relative_to(board_dir).as_posix()
+
+    return resolve
+
+
+# ---------------------------------------------------------------------------
 # Build the BOARD object
 # ---------------------------------------------------------------------------
-def build_board(md, cfg, tag, title, subhead, seed, layout, first_build):
+def build_board(md, cfg, tag, title, subhead, seed, layout, first_build,
+                resolve_asset=None):
     """Build the BOARD object plus an updated layout-memory dict.
 
     `layout` = {"meta": {...}, "cards": {id: {x, y, rotate}}}. Existing cards
@@ -311,6 +382,8 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build):
     (into the first free slot of their section band) and tagged isNew.
     """
     rng = random.Random(seed)
+    if resolve_asset is None:
+        resolve_asset = lambda _f: None
     sections = parse_sections(md)
     saved = layout.get("cards", {})
     meta = layout.get("meta", {})
@@ -344,6 +417,9 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build):
     v = cfg["victim"]
     victim = add({"id": "victim", "type": "polaroid", "w": 185,
                   "caption": v["caption"], "detail": v["detail"]}, "tr")
+    vimg = resolve_asset(v.get("image"))
+    if vimg:
+        victim["image"] = vimg
 
     urgent_card = None
     urgent_items = bullets(section(sections, "urgent", "now"))
@@ -357,29 +433,40 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build):
 
     # ---- Suspects -> id cards (stable id = slug of the name) -----------------
     suspect_cards = []
-    for raw_name, body in parse_suspects(section(sections, "suspect")):
+    for raw_name, raw_body in parse_suspects(section(sections, "suspect")):
         name, _ = strip_new(raw_name)
+        # Pull an optional ![[photo]] embed out of the body so it renders as a
+        # mugshot rather than literal text, and doesn't disturb the id.
+        body, embed = pop_embed(raw_body)
         status_flag = ""
         m = re.search(r"—\s*(STILL OPEN|OPEN|CLEARED|RULED OUT)", name, re.I)
         if m:
             status_flag = m.group(1).upper()
             name = name[: m.start()].strip(" —")
-        suspect_cards.append(add({"id": "sus-" + slugify(name), "type": "id",
-                                  "w": 215, "role": guess_role(name, body),
-                                  "name": name, "detailLine": first_sentence(body),
-                                  "flag": status_flag,
-                                  "detail": md_inline(re.sub(r"\s+", " ", body))},
-                                 "suspect"))
+        card = add({"id": "sus-" + slugify(name), "type": "id",
+                    "w": 215, "role": guess_role(name, body),
+                    "name": name, "detailLine": first_sentence(body),
+                    "flag": status_flag,
+                    "detail": md_inline(re.sub(r"\s+", " ", body))},
+                   "suspect")
+        img = resolve_asset(embed)
+        if img:
+            card["image"] = img
+        suspect_cards.append(card)
 
     # ---- Cornerstone -> 1 stable clipping + cream evidence postits -----------
     corner_items = []
     for b in bullets(section(sections, "cornerstone", "central")):
         clean, _ = strip_new(b)
+        # Strip an ![[photo]] embed first so it neither shows as text nor perturbs
+        # the content-derived id (which must stay stable across episodes).
+        clean, embed = pop_embed(clean)
         aside = re.findall(r"\*\[(.+?)\]\*", clean)
         body = re.sub(r"\*\[.+?\]\*", "", clean).strip()
         parts = re.split(r"\s+—\s+", body, maxsplit=1)
         corner_items.append({"cid": "cs-" + slugify(parts[0]), "parts": parts,
-                             "body": body, "aside": aside})
+                             "body": body, "aside": aside,
+                             "image": resolve_asset(embed)})
     clip_id = meta.get("clipping_id")
     ids_now = [it["cid"] for it in corner_items]
     if corner_items and (not clip_id or clip_id not in ids_now):
@@ -393,11 +480,16 @@ def build_board(md, cfg, tag, title, subhead, seed, layout, first_build):
             clip_card = add({"id": it["cid"], "type": "clipping", "w": 345,
                              "headline": headline, "body": btext,
                              "detail": " ".join(it["aside"])}, "bottom")
+            if it["image"]:
+                clip_card["image"] = it["image"]
         else:
-            corner_cards.append(add({"id": it["cid"], "type": "postit",
-                                     "color": "w", "w": 185,
-                                     "text": md_inline(it["body"]),
-                                     "detail": " ".join(it["aside"])}, "bottom"))
+            postit = add({"id": it["cid"], "type": "postit",
+                          "color": "w", "w": 185,
+                          "text": md_inline(it["body"]),
+                          "detail": " ".join(it["aside"])}, "bottom")
+            if it["image"]:
+                postit["image"] = it["image"]
+            corner_cards.append(postit)
 
     # ---- Open-question asides -> pink stickies -------------------------------
     asides = []
@@ -516,6 +608,8 @@ def main():
                     help="layout-memory JSON (default: <script>/layouts/<series>.json)")
     ap.add_argument("--reflow", action="store_true",
                     help="ignore saved positions and re-lay-out the whole board")
+    ap.add_argument("--check-assets", action="store_true",
+                    help="fail if a referenced card image is missing (default: warn)")
     args = ap.parse_args()
 
     cfg = SERIES_CONFIG.get(args.series)
@@ -537,8 +631,11 @@ def main():
         layout = json.loads(layout_path.read_text(encoding="utf-8"))
     first_build = args.reflow or not layout.get("cards")
 
+    # Card images resolve against the assets/ tree beside the output board.
+    resolve_asset = build_asset_resolver(args.out, check=args.check_assets)
     board, w, h, new_layout = build_board(md, cfg, tag, args.title, subhead,
-                                          seed, layout, first_build)
+                                          seed, layout, first_build,
+                                          resolve_asset=resolve_asset)
     out_html = inject(template, board, w, h)
     Path(args.out).write_text(out_html, encoding="utf-8")
     layout_path.parent.mkdir(parents=True, exist_ok=True)
@@ -546,8 +643,9 @@ def main():
                            encoding="utf-8")
 
     n_new = sum(1 for c in board["cards"] if c.get("isNew"))
+    n_img = sum(1 for c in board["cards"] if c.get("image"))
     print(f"Wrote {args.out}  ({len(board['cards'])} cards, {n_new} new, "
-          f"{len(board['strings'])} strings, world {w}x{h})")
+          f"{n_img} with images, {len(board['strings'])} strings, world {w}x{h})")
     print(f"Layout memory: {layout_path}  ({'created' if first_build else 'updated'})")
 
 

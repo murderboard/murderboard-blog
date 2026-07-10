@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Murder Board — Episode 6</title>
+<title>Murder Board</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Special+Elite&display=swap" rel="stylesheet">
@@ -15,7 +15,8 @@
     BOARD.title, BOARD.subhead, BOARD.cards, and BOARD.strings only.
     Everything above that in this file (styles, layout engine,
     pan/zoom, lightbox) is the reusable template and matches the
-    Murder Board brand system -- it shouldn't need to change between episodes.
+    Murder Board brand system (see the Claude Design project) --
+    it shouldn't need to change between episodes.
     ============================================================
   */
   * { box-sizing: border-box; }
@@ -67,6 +68,7 @@
   }
   .card { position: absolute; cursor: pointer; transition: filter 0.15s ease; user-select: none; }
   .card:hover { filter: brightness(1.12); z-index: 50; }
+  .new-tab { position: absolute; top: -9px; right: -8px; background: var(--red); color: #fff; font-size: 8px; letter-spacing: 0.14em; padding: 2px 5px 1px; transform: rotate(3deg); box-shadow: 0 2px 6px rgba(0,0,0,0.55); z-index: 22; font-family: 'Special Elite', monospace; }
   .pin {
     position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
     width: 13px; height: 13px; border-radius: 50%; background: var(--red);
@@ -83,6 +85,8 @@
     background: #1c1515; aspect-ratio: 4/5; display: flex; align-items: center; justify-content: center;
     font-family: monospace; font-size: 10px; color: #4a3838; text-align: center; padding: 6px; line-height: 1.5;
   }
+  .card-polaroid .img.has-photo { padding: 0; overflow: hidden; }
+  .card-polaroid .img img.photo { width: 100%; height: 100%; object-fit: cover; display: block; }
   .card-polaroid .cap {
     text-align: center; font-family: 'Special Elite', monospace; font-size: 10px; color: #2a2020;
     padding-top: 8px; letter-spacing: 0.06em; text-transform: uppercase;
@@ -101,21 +105,26 @@
     margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid rgba(192,0,26,0.25);
   }
   .card-id { background: var(--cream); color: #111; padding: 12px 14px; box-shadow: 3px 5px 16px rgba(0,0,0,0.6); font-family: 'Special Elite', monospace; border-left: 4px solid var(--red); }
+  .card-id.has-photo { display: flex; gap: 11px; align-items: flex-start; }
+  .card-id .mug { width: 60px; height: 75px; object-fit: cover; flex: none; border: 2px solid #fff; box-shadow: 0 1px 5px rgba(0,0,0,0.45); }
+  .card-id .id-body { min-width: 0; }
   .card-id .role { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--red); margin-bottom: 4px; }
   .card-id .name { font-size: 15px; font-weight: bold; color: var(--black); margin-bottom: 3px; }
   .card-id .detail { font-size: 11px; color: #555; line-height: 1.55; }
+  .card-postit .evidence-photo { width: 100%; display: block; margin-bottom: 9px; border: 1px solid rgba(0,0,0,0.28); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
   .card-clipping { background: #e8e0cc; padding: 13px 15px; font-family: 'Special Elite', monospace; box-shadow: 3px 5px 16px rgba(0,0,0,0.6); }
   .card-clipping .headline { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: #111; line-height: 1.25; margin-bottom: 6px; border-bottom: 2px solid #111; padding-bottom: 5px; }
+  .card-clipping .clip-photo { width: 100%; display: block; margin: 0 0 8px; border: 1px solid rgba(0,0,0,0.3); }
   .card-clipping .body { font-size: 10.5px; color: #333; line-height: 1.6; }
   #hud { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 24px; pointer-events: none; z-index: 200; }
-  #title-block { max-width: 420px; }
+  #title-block { max-width: 420px; background: rgba(13,11,11,0.82); border: 1px solid rgba(192,0,26,0.28); padding: 16px 18px 14px; border-radius: 3px; box-shadow: 0 6px 24px rgba(0,0,0,0.55); }
   .board-episode-tag { display: inline-flex; align-items: center; gap: 0.7rem; background: rgba(192,0,26,0.16); border: 1px solid rgba(192,0,26,0.35); padding: 0.4rem 0.9rem; margin-bottom: 0.7rem; }
   .board-episode-tag span { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; }
   .tag-label { color: var(--red); }
   .tag-ep { color: var(--cream-dim); }
   #title-text { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 26px; text-transform: uppercase; color: var(--cream); margin: 0 0 6px; line-height: 1.1; }
   #subhead { font-size: 12px; color: var(--cream-dim); line-height: 1.6; }
-  #hint { display: none; }
+  #hint { font-family: 'Special Elite', monospace; font-size: 11px; color: var(--cream-dim); background: rgba(13,11,11,0.6); border: 1px solid rgba(240,236,224,0.12); padding: 6px 12px; border-radius: 2px; margin-top: 10px; display: inline-block; letter-spacing: 0.04em; }
   #legend { position: fixed; bottom: 22px; left: 24px; z-index: 200; display: flex; flex-wrap: wrap; gap: 14px; pointer-events: none; background: rgba(13,11,11,0.55); padding: 8px 14px; border: 1px solid rgba(240,236,224,0.1); }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.1em; color: var(--cream-dim); text-transform: uppercase; }
   .legend-dot { width: 9px; height: 9px; border-radius: 50%; }
@@ -185,188 +194,245 @@
 const WORLD_W = 2400;
 const WORLD_H = 1500;
 
-/* ============================================================
-   EPISODE DATA — edit only this block to update the board.
-   Cards: polaroid | postit (y/r/w/pink) | typed | id | clipping
-   Strings: kind = confirmed | suspected | evidence | unverified
-   ============================================================ */
 const BOARD = {
   "tagEp": "Episode 1 — The Card Game",
-  "title": "The Missing Manuscript",
-  "subhead": "A theft, then a death within a day. Nothing connects yet — just fragments, and a bad feeling about the timing.",
+  "title": "The Board So Far",
+  "subhead": "Where the board stands at the end of this episode.",
   "cards": [
-    {
-      "id": "halloway",
-      "type": "polaroid",
-      "x": 110,
-      "y": 340,
-      "w": 185,
-      "rotate": -2.5,
-      "caption": "PROF. HALLOWAY — FOUND FRIDAY",
-      "detail": "Two days ago, frantic in his apartment over a stolen manuscript. This morning the doorman found him dead. They're calling it suicide. I don't believe it — I can't say why yet."
-    },
     {
       "id": "timeline",
       "type": "typed",
-      "x": 345,
-      "y": 330,
       "w": 330,
-      "rotate": -1,
-      "header": "What We Know",
-      "text": "THU AFTERNOON: Halloway finds the manuscript gone. Calls police (“thorough,” he said, not kindly). Tells me.<br>THU MORNING / NIGHT: ?<br>FRI MORNING: Doorman finds him. Ruled a suicide.",
-      "detail": "Barely a day between the theft and the death. That's the whole reason this board exists."
+      "header": "Timeline",
+      "text": "<strong>Thursday morning</strong> — Unknown. Realtor visit? Legal filing?<br><strong>Thursday afternoon</strong> — Halloway home. Discovers theft. Calls police. Speaks to Lena.<br><strong>Thursday night</strong> — Unknown.<br><strong>Friday morning</strong> — Halloway found dead. Ruled suicide.",
+      "detail": "",
+      "x": 75,
+      "y": 98,
+      "rotate": 0.3
     },
     {
-      "id": "manuscript",
-      "type": "clipping",
-      "x": 885,
-      "y": 345,
-      "w": 380,
-      "rotate": 0.5,
-      "headline": "THE MISSING MANUSCRIPT",
-      "body": "Della Mercer's original composition notes — Philadelphia jazz, authenticated, announced in the conservatory newsletter. Priceless to Halloway. Gone from the middle of his desk."
-    },
-    {
-      "id": "lawyer",
-      "type": "typed",
-      "x": 1480,
-      "y": 335,
-      "w": 300,
-      "rotate": -1.5,
-      "header": "A LEGAL CLAIM",
-      "text": "Law-firm letterhead glimpsed on his desk. Two words I caught: <em>legal claim</em>, <em>manuscript</em>. And it looked filed <em>before</em> the theft was ever reported.",
-      "detail": "Who claims something before it's reported stolen? The timing is the first wrong thing."
-    },
-    {
-      "id": "client",
+      "id": "bld-x",
       "type": "postit",
-      "color": "pink",
-      "x": 1870,
-      "y": 660,
-      "w": 225,
-      "rotate": -2,
-      "text": "THE CLIENT. Somebody's lawyer wants the manuscript — name not on the page I saw. Who lawyers up over old jazz notes?",
-      "detail": ""
+      "color": "y",
+      "w": 195,
+      "text": "",
+      "detail": "No crime scene photo yet — sketched the desk from memory: the cleared space in the center, the papers still organized around the edges, the lawyer's letter on top of the stack.",
+      "x": 80,
+      "y": 400,
+      "rotate": -2.2
     },
     {
-      "id": "newsletter",
-      "type": "clipping",
-      "x": 905,
-      "y": 800,
-      "w": 360,
-      "rotate": -1,
-      "headline": "CONSERVATORY NEWSLETTER",
-      "body": "Public. Named Halloway, named the manuscript, announced auditions for a student ensemble. Anyone with a Google alert could have seen it."
-    },
-    {
-      "id": "diane",
-      "type": "id",
-      "x": 1520,
-      "y": 720,
-      "w": 235,
-      "rotate": 2,
-      "role": "realtor?",
-      "name": "Diane Ashford",
-      "detailLine": "Cream card, half-under a grocery receipt in his foyer.",
-      "flag": "? Why was a realtor in his apartment?",
-      "detail": "Margaret: 'Diane Ashford. She does most of the building.' Said with a look I couldn't read."
+      "id": "victim",
+      "type": "polaroid",
+      "w": 185,
+      "caption": "JAMES HALLOWAY — DECEASED",
+      "detail": "Music/piano professor and jazz scholar at the Rittenhouse Conservatory. Recently announced he'd acquired a lost Della Mercer jazz manuscript and was publishing a book about it. Found dead Friday morning.",
+      "image": "assets/people/JamesHalloway.jpg",
+      "x": 1998,
+      "y": 78,
+      "rotate": 0.3
     },
     {
       "id": "urgent",
       "type": "postit",
-      "color": "y",
-      "x": 150,
-      "y": 800,
-      "w": 245,
-      "rotate": -3,
-      "text": "Stolen Thursday. Dead by Friday. Killed for what he KNEW, or what he HAD?",
-      "detail": "And who's the client on that letter? When was it filed? Why was Diane here at all?"
+      "color": "r",
+      "w": 180,
+      "text": "Who is the client behind the lawyer's letter? When exactly was it filed? Why was Diane Ashford in the building? If the manuscript was stolen Thursday and he was dead by Friday — was he killed because of what he knew, or what he had?",
+      "detail": "",
+      "x": 1989,
+      "y": 414,
+      "rotate": 0.2
+    },
+    {
+      "id": "sus-unknown-client",
+      "type": "id",
+      "w": 215,
+      "role": "Person of Interest",
+      "name": "Unknown client",
+      "detailLine": "Someone filed a formal legal claim on the manuscript before the theft was reported.",
+      "flag": "",
+      "detail": "Someone filed a formal legal claim on the manuscript before the theft was reported. Name not on the letter Lena saw. <em>[Who?]</em>",
+      "x": 700,
+      "y": 440,
+      "rotate": 2.1
+    },
+    {
+      "id": "sus-diane-ashford-realtor",
+      "type": "id",
+      "w": 215,
+      "role": "Witness / Suspect — Realtor",
+      "name": "Diane Ashford (realtor?)",
+      "detailLine": "Business card in Halloway's foyer.",
+      "flag": "",
+      "detail": "Business card in Halloway's foyer. Diane Ashford Realty. Margaret: \"She does most of the building.\" <em>[Why was she there?]</em>",
+      "x": 940,
+      "y": 440,
+      "rotate": 1.6
+    },
+    {
+      "id": "cs-the-manuscript-absent",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>The manuscript</strong> <em>(absent)</em> — Della Mercer's original composition notes. Authenticated. Significant enough for a legal claim and a newsletter announcement. Gone.",
+      "detail": "",
+      "x": 481,
+      "y": 864,
+      "rotate": 1.4
+    },
+    {
+      "id": "cs-the-lawyers-letter",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>The lawyer's letter</strong> — Law firm letterhead. Formal ownership claim. Date on letterhead — before the theft was reported?",
+      "detail": "Didn't read it properly. Can't confirm yet.",
+      "x": 726,
+      "y": 866,
+      "rotate": 2.8
+    },
+    {
+      "id": "cs-the-conservatory-newsletter",
+      "type": "clipping",
+      "w": 345,
+      "headline": "THE CONSERVATORY NEWSLETTER",
+      "body": "Public. Named Halloway, named the manuscript, announced auditions for a student ensemble to perform the recovered works. Anyone with a Google alert could have seen it.",
+      "detail": "",
+      "x": 952,
+      "y": 863,
+      "rotate": -2.4
+    },
+    {
+      "id": "cs-the-business-card",
+      "type": "postit",
+      "color": "w",
+      "w": 185,
+      "text": "<strong>The business card</strong> — Cream card stock. Diane Ashford Realty. Console table, foyer. Under a grocery receipt.",
+      "detail": "",
+      "x": 1320,
+      "y": 867,
+      "rotate": -1.7
+    },
+    {
+      "id": "q-who",
+      "type": "postit",
+      "color": "pink",
+      "w": 200,
+      "text": "Who?",
+      "detail": "",
+      "x": 1046,
+      "y": 665,
+      "rotate": -1.2
+    },
+    {
+      "id": "q-why-was-she-there",
+      "type": "postit",
+      "color": "pink",
+      "w": 200,
+      "text": "Why was she there?",
+      "detail": "",
+      "x": 1396,
+      "y": 830,
+      "rotate": -1.5
     }
   ],
   "annotations": [
     {
-      "x": 100,
-      "y": 312,
-      "text": "Victim"
+      "x": 60,
+      "y": 50,
+      "text": "Timeline"
     },
     {
-      "x": 875,
-      "y": 315,
-      "text": "The MacGuffin"
+      "x": 1995,
+      "y": 50,
+      "text": "The victim"
     },
     {
-      "x": 1475,
-      "y": 305,
-      "text": "Who Wanted It?"
+      "x": 760,
+      "y": 432,
+      "text": "Persons of interest"
+    },
+    {
+      "x": 80,
+      "y": 829,
+      "text": "Physical evidence"
     }
   ],
   "strings": [
     {
       "from": [
-        200,
-        350
+        2090,
+        216
       ],
       "to": [
-        1075,
-        380
+        807,
+        488
       ],
-      "sag": 55,
+      "sag": 90,
       "kind": "confirmed"
     },
     {
       "from": [
-        1630,
-        365
+        2090,
+        216
       ],
       "to": [
-        1075,
-        380
+        1047,
+        488
       ],
-      "sag": 55,
+      "sag": 78,
       "kind": "suspected"
     },
     {
       "from": [
-        1085,
-        800
+        807,
+        488
       ],
       "to": [
-        1075,
-        475
+        2079,
+        561
       ],
-      "sag": -30,
-      "kind": "confirmed"
+      "sag": 88,
+      "kind": "suspected"
     },
     {
       "from": [
-        1630,
-        745
+        807,
+        488
       ],
       "to": [
-        205,
-        380
+        1124,
+        936
       ],
-      "sag": 150,
+      "sag": 52,
+      "kind": "suspected"
+    },
+    {
+      "from": [
+        240,
+        181
+      ],
+      "to": [
+        1124,
+        936
+      ],
+      "sag": 83,
+      "kind": "evidence"
+    },
+    {
+      "from": [
+        240,
+        181
+      ],
+      "to": [
+        177,
+        426
+      ],
+      "sag": 37,
       "kind": "unverified"
-    },
-    {
-      "from": [
-        1980,
-        675
-      ],
-      "to": [
-        1630,
-        375
-      ],
-      "sag": 40,
-      "kind": "suspected"
     }
   ]
 };
-
-/* ============================================================
-   TEMPLATE ENGINE — do not edit below this line between episodes
-   ============================================================ */
 
 const STRING_STYLE = {
   confirmed: { stroke: '#ed1c2e', width: 2, opacity: 0.75, dash: null },
@@ -408,23 +474,32 @@ function pinHTML(variant) {
 
 function cardInnerHTML(card) {
   if (card.type === 'polaroid') {
-    return `<div class="card-polaroid"><div class="img">case photo</div><div class="cap">${card.caption}</div></div>`;
+    const inner = card.image
+      ? `<img class="photo" src="${card.image}" alt="${card.caption}">`
+      : 'case photo';
+    return `<div class="card-polaroid"><div class="img${card.image ? ' has-photo' : ''}">${inner}</div><div class="cap">${card.caption}</div></div>`;
   }
   if (card.type === 'postit') {
-    return `<div class="card-postit ${card.color}">${card.text}</div>`;
+    const photo = card.image ? `<img class="evidence-photo" src="${card.image}" alt="">` : '';
+    return `<div class="card-postit ${card.color}">${photo}${card.text}</div>`;
   }
   if (card.type === 'typed') {
     return `<div class="card-typed"><div class="hdr">${card.header}</div>${card.text}</div>`;
   }
   if (card.type === 'id') {
-    return `<div class="card-id">
-      <div class="role">${card.role}</div>
-      <div class="name">${card.name}</div>
-      <div class="detail">${card.detailLine}${card.flag ? '<br><span style="color:var(--red);">' + card.flag + '</span>' : ''}</div>
+    const mug = card.image ? `<img class="mug" src="${card.image}" alt="${card.name}">` : '';
+    return `<div class="card-id${card.image ? ' has-photo' : ''}">
+      ${mug}
+      <div class="id-body">
+        <div class="role">${card.role}</div>
+        <div class="name">${card.name}</div>
+        <div class="detail">${card.detailLine}${card.flag ? '<br><span style="color:var(--red);">' + card.flag + '</span>' : ''}</div>
+      </div>
     </div>`;
   }
   if (card.type === 'clipping') {
-    return `<div class="card-clipping"><div class="headline">${card.headline}</div><div class="body">${card.body}</div></div>`;
+    const photo = card.image ? `<img class="clip-photo" src="${card.image}" alt="">` : '';
+    return `<div class="card-clipping"><div class="headline">${card.headline}</div>${photo}<div class="body">${card.body}</div></div>`;
   }
   return '';
 }
@@ -442,6 +517,7 @@ function renderCards() {
     html += `<div class="card" data-id="${card.id}" style="left:${card.x}px; top:${card.y}px; width:${card.w}px; transform: rotate(${card.rotate}deg);">
       ${pinHTML(pinVariantFor(card, i))}
       ${cardInnerHTML(card)}
+      ${card.isNew ? '<div class="new-tab">NEW</div>' : ''}
     </div>`;
   });
   layer.innerHTML = html;
@@ -496,8 +572,8 @@ function applyTransform() {
 
 function centerView() {
   const vw = viewport.clientWidth, vh = viewport.clientHeight;
-  scale = Math.min(vw / WORLD_W, vh / WORLD_H) * 0.92;
-  scale = Math.max(0.25, Math.min(scale, 1));
+  scale = Math.min(vw / WORLD_W, vh / WORLD_H) * 1.6;
+  scale = Math.max(0.35, Math.min(scale, 1));
   tx = (vw - WORLD_W * scale) / 2;
   ty = (vh - WORLD_H * scale) / 2;
   applyTransform();

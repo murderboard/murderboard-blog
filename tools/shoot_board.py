@@ -48,6 +48,23 @@ def main():
                                 device_scale_factor=args.scale)
         page.goto(html_path.as_uri())
         page.wait_for_timeout(700)  # fonts + layout settle
+        # Card photos load asynchronously and change card heights, so the
+        # bounding box below is only correct once every image has decoded.
+        # Wait for network idle, then explicitly for each <img> to finish.
+        try:
+            page.wait_for_load_state("networkidle", timeout=5000)
+        except Exception:
+            pass
+        page.evaluate(
+            """() => Promise.all(
+                [...document.images]
+                  .filter(img => !img.complete)
+                  .map(img => new Promise(res => {
+                      img.addEventListener('load', res);
+                      img.addEventListener('error', res);
+                  }))
+            )"""
+        )
 
         # First pass: measure the card bounding box so we can size the canvas
         # to the content's aspect ratio (no empty letterbox bands).
