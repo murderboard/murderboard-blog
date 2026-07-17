@@ -49,14 +49,18 @@ export function estHeight(card: RawCard): number {
   return 30 + lines * 22 + (card.image ? 120 : 0);
 }
 
+// Portrait world: narrower + taller, so the board reads top-to-bottom. Sections
+// are stacked vertical zones (by y0); cards flow within a zone and the free-slot
+// packer keeps them from overlapping across zones.
+const WORLD_W = 1200;
 const BANDS: Record<BandKey, [number, number, number, number]> = {
-  timeline: [80, 90, 470, 1010],
-  building: [80, 90, 470, 1010],
-  suspects: [700, 440, 2360, 810],
-  documents: [700, 440, 2360, 810],
-  cornerstone: [80, 1140, 2360, 1500],
-  victim: [1950, 70, 2360, 470],
-  urgent: [1950, 70, 2360, 470],
+  victim: [60, 80, 1140, 470],
+  timeline: [60, 80, 1140, 470],
+  urgent: [60, 80, 1140, 470],
+  suspects: [60, 520, 1140, 940],
+  documents: [60, 520, 1140, 940],
+  building: [60, 980, 1140, 1280],
+  cornerstone: [60, 1320, 1140, 2000],
 };
 
 function hashRotate(id: string): number {
@@ -166,13 +170,13 @@ export function placeBoard(
   const bottom = cards.length ? Math.max(...cards.map((c) => c.y + estHeight(c))) : 1500;
   const worldH = Math.max(1500, Math.round(bottom + 180));
 
-  const evY = Math.min(...cards.filter((c) => c.cat === "cornerstone").map((c) => c.y), 1140) - 34;
+  const evY = Math.min(...cards.filter((c) => c.cat === "cornerstone").map((c) => c.y), 1320) - 34;
+  const susY = Math.min(...cards.filter((c) => c.cat === "suspects" || c.cat === "documents").map((c) => c.y), 520) - 34;
   const annotations: Annotation[] = [
-    annotationLabels.timeline && { x: 60, y: 50, text: annotationLabels.timeline },
-    annotationLabels.victim && { x: 1995, y: 50, text: annotationLabels.victim },
-    annotationLabels.suspects && { x: 760, y: 432, text: annotationLabels.suspects },
-    annotationLabels.evidence && { x: 80, y: evY, text: annotationLabels.evidence },
+    annotationLabels.timeline && { x: 40, y: 48, text: annotationLabels.timeline },
+    annotationLabels.suspects && { x: 40, y: susY, text: annotationLabels.suspects },
+    annotationLabels.evidence && { x: 40, y: evY, text: annotationLabels.evidence },
   ].filter(Boolean) as Annotation[];
 
-  return { cards, strings, annotations, worldW: 2400, worldH };
+  return { cards, strings, annotations, worldW: WORLD_W, worldH };
 }

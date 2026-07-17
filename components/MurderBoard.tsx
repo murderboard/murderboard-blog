@@ -355,8 +355,19 @@ export default function MurderBoard({ board }: { board: Board }) {
 }
 
 function Lightbox({ card, onClose }: { card: Card; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
   return (
     <div className={styles.lightbox} onClick={onClose}>
+      <button className={styles.lightboxClose} onClick={onClose} aria-label="Close">
+        ✕
+      </button>
       <div onClick={(e) => e.stopPropagation()}>
         <div style={{ width: card.w * 1.6 }}>
           <CardFace card={card} />

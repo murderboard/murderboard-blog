@@ -4,184 +4,202 @@
   },
   "cards": {
     "body-position": {
-      "first_seen_episode": 6,
-      "rotate": 1.8,
-      "x": 80,
-      "y": 1242
+      "x": 708,
+      "y": 980,
+      "rotate": 2.2,
+      "first_seen_episode": 6
     },
     "cameras": {
-      "first_seen_episode": 5,
-      "rotate": 0.7,
-      "x": 80,
-      "y": 306
+      "x": 60,
+      "y": 980,
+      "rotate": -2.9,
+      "first_seen_episode": 5
     },
     "card": {
-      "first_seen_episode": 1,
+      "x": 876,
+      "y": 1320,
       "rotate": 2.6,
-      "x": 972,
-      "y": 777
+      "first_seen_episode": 1
     },
     "claimant": {
-      "first_seen_episode": 1,
-      "rotate": -0.4,
-      "x": 748,
-      "y": 472
+      "x": 60,
+      "y": 520,
+      "rotate": 0.8,
+      "first_seen_episode": 1
     },
     "cornerstone-records": {
-      "first_seen_episode": 3,
-      "rotate": -0.8,
-      "x": 296,
-      "y": 1140
+      "x": 276,
+      "y": 1440,
+      "rotate": -2.6,
+      "first_seen_episode": 3
     },
     "demand-letter": {
-      "first_seen_episode": 5,
-      "rotate": 1.8,
-      "x": 512,
-      "y": 1140
+      "x": 876,
+      "y": 1320,
+      "rotate": 1.2,
+      "first_seen_episode": 5
     },
     "desk": {
-      "first_seen_episode": 1,
-      "rotate": -1.5,
-      "x": 92,
-      "y": 290
+      "x": 60,
+      "y": 980,
+      "rotate": -2.7,
+      "first_seen_episode": 1
     },
     "desk-document": {
-      "first_seen_episode": 2,
-      "rotate": 2,
-      "x": 296,
-      "y": 1140
+      "x": 492,
+      "y": 1464,
+      "rotate": -1.8,
+      "first_seen_episode": 2
     },
     "diane": {
-      "first_seen_episode": 1,
-      "rotate": 1.2,
-      "x": 1057,
-      "y": 460
+      "x": 300,
+      "y": 520,
+      "rotate": 1.8,
+      "first_seen_episode": 1
     },
     "folder": {
-      "first_seen_episode": 2,
-      "rotate": -2.5,
-      "x": 80,
-      "y": 1140
+      "x": 60,
+      "y": 1464,
+      "rotate": 1.9,
+      "first_seen_episode": 2
+    },
+    "kelsey": {
+      "x": 540,
+      "y": 520,
+      "rotate": 0.2,
+      "first_seen_episode": 7
     },
     "letter": {
-      "first_seen_episode": 1,
-      "rotate": 0.2,
-      "x": 731,
-      "y": 763
+      "x": 276,
+      "y": 1320,
+      "rotate": -0.1,
+      "first_seen_episode": 1
     },
     "manuscript": {
-      "first_seen_episode": 1,
-      "rotate": 2.8,
-      "x": 480,
-      "y": 769
+      "x": 60,
+      "y": 1320,
+      "rotate": -1.8,
+      "first_seen_episode": 1
     },
     "marcus": {
-      "first_seen_episode": 2,
-      "rotate": -2.7,
-      "x": 1300,
-      "y": 440
+      "x": 540,
+      "y": 592,
+      "rotate": 1.5,
+      "first_seen_episode": 2
     },
     "newsletter": {
-      "first_seen_episode": 1,
-      "rotate": 0.2,
-      "x": 68,
-      "y": 783
+      "x": 492,
+      "y": 1320,
+      "rotate": -0.3,
+      "first_seen_episode": 1
     },
     "officer": {
-      "first_seen_episode": 2,
-      "rotate": 2.7,
-      "x": 80,
-      "y": 330
+      "x": 60,
+      "y": 980,
+      "rotate": -1.7,
+      "first_seen_episode": 2
     },
     "q-he-knows-about-della-how-well": {
-      "first_seen_episode": 3,
-      "rotate": 0.6,
-      "x": 1180,
-      "y": 830
+      "x": 780,
+      "y": 520,
+      "rotate": -0.3,
+      "first_seen_episode": 3
     },
     "q-what-happened-to-the-catalog-where": {
-      "first_seen_episode": 3,
-      "rotate": 0.8,
-      "x": 1420,
-      "y": 830
+      "x": 60,
+      "y": 640,
+      "rotate": 0.3,
+      "first_seen_episode": 3
     },
     "q-what-is-it-who-left-it": {
-      "first_seen_episode": 2,
-      "rotate": 1.4,
-      "x": 1180,
-      "y": 830
+      "x": 780,
+      "y": 592,
+      "rotate": -0.7,
+      "first_seen_episode": 2
     },
     "q-who": {
-      "first_seen_episode": 1,
-      "rotate": 0.5,
-      "x": 756,
-      "y": 643
+      "x": 540,
+      "y": 520,
+      "rotate": -1.4,
+      "first_seen_episode": 1
     },
     "q-why-was-she-there": {
-      "first_seen_episode": 1,
-      "rotate": -2.8,
-      "x": 1031,
-      "y": 646
+      "x": 780,
+      "y": 520,
+      "rotate": 0.1,
+      "first_seen_episode": 1
     },
     "q-why-was-she-there-if-nothings": {
-      "first_seen_episode": 4,
-      "rotate": -1.6,
-      "x": 1180,
-      "y": 830
+      "x": 60,
+      "y": 520,
+      "rotate": -2.9,
+      "first_seen_episode": 4
     },
     "realty-visitor": {
-      "first_seen_episode": 2,
-      "rotate": 2.7,
-      "x": 700,
-      "y": 440
+      "x": 60,
+      "y": 520,
+      "rotate": 2,
+      "first_seen_episode": 2
     },
     "service-entrance": {
-      "first_seen_episode": 3,
-      "rotate": -1.6,
-      "x": 80,
-      "y": 474
+      "x": 276,
+      "y": 980,
+      "rotate": 1.3,
+      "first_seen_episode": 3
     },
     "syringe": {
-      "first_seen_episode": 5,
-      "rotate": 1.5,
-      "x": 80,
-      "y": 930
+      "x": 492,
+      "y": 980,
+      "rotate": 2.6,
+      "first_seen_episode": 5
     },
     "theo": {
-      "first_seen_episode": 3,
-      "rotate": 0.3,
-      "x": 940,
-      "y": 440
+      "x": 300,
+      "y": 520,
+      "rotate": 0.4,
+      "first_seen_episode": 3
     },
     "threat-note": {
-      "first_seen_episode": 6,
-      "rotate": 1.9,
-      "x": 296,
-      "y": 1140
+      "x": 276,
+      "y": 1320,
+      "rotate": 2.7,
+      "first_seen_episode": 6
     },
     "timeline": {
-      "first_seen_episode": 1,
-      "rotate": 2.1,
-      "x": 72,
-      "y": 98
+      "x": 276,
+      "y": 80,
+      "rotate": -2.7,
+      "first_seen_episode": 1
     },
     "toes-comment": {
-      "first_seen_episode": 5,
-      "rotate": 2.7,
-      "x": 728,
-      "y": 1140
+      "x": 492,
+      "y": 1464,
+      "rotate": -2.3,
+      "first_seen_episode": 5
+    },
+    "unknown-man": {
+      "x": 780,
+      "y": 520,
+      "rotate": 1.6,
+      "first_seen_episode": 7
     },
     "urgent": {
-      "first_seen_episode": 1,
-      "rotate": -2.4,
-      "x": 1995,
-      "y": 405
+      "x": 636,
+      "y": 80,
+      "rotate": 0.8,
+      "first_seen_episode": 1
     },
     "victim": {
-      "first_seen_episode": 1,
-      "rotate": -0.2,
-      "x": 1998,
-      "y": 84
+      "x": 60,
+      "y": 80,
+      "rotate": -2.8,
+      "first_seen_episode": 1
+    },
+    "victor": {
+      "x": 60,
+      "y": 640,
+      "rotate": 1.3,
+      "first_seen_episode": 7
     }
   }
 }

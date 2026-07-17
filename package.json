@@ -8,6 +8,7 @@
     "start": "next start",
     "preview": "next build && next start",
     "board:layout": "tsx scripts/board-layout.mts",
+    "board:reflow": "tsx scripts/board-reflow.mts",
     "board:verify": "tsx scripts/verify-board.mts",
     "board:shot": "node scripts/shoot-board.mjs"
   },
