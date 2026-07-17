@@ -58,48 +58,56 @@ Required fields are `title` and `slug`. Everything else has a default — `episo
 
 To add a new series: create a new `.md` file in `content/entries`, give it a unique `slug`, and add episodes to the list as they're published — no other code changes needed.
 
-## Interactive murder boards (static HTML)
+## Interactive murder boards
 
-Standalone interactive board pages live under `public/murderboards/<slug>/` as plain `.html` files (e.g. `public/murderboards/example-case/board.html`). Next.js copies everything in `public/` into the static export untouched, so these are served as-is at `/murderboards/<slug>/board.html`.
+Each episode's board is a first-class part of this app: a committed Markdown file
+rendered by a React component at a real route. No external pipeline, no generated
+HTML in `public/`.
 
-Point a series at its board with the `murderboardUrl` frontmatter field; if present, the detail page shows an "Open interactive murder board" button linking to it.
+**Content.** One Markdown file per episode in
+`content/murderboards/<slug>/episode-N.md`. Frontmatter (`series`, `episode`,
+`tag`, `title`) plus a body in the board grammar (`## Victim`, `## Timeline`,
+`## Suspects`, `## Documents`, `## Cornerstone`, `## Connections`, `## Urgent`,
+with `%%id%%`, `![[image]]`, `[[wikilink]]`, `*[aside]*`, `[NEW]`). See
+[`tools/Murder Board.example.md`](tools/Murder%20Board.example.md) for the full
+grammar.
 
-### Generating boards from Obsidian (`tools/`)
+**How it renders.**
 
-The `tools/` directory turns an episode's `Murder Board.md` (in the Obsidian
-vault) into one of these interactive boards and a Substack-ready screenshot.
-Full walkthrough: [`tools/PIPELINE.md`](tools/PIPELINE.md).
-
-| File | Purpose |
+| Piece | Role |
 | --- | --- |
-| `tools/md_to_board.py` | Parse `Murder Board.md` → lay out cards/strings → emit a standalone board HTML |
-| `tools/layouts/<slug>.json` | Per-series **layout memory** so the board grows organically (auto-saved; commit it) |
-| `tools/shoot_board.py` | Render a board HTML to a wide PNG, cropped to the cards |
-| `tools/board_template.html` | The reusable interactive board (pan/zoom/lightbox) |
-| `tools/PIPELINE.md` | End-to-end playbook + per-episode routine |
+| `lib/board/parse.ts` | Markdown → typed `Board` (cards + connections) |
+| `lib/board/layout.ts` | attaches lockfile positions, builds strings, world size |
+| `lib/board/theme.ts` | per-series theme (palette / fonts / card look) → CSS vars |
+| `components/MurderBoard.tsx` | the interactive board (desktop pan/zoom, **mobile reflow**) |
+| `app/murderboards/[slug]/[episode]/page.tsx` | static-exported route |
+| `tools/layouts/<slug>.json` | committed position lockfile (grows organically) |
+| `tools/series/<slug>.json` | per-series config incl. optional `theme` block |
 
-One-time setup:
-
-```bash
-pip install playwright && python -m playwright install chromium
-```
-
-The board **grows organically**: positions are saved to `tools/layouts/<slug>.json`, so each run keeps existing cards where they are and only places new ones (tagged with a small NEW badge). Keep suspect headings and note wording stable so cards keep their identity; use `--reflow` to deliberately rearrange. See [`tools/PIPELINE.md`](tools/PIPELINE.md) for the rules.
-
-Per episode (example: Episode 3):
+**Adding / updating an episode.**
 
 ```bash
-# 1. generate the interactive board straight into the public/ tree
-python tools/md_to_board.py   "/path/to/Obsidian/.../0003 Episode 3/Murder Board.md"   --template tools/board_template.html   --out public/murderboards/rittenhouse-dog-walker/episode-3.html   --episode 3 --tag "Episode 3 — The Jazz Club" --series rittenhouse-dog-walker
-
-# 2. (optional) polish the `const BOARD = {…}` block at the bottom of the HTML
-
-# 3. render the Substack image (cropped to the cards; --keep-hud to bake in the title)
-python tools/shoot_board.py   public/murderboards/rittenhouse-dog-walker/episode-3.html   --out episode-3-board.png --width 1600 --scale 2
+# 1. write content/murderboards/<slug>/episode-N.md
+# 2. lock in positions (keeps existing cards, places only new ones):
+npm run board:layout -- <slug> episode-N
+# 3. see it (desktop + resize narrow for mobile):
+npm run dev            # -> /murderboards/<slug>/episode-N/
+# 4. Substack image (run the site first, then):
+npm run board:shot -- http://localhost:3000/murderboards/<slug>/episode-N/ episode-N.png
 ```
 
-Then add the episode to its series file's `episodes:` list with
-`murderboardUrl: /murderboards/<slug>/episode-N.html`, and build/deploy.
+Point a series/episode at its board with the `murderboardUrl` frontmatter field
+in `content/entries/<slug>.md` (`/murderboards/<slug>/episode-N/`).
+
+**Responsive.** Desktop is the corkboard (pan/zoom, absolute positions from the
+lockfile); on phones the cards reflow into a readable, section-grouped scroll.
+**Theming.** A series can override palette, fonts, and card look (pins vs tape)
+via a `theme` block in `tools/series/<slug>.json`; the default is the house style.
+
+> The previous Python pipeline (`tools/md_to_board.py`, `regen.py`,
+> `shoot_board.py`, `board_template.html`) and the generated
+> `public/murderboards/*.html` are **superseded** by the above and can be removed
+> once you've confirmed the routes in the browser.
 
 ## GitHub Pages
 

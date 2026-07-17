@@ -1,0 +1,451 @@
+/* All colors/fonts/card-look come from --mb-* vars set by the theme (theme.ts),
+   so a series can restyle the board without touching this file. */
+
+.root {
+  --pin-color: var(--mb-pin);
+  position: fixed;
+  inset: 0;
+  background: var(--mb-bg);
+  font-family: var(--mb-font-typewriter);
+  overflow: hidden;
+}
+.root::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+}
+
+/* ---- desktop corkboard ------------------------------------------------- */
+.viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  cursor: grab;
+}
+.viewport.dragging {
+  cursor: grabbing;
+}
+.world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+.surface {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background:
+    repeating-linear-gradient(0deg, rgba(110, 82, 22, 0.05) 0px, rgba(110, 82, 22, 0.05) 1px, transparent 1px, transparent 30px),
+    repeating-linear-gradient(90deg, rgba(110, 82, 22, 0.04) 0px, rgba(110, 82, 22, 0.04) 1px, transparent 1px, transparent 30px),
+    var(--mb-surface);
+  border: 3px solid rgba(100, 75, 20, 0.35);
+}
+.stringLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.annotation {
+  position: absolute;
+  font-size: 11px;
+  color: var(--mb-cream-dim);
+  opacity: 0.45;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* ---- cards (shared desktop + mobile) ----------------------------------- */
+.card {
+  position: absolute;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+  user-select: none;
+}
+.card:hover {
+  filter: brightness(1.12);
+  z-index: 50;
+}
+.pin {
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--pin-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  z-index: 10;
+}
+.pin::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 200, 200, 0.45);
+  border-radius: 50%;
+}
+.pinGold {
+  background: var(--mb-pin-gold);
+}
+.pinWhite {
+  background: var(--mb-pin-white);
+}
+.tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 54px;
+  height: 20px;
+  background: rgba(230, 225, 200, 0.38);
+  border-left: 1px solid rgba(255, 255, 255, 0.25);
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  z-index: 10;
+}
+.newTab {
+  position: absolute;
+  top: -9px;
+  right: -8px;
+  background: var(--mb-red);
+  color: #fff;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  padding: 2px 5px 1px;
+  transform: rotate(3deg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+  z-index: 22;
+}
+
+.polaroid {
+  background: var(--mb-cream);
+  padding: 9px 9px 26px;
+  box-shadow: var(--mb-card-shadow);
+  border-radius: var(--mb-card-radius);
+}
+.polaroidImg {
+  background: #1c1515;
+  aspect-ratio: 4/5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #4a3838;
+  overflow: hidden;
+}
+.polaroidImg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.cap {
+  text-align: center;
+  font-size: 10px;
+  color: #2a2020;
+  padding-top: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.postit {
+  padding: 13px 15px;
+  font-size: 13px;
+  line-height: 1.55;
+  box-shadow: var(--mb-card-shadow);
+  border-radius: var(--mb-card-radius);
+  color: #1a1400;
+}
+.postit_y { background: var(--mb-postit-y); color: #1a1400; }
+.postit_r { background: var(--mb-postit-r); color: #fceaea; }
+.postit_w { background: var(--mb-postit-w); color: #1a1a1a; }
+.postit_pink { background: var(--mb-postit-pink); color: #2a0014; }
+.evidencePhoto {
+  width: 100%;
+  display: block;
+  margin-bottom: 9px;
+  border: 1px solid rgba(0, 0, 0, 0.28);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+.typed {
+  background: var(--mb-cream);
+  color: #111;
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 1.65;
+  box-shadow: var(--mb-card-shadow);
+  border-top: 3px solid var(--mb-red);
+  border-radius: var(--mb-card-radius);
+}
+.hdr {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--mb-red);
+  margin-bottom: 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(192, 0, 26, 0.25);
+}
+.typedPhoto {
+  width: 100%;
+  display: block;
+  margin: 0 0 9px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+}
+.idCard {
+  background: var(--mb-cream);
+  color: #111;
+  padding: 12px 14px;
+  box-shadow: var(--mb-card-shadow);
+  border-left: 4px solid var(--mb-red);
+  border-radius: var(--mb-card-radius);
+}
+.idCard.hasPhoto {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+}
+.mug {
+  width: 60px;
+  height: 75px;
+  object-fit: cover;
+  flex: none;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.45);
+}
+.role {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--mb-red);
+  margin-bottom: 4px;
+}
+.name {
+  font-size: 15px;
+  font-weight: bold;
+  color: #0d0b0b;
+  margin-bottom: 3px;
+}
+.idDetail {
+  font-size: 11px;
+  color: #555;
+  line-height: 1.55;
+}
+.flag {
+  color: var(--mb-red);
+}
+.clipping {
+  background: var(--mb-clipping);
+  padding: 13px 15px;
+  box-shadow: var(--mb-card-shadow);
+  border-radius: var(--mb-card-radius);
+}
+.headline {
+  font-family: var(--mb-font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.25;
+  margin-bottom: 6px;
+  border-bottom: 2px solid #111;
+  padding-bottom: 5px;
+}
+.clipPhoto {
+  width: 100%;
+  display: block;
+  margin: 0 0 8px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+.clipBody {
+  font-size: 10.5px;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* ---- HUD / legend / controls ------------------------------------------- */
+.hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 24px;
+  pointer-events: none;
+  z-index: 200;
+}
+.titleBlock {
+  max-width: 420px;
+  background: rgba(13, 11, 11, 0.82);
+  border: 1px solid rgba(192, 0, 26, 0.28);
+  padding: 16px 18px 14px;
+  border-radius: 3px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
+}
+.epTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: rgba(192, 0, 26, 0.16);
+  border: 1px solid rgba(192, 0, 26, 0.35);
+  padding: 0.4rem 0.9rem;
+  margin-bottom: 0.7rem;
+}
+.epTag span {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+.tagLabel { color: var(--mb-red); }
+.tagEp { color: var(--mb-cream-dim); }
+.titleText {
+  font-family: var(--mb-font-display);
+  font-weight: 900;
+  font-size: 26px;
+  text-transform: uppercase;
+  color: var(--mb-cream);
+  margin: 0 0 6px;
+  line-height: 1.1;
+}
+.subhead {
+  font-size: 12px;
+  color: var(--mb-cream-dim);
+  line-height: 1.6;
+}
+.hint {
+  font-size: 11px;
+  color: var(--mb-cream-dim);
+  background: rgba(13, 11, 11, 0.6);
+  border: 1px solid rgba(240, 236, 224, 0.12);
+  padding: 6px 12px;
+  border-radius: 2px;
+  margin-top: 10px;
+  display: inline-block;
+  letter-spacing: 0.04em;
+}
+.legend {
+  position: fixed;
+  bottom: 22px;
+  left: 24px;
+  z-index: 200;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  pointer-events: none;
+  background: rgba(13, 11, 11, 0.55);
+  padding: 8px 14px;
+  border: 1px solid rgba(240, 236, 224, 0.1);
+}
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--mb-cream-dim);
+  text-transform: uppercase;
+}
+.legendDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.controls {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.controls button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(192, 0, 26, 0.4);
+  background: rgba(13, 11, 11, 0.75);
+  color: var(--mb-cream);
+  font-size: 16px;
+  cursor: pointer;
+}
+.controls button:hover {
+  background: var(--mb-red);
+  border-color: var(--mb-red);
+}
+
+/* ---- lightbox ---------------------------------------------------------- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 11, 11, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 32px;
+  cursor: pointer;
+}
+.lightboxDetail {
+  background: var(--mb-cream);
+  margin-top: 14px;
+  padding: 16px 18px;
+  border-top: 3px solid var(--mb-red);
+  font-size: 13px;
+  line-height: 1.65;
+  color: #1a1a1a;
+  max-width: 380px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+.lightboxDetail .hdrNote {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--mb-red);
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* ---- mobile reflow ----------------------------------------------------- */
+.mobile {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 96px 18px 48px;
+}
+.mobileSection {
+  margin: 0 auto 30px;
+  max-width: 460px;
+}
+.mobileSectionLabel {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--mb-red);
+  border-bottom: 1px solid rgba(192, 0, 26, 0.3);
+  padding-bottom: 6px;
+  margin-bottom: 16px;
+}
+.mobileCard {
+  position: relative;
+  margin: 0 auto 22px;
+  max-width: 300px;
+}
+.mobileCard :is(.polaroid, .postit, .typed, .idCard, .clipping) {
+  width: 100%;
+}

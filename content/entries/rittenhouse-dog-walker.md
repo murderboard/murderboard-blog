@@ -9,31 +9,34 @@ featured: true
 accent: '#ed1c2e'
 coverImage: /assets/rittenhouse-banner.png
 substackUrl: https://murderboard.substack.com/s/the-rittenhouse-dog-walker
-murderboardUrl: /murderboards/rittenhouse-dog-walker/board.html
+murderboardUrl: /murderboards/rittenhouse-dog-walker/episode-8/
 subscribeUrl: https://murderboard.substack.com/subscribe
 episodes:
   - title: 'Episode 1: The Card Game'
     url: https://murderboard.substack.com/p/the-rittenhouse-dog-walker-ep-01
     date: '2026-03-16'
     description: A dog walker's bad week in posh Rittenhouse Square takes a turn when a reclusive professor, a stolen manuscript, and unexpected news collide.
-    murderboardUrl: /murderboards/rittenhouse-dog-walker/episode-1.html
+    murderboardUrl: /murderboards/rittenhouse-dog-walker/episode-1/
   - title: 'Episode 2: The Manuscript'
     url: https://murderboard.substack.com/p/the-missing-manuscript-ep-02
     date: '2026-03-23'
     description: Lena builds her first murder board, the police won't listen, and a wary building doorman becomes her unlikely ally in Rittenhouse Square.
+    murderboardUrl: /murderboards/rittenhouse-dog-walker/episode-2/
   - title: 'Episode 3: The Jazz Club'
     url: https://murderboard.substack.com/p/the-missing-manuscript-ep-02-fac
     date: '2026-03-30'
     description: A jazz club, a name from the past, and a young musician Lena is suddenly certain she has figured out — maybe a little too certain.
-    murderboardUrl: /murderboards/rittenhouse-dog-walker/episode-3.html
+    murderboardUrl: /murderboards/rittenhouse-dog-walker/episode-3/
   - title: 'Episode 4: The DM'
     url: https://murderboard.substack.com/p/the-missing-manuscript-ep-04
     date: '2026-04-13'
     description: Armed with a friend's interrogation tricks, Lena cold-calls a realtor and DMs a musician — then reads a sudden silence as a confession.
+    murderboardUrl: /murderboards/rittenhouse-dog-walker/episode-4/
   - title: 'Episode 5: The Doorman'
     url: https://murderboard.substack.com/p/the-missing-manuscript-ep-05
     date: '2026-04-27'
     description: The doorman finally talks. Dead-end cameras, an unlatched door, and a small detail Lena doesn't yet realize is the one that matters.
+    murderboardUrl: /murderboards/rittenhouse-dog-walker/episode-5/
 ---
 
 ## The case

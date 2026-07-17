@@ -1,4 +1,7 @@
 {
+  "meta": {
+    "clipping_id": "newsletter"
+  },
   "cards": {
     "body-position": {
       "first_seen_episode": 6,
@@ -44,7 +47,7 @@
     },
     "desk-document": {
       "first_seen_episode": 2,
-      "rotate": 2.0,
+      "rotate": 2,
       "x": 296,
       "y": 1140
     },
@@ -180,8 +183,5 @@
       "x": 1998,
       "y": 84
     }
-  },
-  "meta": {
-    "clipping_id": "newsletter"
   }
 }
