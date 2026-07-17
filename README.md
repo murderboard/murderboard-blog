@@ -31,13 +31,13 @@ order: 10
 accent: '#ed1c2e'
 coverImage: /assets/example.png
 substackUrl: https://yoursubstack.substack.com/s/example-case
-murderboardUrl: /murderboards/example-case/board.html
+murderboardUrl: /murderboards/example-case/episode-1/
 subscribeUrl: https://yoursubstack.substack.com/subscribe
 episodes:
   - title: 'Episode 1: The Setup'
     url: https://yoursubstack.substack.com/p/example-episode-1
     date: '2026-01-01'
-    murderboardUrl: /murderboards/example-case/episode-1.html
+    murderboardUrl: /murderboards/example-case/episode-1/
   - title: 'Episode 2: The Twist'
     url: https://yoursubstack.substack.com/p/example-episode-2
     date: '2026-01-08'
@@ -66,11 +66,12 @@ HTML in `public/`.
 
 **Content.** One Markdown file per episode in
 `content/murderboards/<slug>/episode-N.md`. Frontmatter (`series`, `episode`,
-`tag`, `title`) plus a body in the board grammar (`## Victim`, `## Timeline`,
-`## Suspects`, `## Documents`, `## Cornerstone`, `## Connections`, `## Urgent`,
-with `%%id%%`, `![[image]]`, `[[wikilink]]`, `*[aside]*`, `[NEW]`). See
-[`tools/Murder Board.example.md`](tools/Murder%20Board.example.md) for the full
-grammar.
+`tag`, `title`) plus a body in the board grammar (`## Victim`, `## Summary`,
+`## Timeline`, `## Building / Location Notes`, `## Suspects`, `## Documents`,
+`## Cornerstone`, `## Connections`, `## Urgent`, with `%%id%%`, `![[image]]`,
+`[[wikilink]]`, `*[aside]*`, `**bold**`, `[NEW]`). See
+[`tools/Murder Board.example.md`](tools/Murder%20Board.example.md) for the fully
+annotated grammar.
 
 **How it renders.**
 
@@ -84,30 +85,64 @@ grammar.
 | `tools/layouts/<slug>.json` | committed position lockfile (grows organically) |
 | `tools/series/<slug>.json` | per-series config incl. optional `theme` block |
 
-**Adding / updating an episode.**
+Every board is served at `/murderboards/<slug>/episode-N/`. Point a series or
+episode at it with the `murderboardUrl` frontmatter field in
+`content/entries/<slug>.md` (value: `/murderboards/<slug>/episode-N/`).
+
+### Create or update an episode
 
 ```bash
-# 1. write content/murderboards/<slug>/episode-N.md
-# 2. lock in positions (keeps existing cards, places only new ones):
-npm run board:layout -- <slug> episode-N
-# 3. see it (desktop + resize narrow for mobile):
-npm run dev            # -> /murderboards/<slug>/episode-N/
-# 4. Substack image (run the site first, then):
-npm run board:shot -- http://localhost:3000/murderboards/<slug>/episode-N/ episode-N.png
+# 1. Write the source. Copy the previous episode's md forward and edit it, or
+#    start from tools/Murder Board.example.md:
+#      content/murderboards/rittenhouse-dog-walker/episode-9.md
+#    Pin %%id%% on suspects/cornerstone items you may reword, so they keep their spot.
+
+# 2. Lock in positions. Keeps every existing card where it is and only places
+#    new cards; writes the committed lockfile (review it in `git diff`):
+npm run board:layout -- rittenhouse-dog-walker episode-9
+
+# 3. Look at it (desktop, then narrow the window for the mobile reflow):
+npm run dev     # http://localhost:3000/murderboards/rittenhouse-dog-walker/episode-9/
+
+# 4. Commit the md + the updated tools/layouts/<slug>.json together.
 ```
 
-Point a series/episode at its board with the `murderboardUrl` frontmatter field
-in `content/entries/<slug>.md` (`/murderboards/<slug>/episode-N/`).
+Helper scripts:
+
+- `npm run board:layout -- <slug> <episode-slug>` — place/refresh one episode's positions.
+- `npm run board:reflow -- <slug>` — re-lay-out the **whole** series from scratch
+  (use after changing the bands in `lib/board/layout.ts`; still grows in episode order).
+- `npm run board:verify` — parse + lay out every board and report card/string counts and any unplaced cards.
+- `npm test` — the Vitest suite (parser, layout, theme, `getBoard` integration).
+
+### Substack-ready screenshot
+
+The boards are interactive on the web, but Substack needs a static image. Capture
+one with the built-in shooter, which crops to the cards (no empty cork), hides the
+HUD/legend/controls, and renders a wide, retina-crisp PNG:
+
+```bash
+# terminal 1 — serve the site
+npm run dev
+
+# terminal 2 — shoot a board:
+#   node scripts/shoot-board.mjs <url> [out.png] [width] [scale]
+npm run board:shot --   http://localhost:3000/murderboards/rittenhouse-dog-walker/episode-9/   episode-9-board.png 1600 2
+```
+
+Then upload `episode-9-board.png` to the Substack post and link it to the live
+board URL. (`board:shot` uses Playwright's bundled Chromium — `npm install` once
+so it's available.)
+
+### Responsive & theming
 
 **Responsive.** Desktop is the corkboard (pan/zoom, absolute positions from the
-lockfile); on phones the cards reflow into a readable, section-grouped scroll.
-**Theming.** A series can override palette, fonts, and card look (pins vs tape)
-via a `theme` block in `tools/series/<slug>.json`; the default is the house style.
+lockfile); on phones the cards reflow into a readable, section-grouped scroll, and
+a card's detail opens in a modal with an explicit close button (✕ / Esc / tap-away).
 
-> The previous Python pipeline (`tools/md_to_board.py`, `regen.py`,
-> `shoot_board.py`, `board_template.html`) and the generated
-> `public/murderboards/*.html` are **superseded** by the above and can be removed
-> once you've confirmed the routes in the browser.
+**Theming.** A series can override the palette, fonts, and card look (pins vs
+tape, corner radius, shadow) by adding a `theme` block to `tools/series/<slug>.json`;
+anything omitted falls back to the house style (see `lib/board/theme.ts`).
 
 ## GitHub Pages
 

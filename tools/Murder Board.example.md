@@ -5,12 +5,14 @@ overwrites itself. Copy it forward each episode and add to it.
 
 <!--
 ================================ HOW THIS PARSES ================================
-This file IS the data source for md_to_board.py. It is the COMPLETE source of
-truth for the board: content and connections both live here. Anything that isn't
-a recognized section, list item, or `###` heading (like this comment and the
-prose under a heading) is ignored, so you can annotate freely.
+A Murder Board markdown file lives at content/murderboards/<slug>/episode-N.md and
+is the COMPLETE source of truth for the board: content and connections both live
+here. It's parsed by lib/board/parse.ts and rendered by the app at
+/murderboards/<slug>/episode-N/. Anything that isn't a recognized section, list
+item, or `###` heading (like this comment and the prose under a heading) is
+ignored, so you can annotate freely.
 
-Sections the converter looks for (H2 `## `, matched by keyword):
+Sections the parser looks for (H2 `## `, matched by keyword):
   ## Victim                         -> the centerpiece polaroid (photo + caption)
   ## Timeline                       -> one typed "Timeline" panel (one line/bullet)
   ## Building / Location Notes      -> yellow post-its
@@ -132,5 +134,5 @@ The first bullet becomes the red URGENT flag.
 
 ## Board Notes (meta)
 
-Ignored by the converter — your own notes on where the board is heading, what to
+Ignored by the parser — your own notes on where the board is heading, what to
 plant next. (Or just use `%% … %%` inline anywhere above.)
