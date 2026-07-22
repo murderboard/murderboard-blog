@@ -1,7 +1,7 @@
 ---
 series: rittenhouse-dog-walker
 episode: 7
-tag: "Episode 7"
+tag: "Episode 7 — The Split"
 title: The Board So Far
 ---
 
@@ -11,6 +11,10 @@ title: The Board So Far
 James Halloway — deceased          %%id: victim%%
 ![[JamesHalloway.jpg]]
 Music/piano professor and jazz scholar at the Rittenhouse Conservatory. Announced he'd acquired a lost Della Mercer manuscript and was publishing a book on it. Found dead Friday morning — police ruled a cardiac event, no foul play; the first-night card-game gossip said suicide. Lena: neither. *This was arranged.*
+
+## Summary
+
+The board comes apart into two piles that don't touch: a theft with a name on it, and a death with nothing on it at all.
 
 ## Timeline
 
@@ -31,12 +35,13 @@ Music/piano professor and jazz scholar at the Rittenhouse Conservatory. Announce
 
 ## Suspects
 
-### Kelsey Doyle — THEFT-HAND          %%id: kelsey%%
+### Kelsey Doyle · Realty assistant — THEFT-HAND          %%id: diane%%
 
-(Replaces the combined "Diane Ashford Realty / Kelsey" pin.) Full name found via the agency site → LinkedIn: assistant at Diane Ashford Realty; B.A. art history, **Tyler School of Art (Temple)** — four years of learning to know what's in a room ([[C-03 — Kelsey's Art History Background]]). Placed in the building Thursday morning by Marcus's soft ID. Her handwritten name on the listing contracts. **Cleared of the murder in Lena's mind:** days after the death she spoke of Halloway as alive — *"still working out some of the details on his end"* ([[K-03 — Kelsey Believes Halloway Is Alive]]). Conviction, not proof — no alibi checked, theft NOT closed.
+The "Diane Ashford Realty / Kelsey" card, finally resolved to a person. Full name found via the agency site → LinkedIn: assistant at Diane Ashford Realty; B.A. art history, **Tyler School of Art (Temple)** — four years of learning to know what's in a room. Placed in the building Thursday morning by Marcus's soft ID. Her handwritten name on the listing contracts. **Cleared of the murder in Lena's mind:** days after the death she spoke of Halloway as alive — *"still working out some of the details on his end."* Conviction, not proof — no alibi checked, theft NOT closed.
 
-### Theo Thomas          %%id: theo%%
+### Theo Thomas · Conservatory student          %%id: theo%%
 
+![[TheoThomas.jpg]]
 Holds. Still dark (active 3 days ago). *"Della belongs to me"* still fits his profile; deliberately not reread. Wrong Assumption text drafted with Stephanie — two sentences, wrong on purpose — sitting unsent in Lena's phone.
 
 ### Naomi Mercer          %%id: claimant%%
@@ -56,9 +61,33 @@ Sharpened by recon: a near-blank ("blank is a choice"). No approachable surface 
 - The manuscript *(absent)*.          %%id: manuscript%%
 - The newsletter.          %%id: newsletter%%
 - The Ashford folder.          %%id: folder%%
+- **2D — Halloway's apartment.** The kitchen where he was found, and the desk the manuscript was taken from. ![[HallowayApartment2D.png]]          %%id: apartment%%
+- **The business card** — Cream card stock, Diane Ashford Realty. Console table, foyer. ![[DianeAshfordBusinessCard.png]] The thread that led to the Ashford call — and to the assistant who answered it.          %%id: card%%
+- **The lawyer's letter** — Naomi Mercer's ownership claim on Della's manuscripts. Names her lawyer, and names an independent authenticator. *[He has a phone number. Everyone else here has a reason to lie.]*          %%id: letter%%
 - **The Cornerstone demand letter** — contents read, fully activated as a legal threat. Ep7: set against Victor's pleasant public surface, and the two refuse to be about the same company. "Letters are cheap" (Stephanie) — dissonance parked, unresolved.          %%id: demand-letter%%
 - **The threatening note** — "Della belongs to me." Singular, possessive — reads personal, not corporate. Author unknown to Lena. Bagged by Halloway himself, signaling he took it seriously.          %%id: threat-note%%
 - "Stepped on some toes" comment — still unconnected.          %%id: toes-comment%%
+
+## Connections
+
+- victim -> diane: suspected
+- victim -> theo: suspected
+- victim -> claimant: suspected
+- victim -> unknown-man: suspected
+- victim -> apartment: confirmed
+- diane -> manuscript: suspected
+- diane -> folder: evidence
+- diane -> card: evidence
+- apartment -> manuscript: confirmed
+- apartment -> body-position: confirmed
+- apartment -> card: evidence
+- letter -> claimant: confirmed
+- letter -> manuscript: confirmed
+- demand-letter -> victor: confirmed
+- demand-letter -> manuscript: confirmed
+- threat-note -> theo: suspected
+- syringe -> body-position: evidence
+- timeline -> service-entrance: unverified
 
 ## Urgent / Now
 

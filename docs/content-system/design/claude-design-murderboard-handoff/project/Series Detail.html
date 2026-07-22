@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Hargrove Inheritance — Murder Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black:     #0d0b0b;
+  --dark:      #161212;
+  --dark2:     #1c1818;
+  --red:       #ed1c2e;
+  --red-dark:  #b8101f;
+  --pink:      #ff3d8b;
+  --yellow:    #ffd83d;
+  --navy:      #1a1f3a;
+  --cream:     #f0ece0;
+  --cream-dim: #c8c3b2;
+  --cork:      #7a5c10;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--cream);
+  font-family: 'Special Elite', monospace;
+  overflow-x: hidden;
+}
+
+/* GRAIN */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PScwIDAgMjU2IDI1NicgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJz48ZmlsdGVyIGlkPSdub2lzZSc+PGZlVHVyYnVsZW5jZSB0eXBlPSdmcmFjdGFsTm9pc2UnIGJhc2VGcmVxdWVuY3k9JzAuOScgbnVtT2N0YXZlcz0nNCcgc3RpdGNoVGlsZXM9J3N0aXRjaCcvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbHRlcj0ndXJsKCNub2lzZSknIG9wYWNpdHk9JzAuMDgnLz48L3N2Zz4=");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  padding: 1.2rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(13,11,11,0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(192,0,26,0.18);
+}
+
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cream);
+  text-decoration: none;
+}
+.nav-logo span { color: var(--red); }
+
+.nav-back {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.2s;
+}
+.nav-back:hover { color: var(--red); }
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav-subscribe {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--cream);
+  background: var(--red);
+  border: none;
+  padding: 0.55rem 1.2rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.nav-subscribe:hover { background: var(--red-dark); }
+
+/* ─── HERO ─── */
+#hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 5rem;
+  overflow: hidden;
+  background: var(--black);
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 60% at 70% 40%, rgba(192,0,26,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.9) 100%);
+}
+
+.hero-blinds {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 30px,
+    rgba(0,0,0,0.14) 30px, rgba(0,0,0,0.14) 34px
+  );
+  animation: blindShift 10s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes blindShift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 60px; }
+}
+
+.hero-art {
+  position: absolute;
+  top: 0; right: 0;
+  width: 55%;
+  height: 100%;
+  background: #0f0a0a;
+  overflow: hidden;
+}
+
+.hero-art-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  font-size: 0.65rem;
+  color: #2a2020;
+  text-align: center;
+  line-height: 2;
+  letter-spacing: 0.15em;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      #131010 0px, #131010 12px,
+      #111010 12px, #111010 24px
+    );
+}
+
+.hero-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, var(--black) 0%, rgba(13,11,11,0.5) 40%, transparent 70%);
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 10;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 3rem;
+  padding-top: 8rem;
+}
+
+.breadcrumb {
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.2s forwards;
+}
+
+.breadcrumb a {
+  color: var(--red);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover { text-decoration: underline; }
+
+.hero-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.4s forwards;
+}
+
+.badge {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.7rem;
+  border: 1px solid;
+}
+
+.badge-genre { color: var(--red); border-color: rgba(192,0,26,0.5); }
+
+.badge-status-ongoing {
+  color: #4caf7a;
+  border-color: rgba(76,175,122,0.4);
+  background: rgba(76,175,122,0.07);
+}
+
+.badge-status-complete {
+  color: var(--cream-dim);
+  border-color: rgba(200,195,178,0.3);
+}
+
+.badge-vol {
+  color: var(--cream-dim);
+  border-color: rgba(200,195,178,0.2);
+}
+
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: clamp(3rem, 6.5vw, 6rem);
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--cream);
+  max-width: 650px;
+  margin-bottom: 0.5rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.6s forwards;
+}
+
+.hero-subtitle {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  color: var(--red);
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.75s forwards;
+}
+
+.hero-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.9s forwards;
+}
+
+.hero-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.meta-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(200,195,178,0.5);
+}
+
+.meta-value {
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  color: var(--cream);
+}
+
+.meta-divider {
+  width: 1px;
+  height: 32px;
+  background: rgba(200,195,178,0.15);
+}
+
+.hero-desc {
+  max-width: 500px;
+  font-size: 0.95rem;
+  line-height: 1.85;
+  color: var(--cream-dim);
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 1.05s forwards;
+}
+
+.hero-ctas {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 1.2s forwards;
+}
+
+.btn-primary {
+  background: var(--red);
+  border: none;
+  color: var(--cream);
+  font-family: 'Special Elite', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.btn-primary:hover {
+  background: var(--red-dark);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(200,195,178,0.25);
+  color: var(--cream-dim);
+  font-family: 'Special Elite', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-ghost:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+/* Floating evidence on hero */
+.hero-float {
+  position: absolute;
+  pointer-events: none;
+  z-index: 8;
+}
+
+/* ─── DIVIDER ─── */
+.divider {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--red), transparent);
+}
+
+/* ─── MARQUEE ─── */
+.marquee-wrap {
+  overflow: hidden;
+  border-top: 1px solid rgba(192,0,26,0.3);
+  border-bottom: 1px solid rgba(192,0,26,0.3);
+  padding: 0.75rem 0;
+  background: rgba(192,0,26,0.05);
+}
+.marquee-track {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee 22s linear infinite;
+  gap: 3.5rem;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-item {
+  font-size: 0.6rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--red);
+  opacity: 0.6;
+}
+.marquee-dot { color: var(--cream-dim); opacity: 0.25; }
+
+/* ─── EPISODE LIST ─── */
+#episodes {
+  background: var(--dark);
+  padding: 7rem 0;
+  position: relative;
+}
+
+.section-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 3rem;
+}
+
+.section-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 0.8rem;
+}
+
+.section-heading {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  text-transform: uppercase;
+  color: var(--cream);
+  margin-bottom: 3.5rem;
+  line-height: 1;
+}
+
+/* Case file stack */
+.episode-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.episode-item {
+  position: relative;
+  border-top: 1px solid rgba(240,236,224,0.07);
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 2.5rem;
+  align-items: start;
+  padding: 2.2rem 0;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.episode-item:last-child { border-bottom: 1px solid rgba(240,236,224,0.07); }
+
+.episode-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--red);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.3s ease;
+}
+
+.episode-item:hover::before { transform: scaleY(1); }
+.episode-item:hover { background: rgba(192,0,26,0.04); padding-left: 1rem; margin-left: -1rem; padding-right: 1rem; }
+
+.episode-num {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 2.8rem;
+  color: rgba(192,0,26,0.2);
+  line-height: 1;
+  transition: color 0.25s;
+  user-select: none;
+  padding-top: 0.15rem;
+}
+
+.episode-item:hover .episode-num { color: rgba(192,0,26,0.5); }
+
+.episode-body {}
+
+.episode-status-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.5rem;
+}
+
+.ep-status {
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid;
+}
+
+.ep-status-new {
+  color: #4caf7a;
+  border-color: rgba(76,175,122,0.45);
+  background: rgba(76,175,122,0.08);
+}
+
+.ep-status-read {
+  color: var(--cream-dim);
+  border-color: rgba(200,195,178,0.2);
+}
+
+.ep-date {
+  font-size: 0.6rem;
+  color: rgba(200,195,178,0.4);
+  letter-spacing: 0.15em;
+}
+
+.episode-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--cream);
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.episode-desc {
+  font-size: 0.78rem;
+  color: var(--cream-dim);
+  line-height: 1.7;
+  max-width: 540px;
+}
+
+.episode-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.8rem;
+  padding-top: 0.3rem;
+}
+
+.episode-read-time {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  color: rgba(200,195,178,0.4);
+  white-space: nowrap;
+}
+
+.episode-arrow {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(200,195,178,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: var(--cream-dim);
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.episode-item:hover .episode-arrow {
+  border-color: var(--red);
+  background: var(--red);
+  color: var(--cream);
+}
+
+/* Board preview teaser at end of episode */
+.episode-board-teaser {
+  position: absolute;
+  right: 3.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+/* ─── MURDER BOARD ─── */
+#murder-board {
+  background: var(--black);
+  padding: 7rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+#murder-board::before {
+  content: 'THE BOARD';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 22vw;
+  color: rgba(192,0,26,0.025);
+  white-space: nowrap;
+  pointer-events: none;
+  letter-spacing: -0.02em;
+}
+
+.board-header {
+  margin-bottom: 3rem;
+}
+
+.board-episode-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: rgba(192,0,26,0.12);
+  border: 1px solid rgba(192,0,26,0.3);
+  padding: 0.5rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.board-episode-tag span {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.board-episode-tag .tag-label { color: var(--red); }
+.board-episode-tag .tag-ep { color: var(--cream-dim); }
+
+.board-heading {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  text-transform: uppercase;
+  color: var(--cream);
+  margin-bottom: 0.5rem;
+}
+
+.board-subhead {
+  font-size: 0.85rem;
+  color: var(--cream-dim);
+  line-height: 1.7;
+  max-width: 520px;
+}
+
+/* ─── THE CORK BOARD ─── */
+.cork-board-outer {
+  position: relative;
+  border: 3px solid rgba(100,75,20,0.35);
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(110,82,22,0.05) 0px, rgba(110,82,22,0.05) 1px,
+      transparent 1px, transparent 30px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(110,82,22,0.04) 0px, rgba(110,82,22,0.04) 1px,
+      transparent 1px, transparent 30px
+    ),
+    linear-gradient(135deg, #1e1610, #161210, #1a1510);
+  min-height: 520px;
+  padding: 2.5rem;
+  overflow: hidden;
+}
+
+.cork-board-outer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='25' cy='20' rx='18' ry='10' fill='rgba(130,95,20,0.06)' transform='rotate(25 25 20)'/%3E%3Cellipse cx='80' cy='70' rx='14' ry='22' fill='rgba(130,95,20,0.04)' transform='rotate(-10 80 70)'/%3E%3Cellipse cx='50' cy='95' rx='22' ry='8' fill='rgba(130,95,20,0.05)' transform='rotate(15 50 95)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* SVG strings layer */
+.board-strings {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+/* Board items */
+.board-item {
+  position: absolute;
+  z-index: 5;
+}
+
+/* Pin */
+.pin {
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  background: var(--red);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  z-index: 10;
+}
+.pin::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 5px;
+  height: 5px;
+  background: rgba(255,200,200,0.45);
+  border-radius: 50%;
+}
+.pin-gold { background: #c8942a; }
+.pin-white { background: #e8e4d8; }
+
+/* Polaroid */
+.polaroid {
+  background: #f0ece0;
+  padding: 9px 9px 28px;
+  box-shadow: 3px 6px 22px rgba(0,0,0,0.75);
+}
+.polaroid-img {
+  background: #1c1515;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  font-size: 0.5rem;
+  color: #3a2828;
+  text-align: center;
+  padding: 4px;
+  line-height: 1.5;
+}
+.polaroid-cap {
+  text-align: center;
+  font-family: 'Special Elite', monospace;
+  font-size: 0.45rem;
+  color: #2a2020;
+  padding-top: 5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Post-it */
+.postit {
+  padding: 12px 14px;
+  font-family: 'Special Elite', monospace;
+  line-height: 1.55;
+  box-shadow: 3px 5px 16px rgba(0,0,0,0.6);
+}
+.postit-y { background: #f5e642; color: #1a1400; font-size: 0.6rem; }
+.postit-r { background: #e83232; color: #1a0000; font-size: 0.6rem; }
+.postit-w { background: #f0ece0; color: #1a1a1a; font-size: 0.6rem; }
+.postit-pink { background: #f5a0c0; color: #2a0014; font-size: 0.6rem; }
+
+/* Typed note */
+.typed-note {
+  background: var(--cream);
+  color: #111;
+  padding: 14px 16px;
+  font-family: 'Special Elite', monospace;
+  font-size: 0.6rem;
+  line-height: 1.75;
+  box-shadow: 3px 5px 16px rgba(0,0,0,0.6);
+  border-top: 3px solid var(--red);
+}
+
+.typed-note .note-header {
+  font-size: 0.5rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(192,0,26,0.2);
+}
+
+/* ID card */
+.id-card {
+  background: var(--cream);
+  color: #111;
+  padding: 12px 14px;
+  box-shadow: 3px 5px 16px rgba(0,0,0,0.6);
+  font-family: 'Special Elite', monospace;
+  border-left: 4px solid var(--red);
+}
+.id-card .id-role {
+  font-size: 0.45rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 3px;
+}
+.id-card .id-name {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #0d0b0b;
+  margin-bottom: 2px;
+}
+.id-card .id-detail {
+  font-size: 0.5rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Newspaper clipping */
+.clipping {
+  background: #e8e0cc;
+  padding: 12px 14px;
+  max-width: 160px;
+  box-shadow: 3px 5px 16px rgba(0,0,0,0.6);
+  font-family: 'Special Elite', monospace;
+}
+.clipping-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.2;
+  margin-bottom: 5px;
+  border-bottom: 2px solid #111;
+  padding-bottom: 4px;
+}
+.clipping-body {
+  font-size: 0.47rem;
+  color: #333;
+  line-height: 1.7;
+  column-count: 2;
+  column-gap: 8px;
+}
+
+/* Tape strips */
+.tape {
+  position: absolute;
+  background: rgba(240,230,180,0.35);
+  border: 1px solid rgba(240,230,180,0.2);
+  z-index: 12;
+  transform: rotate(-2deg);
+}
+
+/* Board annotation lines */
+.annotation {
+  position: absolute;
+  font-family: 'Special Elite', monospace;
+  font-size: 0.5rem;
+  color: var(--cream-dim);
+  opacity: 0.5;
+  letter-spacing: 0.1em;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ─── BOARD LEGEND ─── */
+.board-legend {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  color: var(--cream-dim);
+  text-transform: uppercase;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* ─── AUTHOR ─── */
+#author {
+  background: var(--dark2);
+  padding: 6rem 0;
+  border-top: 1px solid rgba(240,236,224,0.05);
+}
+
+.author-grid {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.author-photo {
+  width: 140px;
+  height: 180px;
+  background: #1a1515;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  font-size: 0.5rem;
+  color: #2a2020;
+  text-align: center;
+  border: 1px solid rgba(240,236,224,0.08);
+  line-height: 1.8;
+  flex-shrink: 0;
+}
+
+.author-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 0.6rem;
+}
+
+.author-name {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 2rem;
+  color: var(--cream);
+  margin-bottom: 1rem;
+  line-height: 1.1;
+}
+
+.author-bio {
+  font-size: 0.85rem;
+  color: var(--cream-dim);
+  line-height: 1.85;
+  max-width: 540px;
+}
+
+/* ─── SUBSCRIBE BANNER ─── */
+#subscribe {
+  background: var(--dark);
+  padding: 6rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+#subscribe::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 700px; height: 700px;
+  background: radial-gradient(ellipse, rgba(192,0,26,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.sub-eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 1rem;
+}
+
+.sub-heading {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  text-transform: uppercase;
+  color: var(--cream);
+  line-height: 1.1;
+  margin-bottom: 0.8rem;
+}
+
+.sub-heading em { font-style: italic; color: var(--red); }
+
+.sub-desc {
+  font-size: 0.88rem;
+  color: var(--cream-dim);
+  line-height: 1.8;
+  max-width: 440px;
+  margin: 0 auto 2.5rem;
+}
+
+.sub-form {
+  display: flex;
+  max-width: 440px;
+  margin: 0 auto;
+  gap: 0;
+}
+
+.sub-input {
+  flex: 1;
+  background: rgba(240,236,224,0.05);
+  border: 1px solid rgba(240,236,224,0.18);
+  border-right: none;
+  color: var(--cream);
+  font-family: 'Special Elite', monospace;
+  font-size: 0.85rem;
+  padding: 0.95rem 1.2rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.sub-input::placeholder { color: rgba(200,195,178,0.35); }
+.sub-input:focus { border-color: var(--red); background: rgba(192,0,26,0.04); }
+
+.sub-btn {
+  background: var(--red);
+  border: 1px solid var(--red);
+  color: var(--cream);
+  font-family: 'Special Elite', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  padding: 0.95rem 1.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.sub-btn:hover { background: var(--red-dark); }
+
+/* ─── FOOTER ─── */
+footer {
+  background: var(--black);
+  border-top: 1px solid rgba(240,236,224,0.05);
+  padding: 2.5rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-logo {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 1rem;
+  text-transform: uppercase;
+  color: var(--cream);
+  text-decoration: none;
+}
+.footer-logo span { color: var(--red); }
+
+.footer-copy {
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  color: rgba(200,195,178,0.25);
+  text-transform: uppercase;
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+@keyframes floatA {
+  0%,100% { transform: translateY(0) rotate(-6deg); }
+  50%      { transform: translateY(-10px) rotate(-5deg); }
+}
+@keyframes floatB {
+  0%,100% { transform: translateY(0) rotate(4deg); }
+  50%      { transform: translateY(-8px) rotate(5deg); }
+}
+@keyframes floatC {
+  0%,100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-14px) rotate(-1deg); }
+}
+
+.reveal {
+  opacity:0;
+  transform:translateY(25px);
+  transition: opacity 0.75s ease, transform 0.75s ease;
+}
+.reveal.visible {
+  opacity:1;
+  transform:translateY(0);
+}
+
+.stagger .reveal:nth-child(1) { transition-delay: 0s; }
+.stagger .reveal:nth-child(2) { transition-delay: 0.08s; }
+.stagger .reveal:nth-child(3) { transition-delay: 0.16s; }
+.stagger .reveal:nth-child(4) { transition-delay: 0.24s; }
+.stagger .reveal:nth-child(5) { transition-delay: 0.32s; }
+.stagger .reveal:nth-child(6) { transition-delay: 0.40s; }
+.stagger .reveal:nth-child(7) { transition-delay: 0.48s; }
+.stagger .reveal:nth-child(8) { transition-delay: 0.56s; }
+
+.cursor {
+  display: inline-block;
+  width: 2px; height: 1em;
+  background: var(--red);
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="index.html" style="display:flex; align-items:center; gap:0.6rem;">
+    <img src="assets/murder-board-logo.png" alt="Murder Board" style="height:26px; width:auto; filter:brightness(0) invert(1);">
+  </a>
+  <a class="nav-back" href="index.html">← All Series</a>
+  <div class="nav-right">
+    <a class="nav-subscribe" href="#subscribe">Subscribe</a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section id="hero" data-screen-label="Series Hero">
+
+  <div class="hero-bg"></div>
+  <div class="hero-blinds"></div>
+
+  <!-- Art panel -->
+  <div class="hero-art">
+    <img src="assets/rittenhouse-banner.png" alt="The Rittenhouse Dog Walker" style="width:100%; height:100%; object-fit:cover; object-position:left center; display:block;">
+  </div>
+
+  <!-- Floating evidence -->
+  <div class="hero-float" style="top:18%; right:32%; animation: floatA 7s ease-in-out infinite; z-index:9;">
+    <div class="polaroid" style="width:115px; transform:rotate(-4deg);">
+      <div class="polaroid-img" style="height:90px;">crime scene<br>photo #001</div>
+      <div class="polaroid-cap">HARGROVE STUDY</div>
+    </div>
+    <div class="pin"></div>
+  </div>
+
+  <div class="hero-float" style="top:55%; right:24%; animation: floatB 6s ease-in-out 1s infinite; z-index:9;">
+    <div class="postit postit-y" style="max-width:130px; transform:rotate(2deg);">
+      WHERE WAS<br>ELEANOR<br>10pm–12am?
+    </div>
+    <div class="pin" style="left:60%;"></div>
+  </div>
+
+  <div class="hero-float" style="bottom:18%; right:35%; animation: floatC 8s ease-in-out 2s infinite; z-index:9;">
+    <div class="id-card" style="width:155px; transform:rotate(-1.5deg);">
+      <div class="id-role">Victim</div>
+      <div class="id-name">Victor Hargrove</div>
+      <div class="id-detail">Age 74 · Estate Owner<br>Found: Nov 14, 11:52pm<br>Manner: Undetermined</div>
+    </div>
+    <div class="pin pin-gold" style="left:40%;"></div>
+  </div>
+
+  <!-- Main content -->
+  <div class="hero-inner">
+    <p class="breadcrumb"><a href="index.html">Murder Board</a> &nbsp;/&nbsp; Mystery Series</p>
+
+    <div class="hero-badges">
+      <span class="badge badge-genre">Mystery</span>
+      <span class="badge badge-status-ongoing">● Ongoing</span>
+      <span class="badge badge-vol">Vol. I</span>
+    </div>
+
+    <h1 class="hero-title">The Rittenhouse<br>Dog Walker</h1>
+    <p class="hero-subtitle">A Philadelphia mystery in eight episodes &amp; counting</p>
+
+    <div class="hero-meta-row">
+      <div class="hero-meta-item">
+        <span class="meta-label">Episodes</span>
+        <span class="meta-value">8 · Ongoing</span>
+      </div>
+      <div class="meta-divider"></div>
+      <div class="hero-meta-item">
+        <span class="meta-label">Published</span>
+        <span class="meta-value">Weekly</span>
+      </div>
+      <div class="meta-divider"></div>
+      <div class="hero-meta-item">
+        <span class="meta-label">Latest</span>
+        <span class="meta-value">Ep. 8 — Apr 28</span>
+      </div>
+      <div class="meta-divider"></div>
+      <div class="hero-meta-item">
+        <span class="meta-label">Author</span>
+        <span class="meta-value">M. V. Ashford</span>
+      </div>
+    </div>
+
+    <p class="hero-desc">A young dog walker on the streets of Philadelphia stumbles onto a missing manuscript — and the body of the man who wrote it. The leash leads somewhere the police aren't looking. Each episode ends with a board.</p>
+
+    <div class="hero-ctas">
+      <a class="btn-primary" href="#">Read Episode 1</a>
+      <a class="btn-ghost" href="#episodes">All Episodes</a>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">12 Suspects</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item">Locked Room</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item">No Forced Entry</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item">Missing Will</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item">Poison Undetermined</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item">3 Alibis Disproven</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item">Ongoing Investigation</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item">Episode 10 — Apr 28</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item">12 Suspects</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item">Locked Room</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item">No Forced Entry</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item">Missing Will</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item">Poison Undetermined</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item">3 Alibis Disproven</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item">Ongoing Investigation</span><span class="marquee-dot">✦</span>
+    <span class="marquee-item">Episode 10 — Apr 28</span><span class="marquee-dot">✦</span>
+  </div>
+</div>
+
+<!-- ─── EPISODES ─── -->
+<section id="episodes" data-screen-label="Episode List">
+  <div class="section-inner">
+    <p class="section-label reveal">Case Files</p>
+    <h2 class="section-heading reveal">All Episodes</h2>
+
+    <div class="episode-list stagger" id="episode-list">
+
+      <div class="episode-item reveal" tabindex="0">
+        <div class="episode-num">01</div>
+        <div class="episode-body">
+          <div class="episode-status-row">
+            <span class="ep-status ep-status-read">Read</span>
+            <span class="ep-date">March 3, 2026</span>
+          </div>
+          <h3 class="episode-title">The Body in the Study</h3>
+          <p class="episode-desc">Victor Hargrove is found dead at his desk just after midnight. The door was locked from the inside. His solicitor arrives to find the family already at war over an inheritance no one can locate.</p>
+        </div>
+        <div class="episode-right">
+          <span class="episode-read-time">~24 min</span>
+          <div class="episode-arrow">→</div>
+        </div>
+      </div>
+
+      <div class="episode-item reveal" tabindex="0">
+        <div class="episode-num">02</div>
+        <div class="episode-body">
+          <div class="episode-status-row">
+            <span class="ep-status ep-status-read">Read</span>
+            <span class="ep-date">March 10, 2026</span>
+          </div>
+          <h3 class="episode-title">Six Heirs, One Night</h3>
+          <p class="episode-desc">Detective Rowe interviews each member of the household. Every one of them had reason to want Victor dead — and every one of them has an alibi with a hole in it.</p>
+        </div>
+        <div class="episode-right">
+          <span class="episode-read-time">~28 min</span>
+          <div class="episode-arrow">→</div>
+        </div>
+      </div>
+
+      <div class="episode-item reveal" tabindex="0">
+        <div class="episode-num">03</div>
+        <div class="episode-body">
+          <div class="episode-status-row">
+            <span class="ep-status ep-status-read">Read</span>
+            <span class="ep-date">March 17, 2026</span>
+          </div>
+          <h3 class="episode-title">The Solicitor's Files</h3>
+          <p class="episode-desc">A second will surfaces — dated three days before the death. The solicitor claims he knew nothing of it. The ink doesn't match the pen found in the study.</p>
+        </div>
+        <div class="episode-right">
+          <span class="episode-read-time">~22 min</span>
+          <div class="episode-arrow">→</div>
+        </div>
+      </div>
+
+      <div class="episode-item reveal" tabindex="0">
+        <div class="episode-num">04</div>
+        <div class="episode-body">
+          <div class="episode-status-row">
+            <span class="ep-status ep-status-read">Read</span>
+            <span class="ep-date">March 24, 2026</span>
+          </div>
+          <h3 class="episode-title">What Eleanor Saw</h3>
+          <p class="episode-desc">The youngest heir claims she saw a figure leaving the study at 11pm. Her account changes twice under questioning. Rowe finds a handwritten note tucked behind the fireplace mantle.</p>
+        </div>
+        <div class="episode-right">
+          <span class="episode-read-time">~26 min</span>
+          <div class="episode-arrow">→</div>
+        </div>
+      </div>
+
+      <div class="episode-item reveal" tabindex="0">
+        <div class="episode-num">05</div>
+        <div class="episode-body">
+          <div class="episode-status-row">
+            <span class="ep-status ep-status-read">Read</span>
+            <span class="ep-date">March 31, 2026</span>
+          </div>
+          <h3 class="episode-title">The Missing Hour</h3>
+          <p class="episode-desc">Forensics confirm Victor died between 10:30pm and midnight. The household's clocks had all been set forward by twenty minutes. Someone had planned for an alibi that didn't exist.</p>
+        </div>
+        <div class="episode-right">
+          <span class="episode-read-time">~30 min</span>
+          <div class="episode-arrow">→</div>
+        </div>
+      </div>
+
+      <div class="episode-item reveal" tabindex="0">
+        <div class="episode-num">06</div>
+        <div class="episode-body">
+          <div class="episode-status-row">
+            <span class="ep-status ep-status-read">Read</span>
+            <span class="ep-date">April 7, 2026</span>
+          </div>
+          <h3 class="episode-title">Arsenic &amp; Old Lace</h3>
+          <p class="episode-desc">The toxicology report changes everything. Rowe traces the poison to a bottle of sherry, but the glass had been washed. The only prints on the decanter belong to a man who died in 1987.</p>
+        </div>
+        <div class="episode-right">
+          <span class="episode-read-time">~27 min</span>
+          <div class="episode-arrow">→</div>
+        </div>
+      </div>
+
+      <div class="episode-item reveal" tabindex="0">
+        <div class="episode-num">07</div>
+        <div class="episode-body">
+          <div class="episode-status-row">
+            <span class="ep-status ep-status-read">Read</span>
+            <span class="ep-date">April 14, 2026</span>
+          </div>
+          <h3 class="episode-title">Portraits and Lies</h3>
+          <p class="episode-desc">A painting in the west hall is not what it seems. Hidden behind the canvas: correspondence that Victor had kept secret for decades. Rowe eliminates three suspects — and adds two new ones.</p>
+        </div>
+        <div class="episode-right">
+          <span class="episode-read-time">~25 min</span>
+          <div class="episode-arrow">→</div>
+        </div>
+      </div>
+
+      <div class="episode-item reveal" tabindex="0">
+        <div class="episode-num">08</div>
+        <div class="episode-body">
+          <div class="episode-status-row">
+            <span class="ep-status ep-status-read">Read</span>
+            <span class="ep-date">April 21, 2026</span>
+          </div>
+          <h3 class="episode-title">The Night Gardener</h3>
+          <p class="episode-desc">A witness nobody interviewed: the groundskeeper, who lives off the estate and isn't listed on any staff registry. He saw two people enter the study that evening. He only saw one leave.</p>
+        </div>
+        <div class="episode-right">
+          <span class="episode-read-time">~29 min</span>
+          <div class="episode-arrow">→</div>
+        </div>
+      </div>
+
+      <!-- LOCKED EPISODES -->
+      <div class="episode-item reveal" style="opacity:0.45; cursor:default;" tabindex="-1">
+        <div class="episode-num" style="color:rgba(192,0,26,0.15);">09</div>
+        <div class="episode-body">
+          <div class="episode-status-row">
+            <span class="ep-status ep-status-new">New · Apr 28</span>
+          </div>
+          <h3 class="episode-title" style="color:var(--cream-dim);">The Second Key <span class="cursor"></span></h3>
+          <p class="episode-desc">Subscribe to receive Episode 9 when it drops on April 28.</p>
+        </div>
+        <div class="episode-right">
+          <a class="btn-primary" href="#subscribe" style="font-size:0.6rem; padding:0.6rem 1rem;">Subscribe</a>
+        </div>
+      </div>
+
+      <div class="episode-item reveal" style="opacity:0.25; cursor:default;" tabindex="-1">
+        <div class="episode-num" style="color:rgba(192,0,26,0.1);">10</div>
+        <div class="episode-body">
+          <div class="episode-status-row">
+            <span class="ep-date">May 5, 2026</span>
+          </div>
+          <h3 class="episode-title" style="color:var(--cream-dim);">Coming Soon</h3>
+        </div>
+        <div class="episode-right"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ─── MURDER BOARD ─── -->
+<section id="murder-board" data-screen-label="Murder Board">
+  <div class="section-inner">
+    <div class="board-header reveal">
+      <div class="board-episode-tag">
+        <span class="tag-label">Murder Board</span>
+        <span class="tag-ep">// Episode 8 — The Night Gardener</span>
+      </div>
+      <h2 class="board-heading">The Board So Far</h2>
+      <p class="board-subhead">Where we stand after eight episodes. Every connection, every suspect, every piece of evidence — pinned in place. <em>New threads added after Episode 9.</em></p>
+    </div>
+
+    <div class="cork-board-outer reveal">
+
+      <!-- STRING LAYER -->
+      <svg class="board-strings" viewBox="0 0 1020 520" preserveAspectRatio="xMidYMid meet">
+        <!-- Victor → Eleanor -->
+        <line x1="175" y1="100" x2="370" y2="165" stroke="#c0001a" stroke-width="1.5" opacity="0.7"/>
+        <!-- Victor → Solicitor -->
+        <line x1="175" y1="100" x2="620" y2="85" stroke="#c0001a" stroke-width="1.5" opacity="0.65"/>
+        <!-- Victor → Groundskeeper -->
+        <line x1="175" y1="100" x2="840" y2="240" stroke="#c0001a" stroke-width="1" opacity="0.5"/>
+        <!-- Eleanor → note -->
+        <line x1="370" y1="200" x2="510" y2="300" stroke="#c0001a" stroke-width="1.2" opacity="0.55"/>
+        <!-- Solicitor → forged will -->
+        <line x1="680" y1="120" x2="760" y2="340" stroke="#c0001a" stroke-width="1.2" opacity="0.6"/>
+        <!-- clocks → missing hour -->
+        <line x1="120" y1="330" x2="310" y2="390" stroke="#f5e642" stroke-width="1" opacity="0.4"/>
+        <!-- Groundskeeper → entrance -->
+        <line x1="850" y1="280" x2="680" y2="400" stroke="#c0001a" stroke-width="1" opacity="0.4" stroke-dasharray="5 4"/>
+        <!-- pin markers -->
+        <circle cx="175" cy="100" r="4" fill="#c0001a" opacity="0.9"/>
+        <circle cx="370" cy="165" r="3" fill="#c0001a" opacity="0.8"/>
+        <circle cx="620" cy="85" r="3" fill="#c0001a" opacity="0.8"/>
+        <circle cx="840" cy="240" r="3" fill="#c0001a" opacity="0.7"/>
+        <circle cx="510" cy="300" r="3" fill="#c0001a" opacity="0.7"/>
+        <circle cx="760" cy="340" r="3" fill="#c0001a" opacity="0.7"/>
+        <circle cx="120" cy="330" r="3" fill="#f5e642" opacity="0.6"/>
+        <circle cx="850" cy="280" r="3" fill="#c0001a" opacity="0.7"/>
+      </svg>
+
+      <!-- VICTIM -->
+      <div class="board-item" style="top:4%; left:12%;">
+        <div class="pin"></div>
+        <div class="polaroid" style="width:120px; transform:rotate(-3deg);">
+          <div class="polaroid-img" style="height:100px;">victim photograph<br>#001</div>
+          <div class="polaroid-cap">VICTOR HARGROVE — DECEASED</div>
+        </div>
+      </div>
+
+      <!-- Eleanor post-it -->
+      <div class="board-item" style="top:22%; left:32%;">
+        <div class="pin pin-white" style="left:65%;"></div>
+        <div class="id-card" style="width:160px; transform:rotate(1.5deg);">
+          <div class="id-role">Suspect — Heir</div>
+          <div class="id-name">Eleanor Hargrove</div>
+          <div class="id-detail">Age 31 · Youngest child<br>Alibi: "In her room"<br><span style="color:var(--red);">✗ Disproven Ep.4</span></div>
+        </div>
+      </div>
+
+      <!-- Typed note -->
+      <div class="board-item" style="top:48%; left:44%;">
+        <div class="pin" style="left:40%;"></div>
+        <div class="typed-note" style="width:160px; transform:rotate(-2deg);">
+          <div class="note-header">Detective's Note</div>
+          Someone entered study at<br>~10:45pm. Eleanor confirms<br>figure. <strong>Who was second?</strong><br><br>Check: wine cellar key. Ask<br>Pemberton about the 1987<br>correspondence.
+        </div>
+      </div>
+
+      <!-- Solicitor ID -->
+      <div class="board-item" style="top:5%; left:56%;">
+        <div class="pin pin-gold" style="left:55%;"></div>
+        <div class="id-card" style="width:160px; transform:rotate(2deg);">
+          <div class="id-role">Witness / Suspect</div>
+          <div class="id-name">H. Pemberton</div>
+          <div class="id-detail">Age 58 · Family Solicitor<br>Claims no second will<br><span style="color:#e8a020;">⚠ Ink mismatch — Ep.3</span></div>
+        </div>
+      </div>
+
+      <!-- Newspaper clipping -->
+      <div class="board-item" style="top:52%; left:68%;">
+        <div class="pin" style="left:30%;"></div>
+        <div class="clipping" style="transform:rotate(1.5deg);">
+          <div class="clipping-headline">HARGROVE ESTATE HEIR DISPUTE SURFACES</div>
+          <div class="clipping-body">Solicitor Pemberton denies knowledge of second testament. Family sources indicate Victor had signalled intent to revise distribution weeks before his death. Police are not ruling out foul play.</div>
+        </div>
+      </div>
+
+      <!-- Groundskeeper post-it -->
+      <div class="board-item" style="top:32%; left:78%;">
+        <div class="pin pin-white" style="left:70%;"></div>
+        <div class="postit postit-r" style="max-width:130px; transform:rotate(-3deg);">
+          SAW 2 ENTER<br>ONLY 1 LEFT<br><br>→ WHO?
+        </div>
+      </div>
+
+      <!-- Clocks note -->
+      <div class="board-item" style="top:52%; left:6%;">
+        <div class="pin pin-gold" style="left:50%;"></div>
+        <div class="postit postit-y" style="max-width:140px; transform:rotate(-1.5deg);">
+          ALL CLOCKS<br>+20 MINUTES<br><br>pre-planned alibi<br>→ ep. 5
+        </div>
+      </div>
+
+      <!-- Poison evidence -->
+      <div class="board-item" style="bottom:7%; left:25%;">
+        <div class="pin" style="left:60%;"></div>
+        <div class="typed-note" style="width:175px; transform:rotate(1deg);">
+          <div class="note-header">Lab Report #03</div>
+          Arsenic — sherry decanter.<br>Glass washed. One print:<br>R. Hargrove Sr. (d.1987)<br><br><span style="color:var(--red);">⚠ Impossible. Planted?</span>
+        </div>
+      </div>
+
+      <!-- Annotation labels -->
+      <div class="annotation" style="top:3%; left:3%;">CONFIRMED DEAD</div>
+      <div class="annotation" style="top:3%; right:5%;">UNCONFIRMED WITNESS</div>
+      <div class="annotation" style="bottom:2%; right:3%;">PHYSICAL EVIDENCE</div>
+
+    </div><!-- /cork-board-outer -->
+
+    <div class="board-legend reveal">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--red);"></div>
+        Confirmed connection
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:rgba(192,0,26,0.35);"></div>
+        Suspected connection
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#f5e642;"></div>
+        Physical evidence
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:rgba(200,195,178,0.35);"></div>
+        Unverified
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ─── AUTHOR ─── -->
+<section id="author" data-screen-label="Author">
+  <div class="section-inner">
+    <div class="author-grid reveal">
+      <div class="author-photo">author<br>photograph</div>
+      <div>
+        <p class="author-label">Written by</p>
+        <h3 class="author-name">M. V. Ashford</h3>
+        <p class="author-bio">M. V. Ashford is the author of three acclaimed mystery novels and a former criminal defense investigator. She writes about people who lie convincingly — because she has spent twenty years watching them do it. <em>The Hargrove Inheritance</em> is her first serialized work. She lives somewhere with a very long winter and a very good library.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SUBSCRIBE ─── -->
+<section id="subscribe" data-screen-label="Subscribe">
+  <div class="section-inner">
+    <p class="sub-eyebrow reveal">Stay on the case</p>
+    <h2 class="sub-heading reveal">Episode 9 Drops<br><em>April 28.</em></h2>
+    <p class="sub-desc reveal">Subscribe to get every new episode the moment it's out — plus the full murder board unlocked when the series closes.</p>
+    <div class="sub-form reveal">
+      <input class="sub-input" type="email" placeholder="your@email.com" id="sub-email">
+      <button class="sub-btn" id="sub-btn">Subscribe</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a class="footer-logo" href="index.html" style="display:flex; align-items:center;"><img src="assets/murder-board-logo.png" alt="Murder Board" style="height:28px; width:auto; filter:brightness(0) invert(1);"></a>
+  <span class="footer-copy">© 2026 Murder Board Publishing</span>
+</footer>
+
+<script>
+// Reveal on scroll
+const revealEls = document.querySelectorAll('.reveal');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+revealEls.forEach(el => obs.observe(el));
+
+// Subscribe
+const subBtn = document.getElementById('sub-btn');
+const subEmail = document.getElementById('sub-email');
+subBtn.addEventListener('click', () => {
+  const v = subEmail.value.trim();
+  if (!v || !v.includes('@')) {
+    subEmail.style.borderColor = 'var(--red)';
+    subEmail.placeholder = 'enter a valid email';
+    return;
+  }
+  subBtn.textContent = 'On the Case ✓';
+  subBtn.style.background = '#1a5c1a';
+  subBtn.style.borderColor = '#1a5c1a';
+  subEmail.disabled = true;
+  subBtn.disabled = true;
+});
+subEmail.addEventListener('input', () => {
+  subEmail.style.borderColor = '';
+  subEmail.placeholder = 'your@email.com';
+});
+
+// Episode hover — subtle parallax tilt
+document.querySelectorAll('.episode-item').forEach(item => {
+  if (item.style.cursor === 'default') return;
+  item.addEventListener('click', () => {
+    // Navigate to episode (placeholder)
+  });
+});
+
+// Parallax on board items
+const boardItems = document.querySelectorAll('.board-item');
+document.querySelector('.cork-board-outer')?.addEventListener('mousemove', e => {
+  const rect = e.currentTarget.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const dx = (e.clientX - cx) / (rect.width / 2);
+  const dy = (e.clientY - cy) / (rect.height / 2);
+  boardItems.forEach((item, i) => {
+    const depth = 0.5 + (i % 3) * 0.3;
+    const tx = dx * depth * 6;
+    const ty = dy * depth * 4;
+    const existingTransform = item.style.transform || '';
+    const baseRotation = existingTransform.match(/rotate\([^)]+\)/)?.[0] || '';
+    item.style.transform = `translate(${tx}px, ${ty}px) ${baseRotation}`;
+  });
+});
+
+document.querySelector('.cork-board-outer')?.addEventListener('mouseleave', () => {
+  boardItems.forEach(item => {
+    const existingTransform = item.style.transform || '';
+    const baseRotation = existingTransform.match(/rotate\([^)]+\)/)?.[0] || '';
+    item.style.transform = baseRotation;
+    item.style.transition = 'transform 0.5s ease';
+    setTimeout(() => { item.style.transition = ''; }, 500);
+  });
+});
+</script>
+</body>
+</html>

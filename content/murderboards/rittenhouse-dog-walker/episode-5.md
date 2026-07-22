@@ -12,6 +12,10 @@ James Halloway — deceased          %%id: victim%%
 ![[JamesHalloway.jpg]]
 Music/piano professor and jazz scholar at the Rittenhouse Conservatory. Announced he'd acquired a lost Della Mercer manuscript and was publishing a book on it. Found dead Friday morning, ruled suicide.
 
+## Summary
+
+Confirmations that raise questions instead of closing them — and a needle nobody has explained.
+
 ## Timeline
 
 - **Wednesday** — Realty office walkthrough. Confirmed.
@@ -45,6 +49,21 @@ No changes this episode. Marcus's reaction to the photo ("I don't recall Profess
 - Cornerstone Records / Victor Reese — noted.          %%id: cornerstone-records%%
 - [NEW] **An "official and urgent" envelope for 2D — Harmon & Associates LLP, on behalf of Cornerstone Records.** Lena photographed the return address; unopened. See **The Cornerstone demand letter**.          %%id: demand-letter%%
 - [NEW] **Halloway said he'd "stepped on some toes" with the book.** Doesn't connect to anything yet. Just sits there.          %%id: toes-comment%%
+
+## Connections
+
+- victim -> theo: suspected
+- victim -> diane: suspected
+- theo -> manuscript: suspected
+- theo -> newsletter: evidence
+- diane -> folder: evidence
+- manuscript -> letter: suspected
+- newsletter -> cornerstone-records: evidence
+- demand-letter -> cornerstone-records: confirmed
+- demand-letter -> manuscript: confirmed
+- syringe -> victim: unverified
+- timeline -> service-entrance: unverified
+- toes-comment -> victim: unverified
 
 ## Urgent / Now
 

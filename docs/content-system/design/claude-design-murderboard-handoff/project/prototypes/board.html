@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Board — Murder Board</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+body{margin:0;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.9rem 1.4rem;background:var(--dark);border-bottom:1px solid var(--line);
+  z-index:20;flex:0 0 auto;
+}
+.wordmark{font-family:var(--font-display);font-weight:900;font-size:1.3rem;letter-spacing:.02em}
+.wordmark .b{color:var(--red)}
+.topbar .meta{display:flex;flex-direction:column;align-items:center;gap:.2rem}
+.topbar .meta .eyebrow{font-size:.65rem}
+.toolbar{display:flex;gap:.5rem}
+.tool-btn{
+  font-family:var(--font-body);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--dark-2);border:1px solid var(--line);color:var(--cream-dim);
+  padding:.5em 1em;cursor:pointer;transition:border-color .2s,color .2s;
+}
+.tool-btn:hover,.tool-btn.active{border-color:var(--red);color:var(--cream)}
+
+.board-wrap{position:relative;flex:1 1 auto;overflow:hidden}
+#board{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(240,236,224,.03), transparent 60%),
+    repeating-linear-gradient(0deg,rgba(0,0,0,.15) 0 1px,transparent 1px 42px),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.15) 0 1px,transparent 1px 42px),
+    #241c14;
+  background-blend-mode:normal;
+  cursor:grab;
+}
+#board.panning{cursor:grabbing}
+#board-inner{position:absolute;left:0;top:0;width:2400px;height:1500px;transform-origin:0 0}
+
+#strings{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+#strings line{stroke:var(--red);stroke-width:2.5;opacity:.85;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+#strings line.pending{stroke-dasharray:6 6;opacity:.5}
+
+.pin-card{
+  position:absolute;width:170px;
+  background:var(--cream);color:#2a2118;
+  padding:1rem .9rem .8rem;
+  box-shadow:0 10px 24px rgba(0,0,0,.55);
+  cursor:grab;user-select:none;
+  font-family:var(--font-body);
+  transition:box-shadow .15s;
+}
+.pin-card:active{cursor:grabbing}
+.pin-card::before{
+  content:"";position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+  width:14px;height:14px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #ff5b5b, var(--red-dark) 70%);
+  box-shadow:0 3px 5px rgba(0,0,0,.6);
+}
+.pin-card.selected{outline:2px solid var(--red);outline-offset:3px}
+.pin-card.dragging{box-shadow:0 22px 40px rgba(0,0,0,.7);z-index:50}
+.pin-card .thumb{width:100%;height:110px;object-fit:cover;margin-bottom:.5rem;filter:sepia(.25) contrast(1.05)}
+.pin-card h3{font-family:var(--font-display);font-weight:700;font-size:1rem;margin:0 0 .2em;color:#1c1712}
+.pin-card p{font-size:.7rem;margin:0;color:#5a5040;line-height:1.35}
+.pin-card .tag{
+  display:inline-block;margin-top:.4em;font-size:.6rem;letter-spacing:.08em;
+  background:var(--yellow);color:#2a2118;padding:.15em .5em;text-transform:uppercase;
+}
+.pin-card .suspicion{position:absolute;top:8px;right:8px;width:10px;height:10px;border-radius:50%}
+.suspicion.low{background:#7c9;}
+.suspicion.med{background:var(--yellow)}
+.suspicion.high{background:var(--red)}
+.pin-card[data-rot="1"]{transform:rotate(-2deg)}
+.pin-card[data-rot="2"]{transform:rotate(1.5deg)}
+.pin-card[data-rot="3"]{transform:rotate(-1deg)}
+.pin-card[data-rot="0"]{transform:rotate(2deg)}
+
+.hint{
+  position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);
+  font-family:var(--font-body);font-size:.7rem;color:var(--cream-dim);
+  background:rgba(13,11,11,.8);padding:.5em 1em;border:1px solid var(--line);
+  z-index:15;letter-spacing:.05em;pointer-events:none;
+}
+
+/* modal */
+#modal-backdrop{
+  position:fixed;inset:0;background:rgba(13,11,11,.75);backdrop-filter:blur(3px);
+  display:none;align-items:center;justify-content:center;z-index:200;padding:2rem;
+}
+#modal-backdrop.open{display:flex}
+#modal{
+  background:var(--dark);border:1px solid var(--line);max-width:640px;width:100%;
+  max-height:85vh;overflow-y:auto;box-shadow:0 30px 70px rgba(0,0,0,.7);position:relative;
+}
+#modal .modal-head{padding:1.6rem 1.8rem 1rem;border-bottom:1px solid var(--line);position:relative}
+#modal .modal-head h2{font-size:1.8rem}
+#modal .close{
+  position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--cream-dim);
+  font-size:1.3rem;cursor:pointer;line-height:1;padding:.3em;
+}
+#modal .close:hover{color:var(--red)}
+#modal .modal-body{padding:1.4rem 1.8rem 1.8rem;display:grid;gap:1.2rem}
+#modal .gallery{display:flex;gap:.6rem;overflow-x:auto}
+#modal .gallery img{width:150px;height:110px;object-fit:cover;flex:0 0 auto;filter:sepia(.2)}
+#modal .desc{color:var(--cream-dim);font-family:var(--font-read);font-size:1.05rem;line-height:1.6}
+#modal .connections{font-size:.85rem}
+#modal .connections span.tag-label{color:var(--red);letter-spacing:.1em;font-size:.7rem;display:block;margin-bottom:.4em}
+#modal .connections ul{margin:0;padding-left:1.2em;color:var(--cream-dim)}
+#modal .notes{border-top:1px solid var(--line);padding-top:1rem;font-size:.85rem;color:var(--cream-dim);font-style:italic}
+</style>
+</head>
+<body>
+<svg class="grain" width="100%" height="100%">
+  <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <rect width="100%" height="100%" filter="url(#noise)"/>
+</svg>
+
+<div class="topbar">
+  <div class="wordmark">MURDER <span class="b">BOARD</span></div>
+  <div class="meta"><span class="eyebrow">Case File — Ep. 01</span></div>
+  <div class="toolbar">
+    <button class="tool-btn" id="recenter-btn">Re-center</button>
+    <button class="tool-btn active" id="string-btn">Strings: On</button>
+    <button class="tool-btn" id="connect-btn">+ Connect</button>
+  </div>
+</div>
+
+<div class="board-wrap">
+  <div id="board">
+    <div id="board-inner">
+      <svg id="strings"></svg>
+      <!-- cards injected by JS from CARD_DATA -->
+    </div>
+  </div>
+  <div class="hint" id="hint">Drag cards to rearrange · click a card to open its file · scroll/drag the board to pan</div>
+</div>
+
+<div id="modal-backdrop">
+  <div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-head">
+      <span class="eyebrow" id="modal-eyebrow"></span>
+      <h2 id="modal-title"></h2>
+      <button class="close" id="modal-close" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="gallery" id="modal-gallery"></div>
+      <p class="desc" id="modal-desc"></p>
+      <div class="connections">
+        <span class="tag-label">Connected to</span>
+        <ul id="modal-connections"></ul>
+      </div>
+      <p class="notes" id="modal-notes"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- CASE DATA: The Rittenhouse Dog Walker ---------- */
+/* Placeholder images from a neutral placeholder service. */
+const CARD_DATA = [
+  { id:'vic', type:'suspect', x:900, y:120, rot:1, name:'Dana Marsh', role:'Victim — found in Rittenhouse Park, 6:40am', img:'https://placehold.co/300x220/2a2118/f0ece0?text=Dana+Marsh', suspicion:null,
+    desc:'Freelance illustrator, 34. Walked the same loop through Rittenhouse Square every morning for her neighbor\'s dog, Biscuit. Found near the fountain by a jogger. No sign of forced entry to her apartment; her keys and phone were missing from the scene.',
+    connections:['Marcus Vell','Biscuit the Dog','The 6am Loop'], notes:'TOD estimated 5:50–6:15am. Phone still unaccounted for.' },
+  { id:'marcus', type:'suspect', x:1220, y:160, rot:2, name:'Marcus Vell', role:'Neighbor — dog\'s owner', img:'https://placehold.co/300x220/2a2118/f0ece0?text=Marcus+Vell', suspicion:'high',
+    desc:'Owns Biscuit; hired Dana six months ago. Says he was traveling for work, but his hotel checked him out a day early. Called Dana four times the night before — none of the calls were answered.',
+    connections:['Dana Marsh','Hotel Checkout Receipt','The 6am Loop'], notes:'Alibi doesn\'t hold past 11pm the night before. Worth another pull.' },
+  { id:'priya', type:'suspect', x:900, y:420, rot:0, name:'Priya Okafor', role:'Building super', img:'https://placehold.co/300x220/2a2118/f0ece0?text=Priya+Okafor', suspicion:'med',
+    desc:'Manages Dana\'s building. Claims she saw Dana leave at the usual time. Later admitted, when pressed, that she\'d let a "friend of Marcus\'s" into the building the week before — a detail she initially left out.',
+    connections:['Marcus Vell','Building Log'], notes:'Lied by omission once already. What else is she holding back?' },
+  { id:'loop', type:'location', x:1220, y:440, rot:3, name:'The 6am Loop', role:'Rittenhouse Square, fountain path', img:'https://placehold.co/300x220/1a1f3a/c8c3b2?text=Rittenhouse+Sq', suspicion:null,
+    desc:'Dana\'s fixed morning route, the same every day for six months — a habit anyone watching her could learn. Park cameras cover the entrance but not the fountain path itself.',
+    connections:['Dana Marsh','Marcus Vell'], notes:'Camera blind spot exactly where she was found. Coincidence, or design?' },
+  { id:'phone', type:'evidence', x:560, y:260, rot:2, name:'Missing Phone', role:'Evidence — last pinged 6:12am', img:'https://placehold.co/300x220/201919/ed1c2e?text=Phone+Log', suspicion:null,
+    desc:'Dana\'s phone last pinged a tower two blocks from the park at 6:12am, then went dark. Never recovered. Her call log shows four missed calls from Marcus between 10pm and midnight.',
+    connections:['Marcus Vell','Dana Marsh'], notes:'Went dark, not to voicemail — suggests powered off, not just out of range.' },
+  { id:'receipt', type:'evidence', x:560, y:520, rot:1, name:'Hotel Checkout Receipt', role:'Evidence — timestamp discrepancy', img:'https://placehold.co/300x220/201919/ed1c2e?text=Receipt', suspicion:null,
+    desc:'Marcus\'s hotel folio shows checkout at 9:40pm the night before Dana was found — five hours before he told police he left. Front desk confirms the timestamp.',
+    connections:['Marcus Vell'], notes:'A five-hour gap he hasn\'t explained.' },
+  { id:'note', type:'note', x:1550, y:280, rot:0, name:'Dana\'s Notebook', role:'Index card — found in her bag', img:'https://placehold.co/300x220/8b6914/1a140a?text=Notebook+Page', suspicion:null,
+    desc:'A torn page from Dana\'s sketchbook, tucked in her bag: "M keeps asking about the spare key. Told him no. Ask P about it — she\'ll remember." Undated.',
+    connections:['Marcus Vell','Priya Okafor'], notes:'She suspected something. Who is "P" — and did she ever ask?' },
+  { id:'dog', type:'evidence', x:1550, y:540, rot:2, name:'Biscuit the Dog', role:'Evidence — found tied to the fountain rail', img:'https://placehold.co/300x220/201919/ed1c2e?text=Biscuit', suspicion:null,
+    desc:'Found leashed and calm at the fountain, as if the walk had simply paused. No signs of struggle near the dog. Whoever it was, Biscuit didn\'t bark.',
+    connections:['Dana Marsh','The 6am Loop'], notes:'A dog that knows its attacker doesn\'t bark.' },
+];
+
+const PRESET_CONNECTIONS = [
+  ['vic','marcus'], ['vic','loop'], ['vic','phone'], ['vic','dog'],
+  ['marcus','phone'], ['marcus','receipt'], ['marcus','loop'], ['marcus','note'],
+  ['priya','marcus'], ['priya','note'],
+];
+
+const inner = document.getElementById('board-inner');
+const svg = document.getElementById('strings');
+const board = document.getElementById('board');
+const nameToId = {}; // display name -> card id, for "connections" list rendering
+CARD_DATA.forEach(c=>nameToId[c.name]=c.id);
+
+/* ---------- render cards ---------- */
+function renderCard(c){
+  const el = document.createElement('div');
+  el.className = 'pin-card';
+  el.dataset.id = c.id;
+  el.dataset.rot = c.rot;
+  el.style.left = c.x+'px';
+  el.style.top = c.y+'px';
+  el.tabIndex = 0;
+  el.innerHTML = `
+    ${c.suspicion?`<span class="suspicion ${c.suspicion}" title="Suspicion: ${c.suspicion}"></span>`:''}
+    <img class="thumb" src="${c.img}" alt="${c.name}">
+    <h3>${c.name}</h3>
+    <p>${c.role}</p>
+    <span class="tag">${c.type}</span>
+  `;
+  inner.appendChild(el);
+  return el;
+}
+CARD_DATA.forEach(renderCard);
+
+/* ---------- drag to reposition (physical: lift shadow, cursor grab) ---------- */
+let dragEl=null, dragOffX=0, dragOffY=0, scale=1;
+inner.querySelectorAll('.pin-card').forEach(el=>{
+  el.addEventListener('pointerdown', e=>{
+    // click vs drag disambiguation handled by movement threshold in click handler below
+    dragEl = el;
+    el.setPointerCapture(e.pointerId);
+    el.classList.add('dragging');
+    const rect = el.getBoundingClientRect();
+    dragOffX = (e.clientX - rect.left)/scale;
+    dragOffY = (e.clientY - rect.top)/scale;
+    el.dataset.moved = '0';
+    e.stopPropagation();
+  });
+  el.addEventListener('pointermove', e=>{
+    if(dragEl !== el) return;
+    const innerRect = inner.getBoundingClientRect();
+    let x = (e.clientX - innerRect.left)/scale - dragOffX;
+    let y = (e.clientY - innerRect.top)/scale - dragOffY;
+    x = Math.max(0, Math.min(2400-170, x));
+    y = Math.max(0, Math.min(1500-160, y));
+    el.style.left = x+'px'; el.style.top = y+'px';
+    el.dataset.moved = '1';
+    drawStrings();
+  });
+  el.addEventListener('pointerup', e=>{
+    if(dragEl !== el) return;
+    el.classList.remove('dragging');
+    const moved = el.dataset.moved === '1';
+    dragEl = null;
+    if(!moved) handleCardClick(el);
+  });
+});
+
+/* ---------- click a card: open detail modal (unless it was just dragged) ---------- */
+let selectedForConnect = null;
+let connectMode = false;
+function handleCardClick(el){
+  if(connectMode){
+    if(!selectedForConnect){
+      selectedForConnect = el;
+      el.classList.add('selected');
+    } else if(selectedForConnect !== el){
+      const a = selectedForConnect.dataset.id, b = el.dataset.id;
+      addUserConnection(a,b);
+      selectedForConnect.classList.remove('selected');
+      selectedForConnect = null;
+    }
+    return;
+  }
+  openModal(el.dataset.id);
+}
+inner.querySelectorAll('.pin-card').forEach(el=>{
+  el.addEventListener('keydown', e=>{ if(e.key==='Enter') handleCardClick(el); });
+});
+
+/* ---------- red string connections ---------- */
+let connections = PRESET_CONNECTIONS.map(c=>({a:c[0],b:c[1],user:false}));
+let stringsOn = true;
+function cardCenter(id){
+  const el = inner.querySelector(`.pin-card[data-id="${id}"]`);
+  const x = parseFloat(el.style.left)+85, y = parseFloat(el.style.top)+80;
+  return {x,y};
+}
+function drawStrings(){
+  svg.innerHTML = '';
+  if(!stringsOn) return;
+  connections.forEach(conn=>{
+    const p1 = cardCenter(conn.a), p2 = cardCenter(conn.b);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',p1.x); line.setAttribute('y1',p1.y);
+    line.setAttribute('x2',p2.x); line.setAttribute('y2',p2.y);
+    if(conn.user) line.classList.add('pending');
+    svg.appendChild(line);
+  });
+}
+function addUserConnection(a,b){
+  if(connections.some(c=>(c.a===a&&c.b===b)||(c.a===b&&c.b===a))) return;
+  connections.push({a,b,user:true});
+  drawStrings();
+}
+drawStrings();
+
+/* ---------- toolbar ---------- */
+document.getElementById('string-btn').addEventListener('click', e=>{
+  stringsOn = !stringsOn;
+  e.target.textContent = 'Strings: '+(stringsOn?'On':'Off');
+  e.target.classList.toggle('active', stringsOn);
+  drawStrings();
+});
+document.getElementById('connect-btn').addEventListener('click', e=>{
+  connectMode = !connectMode;
+  e.target.classList.toggle('active', connectMode);
+  document.getElementById('hint').textContent = connectMode
+    ? 'Connect mode: click a first card, then a second, to draw a string between them.'
+    : 'Drag cards to rearrange · click a card to open its file · scroll/drag the board to pan';
+  if(!connectMode && selectedForConnect){ selectedForConnect.classList.remove('selected'); selectedForConnect=null; }
+});
+document.getElementById('recenter-btn').addEventListener('click', ()=>{
+  board.scrollTo({left:600, top:200, behavior:'smooth'});
+});
+
+/* ---------- pan the board surface (drag empty space to scroll) ---------- */
+let panning=false, panStartX=0, panStartY=0, panScrollX=0, panScrollY=0;
+board.addEventListener('pointerdown', e=>{
+  if(e.target !== board) return;
+  panning = true; board.classList.add('panning');
+  panStartX = e.clientX; panStartY = e.clientY;
+  panScrollX = board.scrollLeft; panScrollY = board.scrollTop;
+});
+window.addEventListener('pointermove', e=>{
+  if(!panning) return;
+  board.scrollLeft = panScrollX - (e.clientX-panStartX);
+  board.scrollTop = panScrollY - (e.clientY-panStartY);
+});
+window.addEventListener('pointerup', ()=>{ panning=false; board.classList.remove('panning'); });
+board.scrollLeft = 600; board.scrollTop = 200;
+
+/* ---------- detail modal ---------- */
+const backdrop = document.getElementById('modal-backdrop');
+function openModal(id){
+  const c = CARD_DATA.find(x=>x.id===id);
+  document.getElementById('modal-eyebrow').textContent = c.type.toUpperCase()+' FILE';
+  document.getElementById('modal-title').textContent = c.name;
+  document.getElementById('modal-desc').textContent = c.desc;
+  document.getElementById('modal-notes').textContent = c.notes ? 'Case notes: '+c.notes : '';
+  const gal = document.getElementById('modal-gallery');
+  gal.innerHTML = `<img src="${c.img}" alt="${c.name}">` + (c.img2?`<img src="${c.img2}" alt="">`:'');
+  const ul = document.getElementById('modal-connections');
+  ul.innerHTML = (c.connections||[]).map(n=>`<li>${n}</li>`).join('') || '<li>None on file</li>';
+  backdrop.classList.add('open');
+  document.getElementById('modal-close').focus();
+}
+function closeModal(){ backdrop.classList.remove('open'); }
+document.getElementById('modal-close').addEventListener('click', closeModal);
+backdrop.addEventListener('click', e=>{ if(e.target===backdrop) closeModal(); });
+window.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+</script>
+</body>
+</html>

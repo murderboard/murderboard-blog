@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter One — Murder Board</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+body{margin:0}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--red);z-index:10;width:0%;transition:width .1s linear}
+header.chap{max-width:62ch;margin:5rem auto 2rem;padding:0 1.5rem;text-align:center}
+header.chap .eyebrow{display:block;margin-bottom:1rem}
+header.chap h1{font-size:clamp(2rem,5vw,3rem)}
+.byline{color:var(--cream-dim);font-size:.8rem;letter-spacing:.06em;margin-top:.6rem}
+article{max-width:66ch;margin:0 auto;padding:0 1.5rem 8rem;font-family:var(--font-read);font-size:1.28rem;line-height:1.75;color:var(--cream)}
+article p{margin:0 0 1.4em}
+article p:first-of-type::first-letter{
+  float:left;font-family:var(--font-display);font-weight:900;font-size:4.2rem;line-height:.8;
+  padding:.05em .08em 0 0;color:var(--red);
+}
+article .divider{text-align:center;color:var(--red-dark);margin:2.4em 0;font-size:1.2rem;letter-spacing:.4em}
+.back{position:fixed;top:1.2rem;left:1.2rem;z-index:5;color:var(--cream-dim);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none}
+.back:hover{color:var(--red)}
+</style>
+</head>
+<body>
+<svg class="grain" width="100%" height="100%">
+  <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <rect width="100%" height="100%" filter="url(#noise)"/>
+</svg>
+<div class="progress" id="progress"></div>
+<a class="back" href="index.html">← Gallery</a>
+<header class="chap">
+  <span class="eyebrow">Case File — Ep. 01</span>
+  <h1>I. The Usual Time</h1>
+  <p class="byline">THE RITTENHOUSE DOG WALKER</p>
+</header>
+<article>
+<p>Dana Marsh left her apartment at six-oh-four, same as she had every weekday morning for six months, the leash already looped twice around her wrist before she hit the stairwell. Biscuit went first. He always went first, nose down, tail up, indifferent to the cold snapping off the square's dry fountain. It was a route so fixed you could set a clock by it — and someone had.</p>
+<p>The doorman at the corner building would later remember seeing her pass at six-eleven. He always remembered seeing her; that was the trouble with a habit this precise. It made her easy to find and easier to miss, the way a metronome disappears into a room once you stop listening for it.</p>
+<p>By six-forty she was face-down near the fountain's north rail, and Biscuit was tied — tied, not merely dropped — to the same rail, sitting with the patience of a dog who had not seen anything worth barking at.</p>
+<div class="divider">⁂</div>
+<p>Marcus Vell would say, later and often, that he had been three states away. His hotel folio told a different story: checkout at nine-forty the night before, a five-hour gap between what he'd said and what the front desk clerk had stamped. Five hours is not an alibi. Five hours is a door left open.</p>
+<p>Priya Okafor, who ran the building the way she ran everything else — quietly, and only as much as she had to — remembered letting someone in the week before. A friend of Marcus's, she'd said, the first time. She would need to be asked again.</p>
+<p>In Dana's sketchbook, torn free and folded twice, a single line waited to be found: <em>M keeps asking about the spare key. Told him no. Ask P about it — she'll remember.</em> No date. No name for P that wasn't already a guess.</p>
+<p>Whoever had been watching the loop had learned it the way you learn a language you intend to use once.</p>
+</article>
+<script>
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+  document.getElementById('progress').style.width = pct+'%';
+});
+</script>
+</body>
+</html>

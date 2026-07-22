@@ -12,6 +12,10 @@ James Halloway — deceased          %%id: victim%%
 ![[JamesHalloway.jpg]]
 Music/piano professor and jazz scholar at the Rittenhouse Conservatory. Announced he'd acquired a lost Della Mercer manuscript and was publishing a book on it. Found dead Friday morning, ruled suicide.
 
+## Summary
+
+Four objects, no connections, and one conviction: the timing is wrong.
+
 ## Timeline
 
 - **Thursday morning** — Unknown. Realtor visit? Legal filing?
@@ -39,6 +43,15 @@ Business card in Halloway's foyer. Diane Ashford Realty. Margaret: "She does mos
 - **The lawyer's letter** — Law firm letterhead. Formal ownership claim. Date on letterhead — before the theft was reported? *[Didn't read it properly. Can't confirm yet.]*          %%id: letter%%
 - **The Conservatory Newsletter** — Public. Named Halloway, named the manuscript, announced auditions for a student ensemble to perform the recovered works. Anyone with a Google alert could have seen it.          %%id: newsletter%%
 - **The business card** — Cream card stock. Diane Ashford Realty. Console table, foyer. Under a grocery receipt.          %%id: card%%
+
+## Connections
+
+- victim -> claimant: unverified
+- victim -> diane: unverified
+- manuscript -> letter: suspected
+- manuscript -> newsletter: evidence
+- diane -> card: confirmed
+- timeline -> desk: evidence
 
 ## Urgent / Now
 

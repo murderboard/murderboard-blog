@@ -12,6 +12,10 @@ James Halloway — deceased          %%id: victim%%
 ![[JamesHalloway.jpg]]
 Music/piano professor and jazz scholar at the Rittenhouse Conservatory. Announced he'd acquired a lost Della Mercer manuscript and was publishing a book on it. Found dead Friday morning, ruled suicide.
 
+## Summary
+
+The board doubles overnight and points nowhere — accumulation, not theory.
+
 ## Timeline
 
 - **Wednesday** — [NEW] Realty office walkthrough. Confirmed by Marcus.
@@ -47,6 +51,19 @@ Been in the building years. Noticed the police dismissal without surprise. Volun
 - **The business card** — Cream card stock. Diane Ashford Realty. Console table, foyer.          %%id: card%%
 - **The branded folder on the counter** [NEW] — Corporate-looking, with a logo. Out of place among Halloway's academic clutter. Marcus noticed it during a building check; didn't open it. *[What is it? Who left it?]*          %%id: folder%%
 - **Something formal on the desk** [NEW] — Next to the lawyer's letter. Couldn't tell from the doorway.          %%id: desk-document%%
+
+## Connections
+
+- victim -> realty-visitor: suspected
+- victim -> diane: unverified
+- victim -> marcus: unverified
+- manuscript -> letter: suspected
+- manuscript -> newsletter: evidence
+- diane -> card: confirmed
+- realty-visitor -> folder: suspected
+- folder -> diane: suspected
+- timeline -> officer: unverified
+- desk-document -> letter: unverified
 
 ## Urgent / Now
 

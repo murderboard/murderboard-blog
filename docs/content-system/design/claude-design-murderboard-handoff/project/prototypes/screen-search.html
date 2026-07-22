@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search — Murder Board</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+body{margin:0;padding:2rem 1.2rem 6rem}
+.back{color:var(--cream-dim);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none}
+.back:hover{color:var(--red)}
+.search-wrap{max-width:640px;margin:2.4rem auto 0}
+.logo-row{display:flex;align-items:baseline;gap:.5rem;justify-content:center;margin-bottom:1.4rem}
+.logo-row .mark{width:26px;height:26px;border-radius:50%;background:conic-gradient(var(--red),var(--red-dark),var(--yellow),var(--red));flex:0 0 auto}
+.logo-row h1{font-family:var(--font-display);font-weight:900;font-size:1.6rem;margin:0}
+.logo-row h1 .find{color:var(--red)}
+.search-box{
+  display:flex;align-items:center;gap:.6em;background:var(--dark);border:1px solid var(--line);
+  padding:.8em 1.1em;border-radius:24px;
+}
+.search-box:focus-within{border-color:var(--red)}
+.search-box input{
+  flex:1;background:none;border:none;color:var(--cream);font-family:var(--font-body);font-size:.9rem;outline:none;
+}
+.search-box .go{color:var(--cream-dim);font-size:.9rem}
+.results-meta{font-size:.72rem;color:var(--cream-dim);margin:1.2rem 0 1.4rem;letter-spacing:.03em}
+.result{margin-bottom:1.6rem}
+.result .url{font-size:.75rem;color:var(--cream-dim);letter-spacing:.02em;margin-bottom:.2rem}
+.result h3{font-family:var(--font-body);font-weight:400;font-size:1.05rem;margin:0 0 .3rem}
+.result h3 a{color:#8ab4f8;text-decoration:none}
+.result h3 a:hover{color:var(--red)}
+.result.lead h3 a{color:var(--red)}
+.result p{font-size:.85rem;color:var(--cream-dim);margin:0;line-height:1.5}
+.related{margin-top:2.2rem;border-top:1px solid var(--line);padding-top:1.2rem}
+.related .eyebrow{display:block;margin-bottom:.7rem}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.chip{font-size:.75rem;color:var(--cream-dim);border:1px solid var(--line);padding:.4em .8em;border-radius:14px}
+</style>
+</head>
+<body>
+<svg class="grain" width="100%" height="100%">
+  <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <rect width="100%" height="100%" filter="url(#noise)"/>
+</svg>
+<a class="back" href="index.html">← Gallery</a>
+<div class="search-wrap">
+  <div class="logo-row"><span class="mark"></span><h1>Ask<span class="find">Ferret</span></h1></div>
+  <div class="search-box">
+    <span>🔍</span>
+    <input value="marcus vell hotel checkout time discrepancy" readonly aria-label="Search query">
+    <span class="go">↵</span>
+  </div>
+  <div class="results-meta">About 1,140 results — searched at 11:47 PM, eight days before</div>
+
+  <div class="result lead">
+    <div class="url">philadelphiadaily.example › local › estate-dispute-executor</div>
+    <h3><a href="screen-news.html">Local Illustrator's Estate Dispute Surfaces Amid Investigation</a></h3>
+    <p>...records show Dana Marsh had recently removed a close associate as executor of her estate, citing "trust concerns," according to a person familiar with the filing...</p>
+  </div>
+  <div class="result">
+    <div class="url">hotelfolioaccess.example › guest-timestamps-faq</div>
+    <h3><a href="#">Why does my checkout timestamp differ from what I remember?</a></h3>
+    <p>Front desk systems log the actual keycard deactivation time, which may differ from when a guest believes they departed...</p>
+  </div>
+  <div class="result">
+    <div class="url">forums.legalhelp.example › thread › executor-removal-key-access</div>
+    <h3><a href="#">Does removing someone as executor revoke their building access?</a></h3>
+    <p>Not automatically — property access and estate roles are handled through entirely separate paperwork. You'd need to notify...</p>
+  </div>
+  <div class="result">
+    <div class="url">rittenhousesq-assoc.example › camera-coverage-map</div>
+    <h3><a href="#">Rittenhouse Square Path Camera Coverage — Resident FAQ</a></h3>
+    <p>Cameras cover both park entrances and the main lawn. The fountain path on the north side currently has no direct coverage...</p>
+  </div>
+
+  <div class="related">
+    <span class="eyebrow">Related Searches</span>
+    <div class="chips">
+      <span class="chip">spare key liability laws</span>
+      <span class="chip">building super testimony reliability</span>
+      <span class="chip">dog walker route patterns</span>
+      <span class="chip">missing phone last ping meaning</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

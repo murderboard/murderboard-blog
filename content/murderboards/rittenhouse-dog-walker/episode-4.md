@@ -12,6 +12,10 @@ James Halloway — deceased          %%id: victim%%
 ![[JamesHalloway.jpg]]
 Music/piano professor and jazz scholar at the Rittenhouse Conservatory. Announced he'd acquired a lost Della Mercer manuscript and was publishing a book on it. Found dead Friday morning, ruled suicide.
 
+## Summary
+
+Two clusters that don't touch — Theo on one side, the realty office on the other, and no thread between them.
+
 ## Timeline
 
 - **Wednesday** — Realty office walkthrough. Confirmed.
@@ -47,6 +51,19 @@ Off today. Conversation still pending — tomorrow.
 - The business card — now fully paid off (led to the Ashford call).          %%id: card%%
 - The branded folder on the counter.          %%id: folder%%
 - Cornerstone Records / Victor Reese — noted, dormant.          %%id: cornerstone-records%%
+
+## Connections
+
+- victim -> theo: suspected
+- victim -> diane: suspected
+- victim -> marcus: unverified
+- theo -> manuscript: suspected
+- theo -> newsletter: evidence
+- diane -> card: confirmed
+- diane -> folder: evidence
+- manuscript -> letter: suspected
+- newsletter -> cornerstone-records: evidence
+- timeline -> service-entrance: unverified
 
 ## Urgent / Now
 

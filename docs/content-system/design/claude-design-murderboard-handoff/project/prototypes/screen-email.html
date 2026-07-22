@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inbox — Murder Board</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+body{margin:0;padding:0}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+@media (max-width:760px){.app{grid-template-columns:1fr}.sidebar{display:none}}
+.sidebar{border-right:1px solid var(--line);background:var(--dark);padding:1.2rem 0}
+.sidebar .brand{font-family:var(--font-display);font-weight:900;padding:0 1.2rem 1rem;font-size:1.1rem;border-bottom:1px solid var(--line);margin-bottom:.6rem}
+.sidebar .brand .b{color:var(--red)}
+.mail-item{padding:.9rem 1.2rem;border-left:3px solid transparent;cursor:pointer;transition:background .15s}
+.mail-item:hover{background:var(--dark-2)}
+.mail-item.active{border-left-color:var(--red);background:var(--dark-2)}
+.mail-item .from{font-family:var(--font-body);font-size:.8rem;color:var(--cream)}
+.mail-item .subj{font-size:.78rem;color:var(--cream-dim);margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mail-item .when{font-size:.65rem;color:var(--cream-dim);opacity:.7;margin-top:.2rem}
+
+.reading{padding:2rem 3rem 4rem;max-width:760px}
+.back{color:var(--cream-dim);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;display:inline-block;margin-bottom:1.5rem}
+.back:hover{color:var(--red)}
+.mail-head{border-bottom:1px solid var(--line);padding-bottom:1.2rem;margin-bottom:1.4rem}
+.mail-head h1{font-size:1.6rem;margin-bottom:.6rem}
+.mail-head .row{font-size:.8rem;color:var(--cream-dim);margin:.15rem 0}
+.mail-head .row b{color:var(--cream)}
+.mail-body{font-family:var(--font-read);font-size:1.1rem;line-height:1.7;color:var(--cream)}
+.mail-body p{margin:0 0 1.2em}
+.attachment{
+  display:inline-flex;align-items:center;gap:.6em;margin-top:1.4rem;padding:.7em 1em;
+  background:var(--dark-2);border:1px solid var(--line);font-family:var(--font-body);font-size:.8rem;cursor:pointer;
+}
+.attachment:hover{border-color:var(--red)}
+.attachment .icon{color:var(--red)}
+</style>
+</head>
+<body>
+<svg class="grain" width="100%" height="100%">
+  <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <rect width="100%" height="100%" filter="url(#noise)"/>
+</svg>
+<div class="app">
+  <div class="sidebar">
+    <div class="brand">CASE<span class="b">MAIL</span></div>
+    <div class="mail-item active">
+      <div class="from">Marsh &amp; Vell Legal Group</div>
+      <div class="subj">RE: Estate matters — will_final_draft</div>
+      <div class="when">Mon 8:12 PM</div>
+    </div>
+    <div class="mail-item">
+      <div class="from">Rittenhouse Sq. Assoc.</div>
+      <div class="subj">Reminder: fountain maintenance closure</div>
+      <div class="when">Sat 10:03 AM</div>
+    </div>
+    <div class="mail-item">
+      <div class="from">Priya Okafor</div>
+      <div class="subj">lease renewal — quick question</div>
+      <div class="when">Thu 4:47 PM</div>
+    </div>
+  </div>
+  <div class="reading">
+    <a class="back" href="index.html">← Gallery</a>
+    <div class="mail-head">
+      <span class="eyebrow">Evidence — Recovered Email</span>
+      <h1>RE: Estate matters — will_final_draft</h1>
+      <div class="row"><b>From:</b> Ellen Kwan, Marsh &amp; Vell Legal Group &lt;e.kwan@marshvelllegal.example&gt;</div>
+      <div class="row"><b>To:</b> Dana Marsh</div>
+      <div class="row"><b>Date:</b> Monday, 8:12 PM — eleven days before</div>
+    </div>
+    <div class="mail-body">
+      <p>Dana,</p>
+      <p>Attached is the finalized draft we discussed. As requested, I've removed Marcus Vell as executor and named your sister in his place — the change is reflected on page 4. I've also flagged, per your question, that revoking someone's access as executor does not by itself affect any property or spare-key arrangements made outside the will; that would need to be handled separately, in writing, with the building management.</p>
+      <p>Let me know if you'd like to sign this week. I know you mentioned wanting it settled "before anything changes."</p>
+      <p>Best,<br>Ellen</p>
+      <div class="attachment"><span class="icon">📎</span> will_final_draft.pdf — 214 KB</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

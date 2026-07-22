@@ -1,7 +1,7 @@
 ---
 series: rittenhouse-dog-walker
 episode: 6
-tag: "Episode 6"
+tag: "Episode 6 — The Apartment"
 title: The Board So Far
 ---
 
@@ -11,6 +11,10 @@ title: The Board So Far
 James Halloway — deceased          %%id: victim%%
 ![[JamesHalloway.jpg]]
 Music/piano professor and jazz scholar at the Rittenhouse Conservatory. Announced he'd acquired a lost Della Mercer manuscript and was publishing a book on it. Found dead Friday morning, ruled suicide.
+
+## Summary
+
+Inside the apartment at last — and the needle on the counter turns out to be the one thing in the room that wasn't his.
 
 ## Timeline
 
@@ -30,7 +34,9 @@ Music/piano professor and jazz scholar at the Rittenhouse Conservatory. Announce
 
 ## Suspects
 
-### Theo Thomas          %%id: theo%%
+### Theo Thomas · Conservatory student          %%id: theo%%
+
+![[TheoThomas.jpg]]
 
 No changes — still pinned at center, still wrong, still unresolved (offline since Episode 4). The new threatening note ("Della belongs to me") is a plausible fit for his profile — possessive, conservatory-adjacent, excluded from the performance — even though Lena hasn't drawn that line explicitly yet.
 
@@ -47,9 +53,31 @@ New name, new suspect. Her lawyer's letter — glimpsed in Episode 1, read in fu
 - The manuscript *(absent)*.          %%id: manuscript%%
 - The newsletter.          %%id: newsletter%%
 - The Ashford folder.          %%id: folder%%
+- **2D — Halloway's apartment** [NEW] — Inside it at last, with Marcus, under cover of handling the mail and the perishables. The kitchen, the counter, the fridge, the desk. ![[HallowayApartment2D.png]] *[Everything in here reads as ordinary until you know he used pens.]*          %%id: apartment%%
+- **The business card** — Cream card stock, Diane Ashford Realty. Console table, foyer. ![[DianeAshfordBusinessCard.png]] Already paid off — it's what led to the Ashford call.          %%id: card%%
+- **The lawyer's letter** — Read properly at last: Naomi Mercer's formal ownership claim on Della's manuscripts. Names her lawyer, and names an independent authenticator retained to verify.          %%id: letter%%
 - **The Cornerstone demand letter** — contents read, fully activated as a legal threat. Lena connects the return address to the envelope Marcus is carrying (Episode 5 callback). Catalog-value question from Episode 3 starting to feel concrete.          %%id: demand-letter%%
 - **The threatening note** — "Della belongs to me." Singular, possessive — reads personal, not corporate. Author unknown to Lena. Bagged by Halloway himself, signaling he took it seriously.          %%id: threat-note%%
 - "Stepped on some toes" comment — still unconnected.          %%id: toes-comment%%
+
+## Connections
+
+- victim -> theo: suspected
+- victim -> diane: suspected
+- victim -> claimant: suspected
+- victim -> apartment: confirmed
+- diane -> manuscript: suspected
+- diane -> folder: evidence
+- diane -> card: evidence
+- apartment -> manuscript: confirmed
+- apartment -> body-position: confirmed
+- apartment -> card: evidence
+- letter -> claimant: confirmed
+- letter -> manuscript: confirmed
+- demand-letter -> manuscript: confirmed
+- threat-note -> theo: suspected
+- syringe -> body-position: evidence
+- timeline -> service-entrance: unverified
 
 ## Urgent / Now
 

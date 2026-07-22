@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="design_doc_mode" content="canvas">
+<title>Murder Board — Logo Recreation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { font-family: 'Special Elite', monospace; }
+
+.frame {
+  position: absolute;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.frame-label {
+  position: absolute;
+  top: -34px;
+  left: 0;
+  font-family: 'Special Elite', monospace;
+  font-size: 13px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #888;
+  white-space: nowrap;
+}
+
+.frame-label b { color: #ed1c2e; }
+
+.logo-stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 44px;
+}
+
+.note {
+  position: absolute;
+  bottom: 14px;
+  left: 24px;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.wm {
+  font-family: 'Archivo Black', sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+</style>
+</head>
+<body>
+
+<!-- ════════ V1 — FAITHFUL REFRESH (dark) ════════ -->
+<div class="frame" style="left:80px; top:80px; width:760px; height:280px; background:#0d0b0b;">
+  <div class="frame-label">01 — <b>Faithful refresh</b> · cleaner geometry, on noir</div>
+  <div class="logo-stage">
+    <svg width="660" height="150" viewBox="0 0 840 150" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(0,5)">
+        <circle cx="70" cy="70" r="70" fill="#000"/>
+        <g stroke="#f0ece0" stroke-width="4" stroke-linecap="round" fill="none">
+          <line x1="42" y1="34" x2="92" y2="44"/>
+          <line x1="92" y1="44" x2="108" y2="86"/>
+          <line x1="108" y1="86" x2="78" y2="112"/>
+          <line x1="78" y1="112" x2="38" y2="100"/>
+          <line x1="38" y1="100" x2="42" y2="34"/>
+          <line x1="42" y1="34" x2="70" y2="72"/>
+          <line x1="92" y1="44" x2="70" y2="72"/>
+          <line x1="108" y1="86" x2="70" y2="72"/>
+          <line x1="78" y1="112" x2="70" y2="72"/>
+          <line x1="38" y1="100" x2="70" y2="72"/>
+        </g>
+        <g fill="#f0ece0">
+          <circle cx="42" cy="34" r="9"/>
+          <circle cx="92" cy="44" r="9"/>
+          <circle cx="108" cy="86" r="9"/>
+          <circle cx="78" cy="112" r="9"/>
+          <circle cx="38" cy="100" r="9"/>
+        </g>
+        <circle cx="70" cy="72" r="11" fill="#ed1c2e"/>
+      </g>
+      <text x="172" y="92" class="wm" font-size="58"><tspan fill="#f0ece0">MURDER</tspan><tspan fill="#ed1c2e" dx="22">BOARD</tspan></text>
+    </svg>
+  </div>
+  <div class="note" style="color:#666;">Current logo, rebuilt as vector</div>
+</div>
+
+<!-- ════════ V2 — RED-STRING (dark, red lines) ════════ -->
+<div class="frame" style="left:80px; top:440px; width:760px; height:280px; background:#0d0b0b;">
+  <div class="frame-label">02 — <b>Red string</b> · connections in crimson</div>
+  <div class="logo-stage">
+    <svg width="660" height="150" viewBox="0 0 840 150" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(0,5)">
+        <circle cx="70" cy="70" r="70" fill="#000"/>
+        <g stroke="#ed1c2e" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95">
+          <line x1="42" y1="34" x2="92" y2="44"/>
+          <line x1="92" y1="44" x2="108" y2="86"/>
+          <line x1="108" y1="86" x2="78" y2="112"/>
+          <line x1="78" y1="112" x2="38" y2="100"/>
+          <line x1="38" y1="100" x2="42" y2="34"/>
+          <line x1="42" y1="34" x2="70" y2="72"/>
+          <line x1="92" y1="44" x2="70" y2="72"/>
+          <line x1="108" y1="86" x2="70" y2="72"/>
+          <line x1="78" y1="112" x2="70" y2="72"/>
+          <line x1="38" y1="100" x2="70" y2="72"/>
+        </g>
+        <g fill="#f0ece0">
+          <circle cx="42" cy="34" r="9"/>
+          <circle cx="92" cy="44" r="9"/>
+          <circle cx="108" cy="86" r="9"/>
+          <circle cx="78" cy="112" r="9"/>
+          <circle cx="38" cy="100" r="9"/>
+        </g>
+        <circle cx="70" cy="72" r="12" fill="#ed1c2e" stroke="#fff" stroke-width="2.5"/>
+      </g>
+      <text x="172" y="92" class="wm" font-size="58"><tspan fill="#f0ece0">MURDER</tspan><tspan fill="#ed1c2e" dx="22">BOARD</tspan></text>
+    </svg>
+  </div>
+  <div class="note" style="color:#666;">String motif made literal — ties to "red string" theme</div>
+</div>
+
+<!-- ════════ V3 — POP NOIR (banner palette) ════════ -->
+<div class="frame" style="left:80px; top:800px; width:760px; height:280px; background:#16183a;">
+  <div class="frame-label">03 — <b>Pop noir</b> · banner palette (pink · yellow · navy)</div>
+  <div class="logo-stage">
+    <svg width="660" height="150" viewBox="0 0 840 150" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(0,5)">
+        <circle cx="70" cy="70" r="70" fill="#0d0b0b"/>
+        <g stroke="#f0ece0" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.85">
+          <line x1="42" y1="34" x2="92" y2="44"/>
+          <line x1="92" y1="44" x2="108" y2="86"/>
+          <line x1="108" y1="86" x2="78" y2="112"/>
+          <line x1="78" y1="112" x2="38" y2="100"/>
+          <line x1="38" y1="100" x2="42" y2="34"/>
+          <line x1="42" y1="34" x2="70" y2="72"/>
+          <line x1="92" y1="44" x2="70" y2="72"/>
+          <line x1="108" y1="86" x2="70" y2="72"/>
+          <line x1="78" y1="112" x2="70" y2="72"/>
+          <line x1="38" y1="100" x2="70" y2="72"/>
+        </g>
+        <g>
+          <circle cx="42" cy="34" r="9" fill="#ffd83d"/>
+          <circle cx="92" cy="44" r="9" fill="#f0ece0"/>
+          <circle cx="108" cy="86" r="9" fill="#ff3d8b"/>
+          <circle cx="78" cy="112" r="9" fill="#f0ece0"/>
+          <circle cx="38" cy="100" r="9" fill="#ffd83d"/>
+        </g>
+        <circle cx="70" cy="72" r="12" fill="#ed1c2e" stroke="#fff" stroke-width="2"/>
+      </g>
+      <text x="172" y="92" class="wm" font-size="58"><tspan fill="#f0ece0">MURDER</tspan><tspan fill="#ff3d8b" dx="22">BOARD</tspan></text>
+    </svg>
+  </div>
+  <div class="note" style="color:#9a9cc0;">Nodes become evidence pins — pink "BOARD" matches series art</div>
+</div>
+
+<!-- ════════ V4 — STACKED LOCKUP ════════ -->
+<div class="frame" style="left:920px; top:80px; width:520px; height:380px; background:#0d0b0b;">
+  <div class="frame-label">04 — <b>Stacked lockup</b> · avatar / square use</div>
+  <div class="logo-stage" style="flex-direction:column; gap:24px;">
+    <svg width="170" height="170" viewBox="0 0 170 170" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="85" cy="85" r="82" fill="#000"/>
+      <g transform="translate(15,15)">
+        <g stroke="#f0ece0" stroke-width="4" stroke-linecap="round" fill="none">
+          <line x1="42" y1="34" x2="92" y2="44"/>
+          <line x1="92" y1="44" x2="108" y2="86"/>
+          <line x1="108" y1="86" x2="78" y2="112"/>
+          <line x1="78" y1="112" x2="38" y2="100"/>
+          <line x1="38" y1="100" x2="42" y2="34"/>
+          <line x1="42" y1="34" x2="70" y2="72"/>
+          <line x1="92" y1="44" x2="70" y2="72"/>
+          <line x1="108" y1="86" x2="70" y2="72"/>
+          <line x1="78" y1="112" x2="70" y2="72"/>
+          <line x1="38" y1="100" x2="70" y2="72"/>
+        </g>
+        <g fill="#f0ece0">
+          <circle cx="42" cy="34" r="9"/>
+          <circle cx="92" cy="44" r="9"/>
+          <circle cx="108" cy="86" r="9"/>
+          <circle cx="78" cy="112" r="9"/>
+          <circle cx="38" cy="100" r="9"/>
+        </g>
+        <circle cx="70" cy="72" r="11" fill="#ed1c2e"/>
+      </g>
+    </svg>
+    <svg width="300" height="100" viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
+      <text x="150" y="42" class="wm" font-size="42" fill="#f0ece0" text-anchor="middle">MURDER</text>
+      <text x="150" y="86" class="wm" font-size="42" fill="#ed1c2e" text-anchor="middle">BOARD</text>
+    </svg>
+  </div>
+  <div class="note" style="color:#666;">For profile pics, app icons, merch</div>
+</div>
+
+<!-- ════════ V5 — LIGHT BG TEST ════════ -->
+<div class="frame" style="left:920px; top:540px; width:520px; height:280px; background:#f0ece0;">
+  <div class="frame-label">05 — <b>On light</b> · versatility check</div>
+  <div class="logo-stage">
+    <svg width="430" height="110" viewBox="0 0 580 110" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(0,2)">
+        <circle cx="52" cy="52" r="52" fill="#0d0b0b"/>
+        <g transform="translate(8,8) scale(0.62)">
+          <g stroke="#f0ece0" stroke-width="5.5" stroke-linecap="round" fill="none">
+            <line x1="42" y1="34" x2="92" y2="44"/>
+            <line x1="92" y1="44" x2="108" y2="86"/>
+            <line x1="108" y1="86" x2="78" y2="112"/>
+            <line x1="78" y1="112" x2="38" y2="100"/>
+            <line x1="38" y1="100" x2="42" y2="34"/>
+            <line x1="42" y1="34" x2="70" y2="72"/>
+            <line x1="92" y1="44" x2="70" y2="72"/>
+            <line x1="108" y1="86" x2="70" y2="72"/>
+            <line x1="78" y1="112" x2="70" y2="72"/>
+            <line x1="38" y1="100" x2="70" y2="72"/>
+          </g>
+          <g fill="#f0ece0">
+            <circle cx="42" cy="34" r="11"/>
+            <circle cx="92" cy="44" r="11"/>
+            <circle cx="108" cy="86" r="11"/>
+            <circle cx="78" cy="112" r="11"/>
+            <circle cx="38" cy="100" r="11"/>
+          </g>
+          <circle cx="70" cy="72" r="13" fill="#ed1c2e"/>
+        </g>
+      </g>
+      <text x="124" y="68" class="wm" font-size="42"><tspan fill="#0d0b0b">MURDER</tspan><tspan fill="#ed1c2e" dx="16">BOARD</tspan></text>
+    </svg>
+  </div>
+  <div class="note" style="color:#999;">Icon disc keeps it readable on any background</div>
+</div>
+
+</body>
+</html>

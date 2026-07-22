@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Philadelphia Daily Ledger — Murder Board</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+body{margin:0;padding:0 1.2rem 6rem}
+.back{color:var(--cream-dim);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;display:inline-block;margin-top:1.4rem}
+.back:hover{color:var(--red)}
+.masthead{text-align:center;padding:2rem 0 1.2rem;border-bottom:2px solid var(--line);max-width:760px;margin:0 auto}
+.masthead .title{font-family:var(--font-display);font-weight:900;font-size:2rem;letter-spacing:.02em}
+.masthead .tagline{font-size:.65rem;letter-spacing:.28em;text-transform:uppercase;color:var(--cream-dim);margin-top:.3rem}
+article{max-width:700px;margin:2rem auto 0}
+.kicker{display:block;margin-bottom:.8rem}
+h1.headline{font-size:clamp(1.8rem,4.5vw,2.6rem);line-height:1.1;margin-bottom:.8rem}
+.byline{font-size:.85rem;color:var(--cream-dim);border-bottom:1px solid var(--line);padding-bottom:1.2rem;margin-bottom:1.4rem}
+.byline b{color:var(--cream)}
+figure{margin:0 0 1.6rem}
+figure img{width:100%;object-fit:cover;height:340px;filter:grayscale(.3) contrast(1.05)}
+figcaption{font-size:.75rem;color:var(--cream-dim);margin-top:.5rem;font-style:italic}
+.body-copy{font-family:var(--font-read);font-size:1.15rem;line-height:1.75;color:var(--cream)}
+.body-copy p{margin:0 0 1.3em}
+blockquote{
+  font-family:var(--font-display);font-style:italic;font-size:1.5rem;color:var(--cream);
+  border-left:3px solid var(--red);padding-left:1.2rem;margin:2rem 0;line-height:1.4;
+}
+</style>
+</head>
+<body>
+<svg class="grain" width="100%" height="100%">
+  <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <rect width="100%" height="100%" filter="url(#noise)"/>
+</svg>
+<a class="back" href="index.html">← Gallery</a>
+<div class="masthead">
+  <div class="title">The Philadelphia Daily Ledger</div>
+  <div class="tagline">Local &amp; Regional News Since 1927</div>
+</div>
+<article>
+  <span class="eyebrow kicker">Local — Center City</span>
+  <h1 class="headline">Local Illustrator's Estate Dispute Surfaces Amid Ongoing Investigation</h1>
+  <div class="byline">By <b>Renata Cho</b>, Staff Writer · Published Tuesday, 6:00 AM</div>
+  <figure>
+    <img src="https://placehold.co/700x340/1a1f3a/c8c3b2?text=Rittenhouse+Square" alt="Rittenhouse Square fountain path, overcast morning">
+    <figcaption>The fountain path in Rittenhouse Square, photographed the morning after police closed the area to the public.</figcaption>
+  </figure>
+  <div class="body-copy">
+    <p>Court filings reviewed by the Ledger show that Dana Marsh, the 34-year-old illustrator found dead in Rittenhouse Square last week, had recently amended her will to remove a close associate as executor — a change her attorney says was finalized less than two weeks before her death.</p>
+    <p>"She wanted it settled quickly," said Ellen Kwan, the estate attorney who prepared the amendment, declining to name the associate being removed. "That's all I can say given the circumstances."</p>
+    <p>Neighbors have identified the associate in question as Marcus Vell, who lived in Marsh's building and employed her to walk his dog, Biscuit, six mornings a week. Vell has not responded to requests for comment. Building records show he was traveling the week of the incident, though hotel documentation obtained separately by this paper indicates his stay ended several hours earlier than he has publicly stated.</p>
+    <blockquote>"Removing someone as an executor and revoking their access to a building are two completely different processes — one doesn't undo the other."</blockquote>
+    <p>Legal experts note that estate changes and physical access — such as spare keys or door codes — are handled through entirely separate channels, meaning a falling-out reflected in a will might not be visible anywhere else on paper.</p>
+    <p>Police have not named a suspect. The investigation remains open.</p>
+  </div>
+</article>
+</body>
+</html>

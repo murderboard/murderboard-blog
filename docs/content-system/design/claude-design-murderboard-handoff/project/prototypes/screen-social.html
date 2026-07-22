@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glimmr — Murder Board</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+body{margin:0;display:flex;justify-content:center;min-height:100vh;padding:2rem 1rem}
+.phone{width:100%;max-width:390px;background:var(--black);border:1px solid var(--line);display:flex;flex-direction:column;min-height:82vh}
+.app-header{
+  display:flex;align-items:center;justify-content:space-between;padding:.9rem 1rem;border-bottom:1px solid var(--line);flex:0 0 auto;
+}
+.app-header .brand{font-family:var(--font-display);font-weight:900;font-size:1.1rem}
+.app-header .brand .g{color:var(--red)}
+.tabs{display:flex;gap:.3rem}
+.tab-btn{
+  font-family:var(--font-body);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;
+  background:none;border:1px solid var(--line);color:var(--cream-dim);padding:.4em .8em;cursor:pointer;
+}
+.tab-btn.active{border-color:var(--red);color:var(--cream)}
+.back{position:absolute;top:1.2rem;left:1.2rem;color:var(--cream-dim);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;z-index:2}
+.back:hover{color:var(--red)}
+
+.view{flex:1;overflow-y:auto;display:none}
+.view.active{display:block}
+
+/* profile view */
+.profile-head{display:flex;gap:1rem;padding:1.2rem 1rem;align-items:center}
+.avatar-lg{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#3a2f2f,#1a1414);flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:1.6rem;color:var(--cream-dim)}
+.profile-info h2{font-size:1.05rem;margin:0 0 .1rem}
+.handle{color:var(--cream-dim);font-size:.78rem;margin-bottom:.4rem}
+.stats{display:flex;gap:1rem;font-size:.75rem;color:var(--cream-dim)}
+.stats b{color:var(--cream);display:block;font-size:.9rem}
+.bio{padding:0 1rem 1rem;font-size:.82rem;color:var(--cream-dim);line-height:1.5}
+.post{border-top:1px solid var(--line)}
+.post img{width:100%;height:280px;object-fit:cover}
+.post-body{padding:.9rem 1rem}
+.post-meta{display:flex;gap:1rem;font-size:.8rem;color:var(--cream-dim);margin-bottom:.5rem}
+.caption{font-size:.85rem;line-height:1.5;margin-bottom:.9rem}
+.caption b{color:var(--cream)}
+.comments{border-top:1px solid var(--line);padding-top:.8rem;display:flex;flex-direction:column;gap:.6rem}
+.comment{font-size:.8rem;line-height:1.4}
+.comment b{color:var(--cream);margin-right:.3em}
+.comment span{color:var(--cream-dim)}
+
+/* DM view */
+.dm-header{padding:1rem;border-bottom:1px solid var(--line);text-align:center;position:relative}
+.dm-header .avatar{width:40px;height:40px;border-radius:50%;margin:0 auto .3rem;background:linear-gradient(135deg,#3a2f2f,#1a1414);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;color:var(--cream-dim)}
+.dm-thread{padding:1rem;display:flex;flex-direction:column;gap:.5rem}
+.dm-row{display:flex}
+.dm-row.me{justify-content:flex-end}
+.dm-bubble{max-width:78%;padding:.55em .85em;font-family:var(--font-body);font-size:.82rem;border-radius:14px;opacity:0;transform:translateY(6px);animation:pop .3s ease forwards}
+@keyframes pop{to{opacity:1;transform:translateY(0)}}
+.dm-bubble.them{background:var(--dark-2);border-bottom-left-radius:4px}
+.dm-bubble.me{background:linear-gradient(135deg,var(--red-dark),var(--red));border-bottom-right-radius:4px}
+.dm-hint{padding:.8rem;text-align:center;border-top:1px solid var(--line);font-family:var(--font-body);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-dim);cursor:pointer}
+.dm-hint:hover{color:var(--red)}
+.dm-hint[disabled]{opacity:.3;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.dm-bubble{animation:none;opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← Gallery</a>
+<div class="phone">
+  <div class="app-header">
+    <div class="brand">Glim<span class="g">mr</span></div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-profile">Profile</button>
+      <button class="tab-btn" id="tab-dm">DMs</button>
+    </div>
+  </div>
+
+  <div class="view active" id="view-profile">
+    <div class="profile-head">
+      <div class="avatar-lg">MV</div>
+      <div class="profile-info">
+        <h2>Marcus Vell</h2>
+        <div class="handle">@marcusvell_runs</div>
+        <div class="stats"><div><b>412</b>posts</div><div><b>3.2k</b>followers</div><div><b>289</b>following</div></div>
+      </div>
+    </div>
+    <div class="bio">Marathon training log 🏃 · Rittenhouse Sq. regular · dog dad to the best boy, Biscuit 🐕</div>
+    <div class="post">
+      <img src="https://placehold.co/390x280/1a1f3a/c8c3b2?text=Marathon+Training" alt="Marcus jogging in the park, posted photo">
+      <div class="post-body">
+        <div class="post-meta"><span>♥ 214 likes</span><span>18 comments</span></div>
+        <div class="caption"><b>marcusvell_runs</b> Back on the loop this morning — nothing clears my head like an early lap around the square. Miss having Dana walk Biscuit but he's adjusting 🐾</div>
+        <div class="comments">
+          <div class="comment"><b>runnerkate_</b><span>so sorry for your loss, Marcus 🕊️</span></div>
+          <div class="comment"><b>philly_pup_life</b><span>Biscuit looking good! glad he has you</span></div>
+          <div class="comment"><b>j.ortiz215</b><span>wait weren't you out of town that week?</span></div>
+          <div class="comment"><b>marcusvell_runs</b><span>@j.ortiz215 got back early, unrelated</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="view-dm">
+    <div class="dm-header">
+      <div class="avatar">MV</div>
+      <div style="font-family:var(--font-body);font-size:.8rem">marcusvell_runs</div>
+    </div>
+    <div class="dm-thread" id="dm-thread"></div>
+    <button class="dm-hint" id="dm-hint">Tap to continue</button>
+  </div>
+</div>
+<script>
+// Tab switching between the public profile and the private DM view
+document.getElementById('tab-profile').addEventListener('click', ()=>setTab('profile'));
+document.getElementById('tab-dm').addEventListener('click', ()=>setTab('dm'));
+function setTab(name){
+  document.getElementById('tab-profile').classList.toggle('active', name==='profile');
+  document.getElementById('tab-dm').classList.toggle('active', name==='dm');
+  document.getElementById('view-profile').classList.toggle('active', name==='profile');
+  document.getElementById('view-dm').classList.toggle('active', name==='dm');
+}
+
+// Story beat: the DM reveals a private tone at odds with the public grief post —
+// Marcus messaging a friend, more anxious than sad.
+const DMS = [
+  {who:'them', text:"hey did the detective call you too?"},
+  {who:'me', text:"yeah. asked about the hotel again."},
+  {who:'them', text:"what'd you tell them"},
+  {who:'me', text:"same thing. that I got back early, nothing to do with it."},
+  {who:'me', text:"just need everyone to stick to that"},
+  {who:'them', text:"marcus that's not nothing to do with it if it's five hours"},
+  {who:'me', text:"can we not do this over text"},
+];
+const dmThread = document.getElementById('dm-thread');
+const dmHint = document.getElementById('dm-hint');
+let di = 0;
+function renderDM(){
+  if(di >= DMS.length){ dmHint.textContent='End of conversation'; dmHint.disabled=true; return; }
+  const m = DMS[di];
+  const row = document.createElement('div');
+  row.className = 'dm-row '+(m.who==='me'?'me':'them');
+  const b = document.createElement('div');
+  b.className = 'dm-bubble '+(m.who==='me'?'me':'them');
+  b.textContent = m.text;
+  row.appendChild(b);
+  dmThread.appendChild(row);
+  di++;
+  dmThread.scrollTop = dmThread.scrollHeight;
+}
+dmHint.addEventListener('click', renderDM);
+renderDM();
+</script>
+</body>
+</html>

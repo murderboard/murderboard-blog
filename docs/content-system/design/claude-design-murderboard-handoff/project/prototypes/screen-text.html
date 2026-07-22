@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Messages — Murder Board</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+body{margin:0;display:flex;justify-content:center;min-height:100vh;padding:2rem 1rem}
+.phone{width:100%;max-width:390px;background:var(--black);border:1px solid var(--line);border-radius:2px;display:flex;flex-direction:column;min-height:80vh}
+.ph-header{
+  padding:1rem 1rem .8rem;border-bottom:1px solid var(--line);text-align:center;position:relative;flex:0 0 auto;
+}
+.ph-header .back{position:absolute;left:.8rem;top:1rem;color:var(--cream-dim);text-decoration:none;font-size:1rem}
+.ph-header .back:hover{color:var(--red)}
+.ph-header .avatar{
+  width:40px;height:40px;border-radius:50%;margin:0 auto .3rem;
+  background:linear-gradient(135deg,#3a2f2f,#1a1414);display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-weight:700;color:var(--cream-dim);
+}
+.ph-header .name{font-family:var(--font-body);font-size:.8rem;letter-spacing:.05em}
+.ph-header .sub{font-size:.65rem;color:var(--cream-dim);letter-spacing:.05em}
+
+.thread{flex:1;overflow-y:auto;padding:1.2rem 1rem;display:flex;flex-direction:column;gap:.5rem}
+.bubble-row{display:flex}
+.bubble-row.me{justify-content:flex-end}
+.bubble{
+  max-width:75%;padding:.6em .9em;font-family:var(--font-body);font-size:.85rem;line-height:1.4;
+  border-radius:14px;opacity:0;transform:translateY(8px);animation:pop .35s ease forwards;
+}
+@keyframes pop{to{opacity:1;transform:translateY(0)}}
+.bubble.them{background:var(--dark-2);color:var(--cream);border-bottom-left-radius:4px}
+.bubble.me{background:linear-gradient(135deg,var(--red-dark),var(--red));color:var(--cream);border-bottom-right-radius:4px}
+.timestamp{text-align:center;font-size:.65rem;color:var(--cream-dim);letter-spacing:.08em;margin:.6rem 0 .2rem;opacity:0;animation:pop .35s ease forwards}
+.typing{display:flex;gap:4px;padding:.6em .9em;background:var(--dark-2);border-radius:14px;width:fit-content;border-bottom-left-radius:4px}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--cream-dim);animation:tb 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes tb{0%,60%,100%{opacity:.3}30%{opacity:1}}
+
+.tap-hint{
+  flex:0 0 auto;padding:.8rem;text-align:center;border-top:1px solid var(--line);
+  font-family:var(--font-body);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-dim);
+  cursor:pointer;background:var(--dark);
+}
+.tap-hint:hover{color:var(--red)}
+.tap-hint[disabled]{opacity:.3;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.bubble,.timestamp{animation:none;opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<svg class="grain" width="100%" height="100%">
+  <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <rect width="100%" height="100%" filter="url(#noise)"/>
+</svg>
+<div class="phone">
+  <div class="ph-header">
+    <a class="back" href="index.html">←</a>
+    <div class="avatar">P</div>
+    <div class="name">Priya Okafor</div>
+    <div class="sub">Building Super</div>
+  </div>
+  <div class="thread" id="thread"></div>
+  <button class="tap-hint" id="tap-hint">Tap to continue</button>
+</div>
+<script>
+/* Story beat: Priya, pressed over text by "you" (the detective/player),
+   slips and reveals more than she meant to about who she let into the building. */
+const MESSAGES = [
+  {who:'them', text:"I already told the officer everything I saw."},
+  {who:'me', text:"I know. I just want to go over the building log with you again."},
+  {time:'TUESDAY 9:14 PM'},
+  {who:'them', text:"Fine. Dana left around six. Same as always."},
+  {who:'them', text:"I didn't see anyone else that morning."},
+  {who:'me', text:"What about the week before? You mentioned letting someone in."},
+  {who:'them', text:"A friend of Marcus's. He said he'd forgotten his key."},
+  {who:'me', text:"Did you get a name?"},
+  {time:'9:22 PM'},
+  {who:'them', text:"No. I didn't think it mattered."},
+  {who:'them', text:"He knew the code for the side door already, actually."},
+  {who:'them', text:"Wait — I shouldn't have said that."},
+  {who:'me', text:"Said what, Priya?"},
+  {who:'them', text:"Nothing. I have to go."},
+];
+
+const thread = document.getElementById('thread');
+const hint = document.getElementById('tap-hint');
+let i = 0;
+
+function renderNext(){
+  if(i >= MESSAGES.length){ hint.textContent = 'End of thread'; hint.disabled = true; return; }
+  const m = MESSAGES[i];
+  if(m.time){
+    const t = document.createElement('div');
+    t.className='timestamp'; t.textContent=m.time;
+    thread.appendChild(t);
+    i++; thread.scrollTop = thread.scrollHeight;
+    renderNext(); // timestamps render immediately, no extra tap needed
+    return;
+  }
+  const row = document.createElement('div');
+  row.className = 'bubble-row '+(m.who==='me'?'me':'them');
+  const b = document.createElement('div');
+  b.className = 'bubble '+(m.who==='me'?'me':'them');
+  b.textContent = m.text;
+  row.appendChild(b);
+  thread.appendChild(row);
+  i++;
+  thread.scrollTop = thread.scrollHeight;
+}
+
+// show a brief typing indicator before "them" messages for texture
+function showTypingThenNext(){
+  const next = MESSAGES[i];
+  if(next && next.who==='them'){
+    const row = document.createElement('div'); row.className='bubble-row';
+    row.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+    thread.appendChild(row); thread.scrollTop = thread.scrollHeight;
+    setTimeout(()=>{ row.remove(); renderNext(); }, 650);
+  } else {
+    renderNext();
+  }
+}
+
+hint.addEventListener('click', showTypingThenNext);
+renderNext(); // reveal the opener immediately
+</script>
+</body>
+</html>

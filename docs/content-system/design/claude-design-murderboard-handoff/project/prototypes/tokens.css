@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Special+Elite&family=IM+Fell+English&display=swap');
+
+:root{
+  --black:#0d0b0b;
+  --dark:#161212;
+  --dark-2:#201919;
+  --navy:#1a1f3a;
+  --red:#ed1c2e;
+  --red-dark:#a60d1a;
+  --yellow:#ffd83d;
+  --cream:#f0ece0;
+  --cream-dim:#c8c3b2;
+  --cork:#8b6914;
+  --line:rgba(240,236,224,0.14);
+  --font-display:'Playfair Display',serif;
+  --font-body:'Special Elite',monospace;
+  --font-read:'IM Fell English',serif;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--black);
+  color:var(--cream);
+  font-family:var(--font-body);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:900;margin:0 0 .4em;letter-spacing:.01em}
+p{margin:0 0 1em}
+a{color:var(--cream);text-decoration-color:var(--red);text-underline-offset:.2em}
+a:hover{color:var(--red)}
+img{max-width:100%;display:block}
+
+/* eyebrow label — typewriter, red, wide tracking */
+.eyebrow{
+  font-family:var(--font-body);
+  color:var(--red);
+  font-size:.72rem;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  display:inline-block;
+}
+
+/* redacted bar — cream or black over text, for teases/reveals */
+.redacted{
+  background:var(--black);
+  color:transparent;
+  border-radius:2px;
+  user-select:none;
+  cursor:default;
+}
+.redacted.cream{background:var(--cream)}
+
+/* buttons */
+.btn{
+  font-family:var(--font-body);
+  font-size:.8rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--cream);
+  background:var(--dark-2);
+  border:1px solid var(--line);
+  padding:.85em 1.6em;
+  cursor:pointer;
+  transition:border-color .2s,color .2s,background .2s;
+}
+.btn:hover{border-color:var(--red);color:var(--cream)}
+.btn.primary{background:var(--red-dark);border-color:var(--red-dark);color:var(--cream)}
+.btn.primary:hover{background:var(--red)}
+.btn:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+
+/* card base — index-card / manila feel */
+.card{
+  background:var(--dark);
+  border:1px solid var(--line);
+  box-shadow:0 12px 30px rgba(0,0,0,.5);
+}
+
+/* film grain overlay — fixed, above content, subtle */
+.grain{
+  position:fixed;inset:0;
+  pointer-events:none;
+  z-index:999;
+  opacity:.08;
+  mix-blend-mode:overlay;
+}
+
+/* vignette for hero/title surfaces */
+.vignette{
+  position:absolute;inset:0;
+  pointer-events:none;
+  background:radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.75) 100%);
+}
+
+/* spotlight beam from top-center */
+.spotlight{
+  position:absolute;inset:0;
+  pointer-events:none;
+  background:conic-gradient(from 180deg at 50% 0%, transparent 78%, rgba(240,236,224,.05) 88%, transparent 98%);
+}
+
+/* venetian blind shadows — animated horizontal lines */
+.blinds{
+  position:absolute;inset:0;
+  pointer-events:none;
+  background:repeating-linear-gradient(to bottom, rgba(0,0,0,.35) 0px, rgba(0,0,0,.35) 3px, transparent 3px, transparent 26px);
+  animation:blind-drift 18s linear infinite;
+  opacity:.5;
+}
+@keyframes blind-drift{0%{transform:translateY(0)}100%{transform:translateY(26px)}}
+
+@media (prefers-reduced-motion:reduce){
+  .blinds{animation:none}
+  html{scroll-behavior:auto}
+}
+
+::selection{background:var(--red-dark);color:var(--cream)}

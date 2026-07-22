@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Murder Board — Prototype Gallery</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+body{padding:6vw 6vw 10vw}
+header{max-width:70ch;margin:0 auto 4rem;text-align:center}
+header h1{font-size:clamp(2.4rem,6vw,4rem);margin:.3em 0}
+header h1 .board{color:var(--red)}
+header p{color:var(--cream-dim);font-family:var(--font-read);font-size:1.15rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.6rem;max-width:1200px;margin:0 auto}
+.tile{
+  position:relative;padding:2rem 1.6rem;text-decoration:none;color:var(--cream);
+  background:var(--dark);border:1px solid var(--line);overflow:hidden;
+  transition:transform .25s,border-color .25s;
+  min-height:170px;display:flex;flex-direction:column;justify-content:flex-end;gap:.6rem;
+}
+.tile::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(237,28,46,.06),transparent 60%);
+  opacity:0;transition:opacity .25s;
+}
+.tile:hover{transform:translateY(-4px);border-color:var(--red)}
+.tile:hover::before{opacity:1}
+.tile .num{font-family:var(--font-body);color:var(--red-dark);font-size:.75rem;letter-spacing:.2em}
+.tile h2{font-size:1.5rem;margin:0}
+.tile p{color:var(--cream-dim);font-size:.85rem;margin:0}
+footer{text-align:center;color:var(--cream-dim);font-size:.8rem;margin-top:5rem;letter-spacing:.1em}
+</style>
+</head>
+<body>
+<svg class="grain" width="100%" height="100%">
+  <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <rect width="100%" height="100%" filter="url(#noise)"/>
+</svg>
+<header>
+  <span class="eyebrow">A Murder Board Serial — Prototype Set</span>
+  <h1>MURDER <span class="board">BOARD</span></h1>
+  <p>Every way to read a case: the board itself, and the screens that deliver each chapter in-world.</p>
+</header>
+<div class="grid">
+  <a class="tile" href="board.html"><span class="num">THE BOARD</span><h2>Murder Board</h2><p>Draggable evidence, red string, detail files.</p></a>
+  <a class="tile" href="screen-header.html"><span class="num">01</span><h2>Title Card</h2><p>Cinematic chapter opener.</p></a>
+  <a class="tile" href="screen-scroll.html"><span class="num">02</span><h2>Long-Form Read</h2><p>A full chapter, comfortable reading.</p></a>
+  <a class="tile" href="screen-text.html"><span class="num">03</span><h2>Text Thread</h2><p>A conversation someone shouldn't have sent.</p></a>
+  <a class="tile" href="screen-email.html"><span class="num">04</span><h2>Inbox</h2><p>An email with an attachment worth opening.</p></a>
+  <a class="tile" href="screen-search.html"><span class="num">05</span><h2>Search Results</h2><p>Whatever she was looking up before it happened.</p></a>
+  <a class="tile" href="screen-news.html"><span class="num">06</span><h2>News Article</h2><p>The public record, such as it is.</p></a>
+  <a class="tile" href="screen-social.html"><span class="num">07</span><h2>Social Profile</h2><p>The persona, and the DMs behind it.</p></a>
+</div>
+<footer>CASE FILE — EP. 01 · THE RITTENHOUSE DOG WALKER</footer>
+</body>
+</html>
